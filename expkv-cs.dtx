@@ -256,9 +256,9 @@ and the derived files           expkv-cs.pdf
 %
 % All macros defined with \expkvc\ have to be previously undefined or have the
 % |\meaning| of |\relax|. This is necessary as there is no way to undefine keys
-% once they are set up (neither \expkv\ nor \expkvc\ keep track of defined keys)
-% so to make sure there are no conflicts only new definitions are allowed
-% (that's not the case for individual keys, only for frontend macros).
+% once they are set up (neither \expkv\ nor \expkvc\ keep track of defined
+% keys) -- so to make sure there are no conflicts only new definitions are
+% allowed (that's not the case for individual keys, only for frontend macros).
 %
 %
 % \subsubsection{Primary Keys}\label{sec:primaries}
@@ -287,7 +287,7 @@ and the derived files           expkv-cs.pdf
 %   should contain a \kv\ list. The \meta{primary keys} will be defined for this
 %   macro (see \autoref{sec:primaries}). The \meta{definition} is the code that
 %   will be executed. You can access the \val\ of a \key\ by using a macro
-%   parameter from |#1| to |#9|. The order of the macro parameter will be the
+%   parameter from |#1| to |#9|. The order of the macro parameters will be the
 %   order provided in the \meta{primary keys} list (so |#1| is the \val\ of the
 %   key defined first). With |\ekvcSplit| you can define macros using at most
 %   nine primary keys.
@@ -312,8 +312,8 @@ and the derived files           expkv-cs.pdf
 % primitive macro with a single key benchmarking was almost two times slower,
 % the root of which being the key access with |\ekvcValue|, not the parsing, and
 % for a key access using |\ekvcValueFast| it was still about $1.2$ times
-% slower). So if your macro uses below ten primary keys, you should most likely
-% use the split approach.
+% slower). So if your macro uses less than ten primary keys, you should most
+% likely use the split approach.
 %
 % \begin{function}{\ekvcHash}
 %   \begin{syntax}
@@ -407,7 +407,7 @@ and the derived files           expkv-cs.pdf
 %
 % If you're familiar with \expkvd\ you'll notice that the |t|-type prefixes
 % provided here are much fewer. The expansion only concept doesn't allow for
-% great versatility in the auto-defined keys.
+% great variety in the auto-defined keys.
 %
 % The syntax examples of the |t|-prefixes will show which |p|-prefix will be
 % automatically used by printing those black (\texttt{\enflong}), which
@@ -699,10 +699,10 @@ and the derived files           expkv-cs.pdf
 % \end{macro}
 %
 % \begin{macro}[internal]{\ekvcSplitAndForward@}
-%   The actual macro setting up things. We need to set some variables forward
-%   the key list to |\ekvc@SetupSplitKeys| and afterwards define the front
-%   facing macro to call |\ekvset| and put the defaults and the argument sorting
-%   macro behind it. The internals |\ekvc@any@long|, |\ekvc@defaults| and
+%   The actual macro setting up things. We need to set some variables, forward
+%   the key list to |\ekvc@SetupSplitKeys|, and afterwards define the front
+%   facing macro to call |\ekvset| and put the initials and the argument sorting
+%   macro behind it. The internals |\ekvc@any@long|, |\ekvc@initials| and
 %   |\ekvc@keycount| will be set correctly by |\ekvc@SetupSplitKeys|.
 %    \begin{macrocode}
 \protected\long\def\ekvcSplitAndForward@#1#2#3%
@@ -714,7 +714,7 @@ and the derived files           expkv-cs.pdf
         \unexpanded{\ekvset}{\ekvc@set}{##1}%
         \unexpanded\expandafter
           {\csname ekvc@split@\the\ekvc@keycount\endcsname}%
-        \unexpanded\expandafter{\ekvc@defaults{}#2}%
+        \unexpanded\expandafter{\ekvc@initials{}#2}%
       }%
   }
 %    \end{macrocode}
@@ -763,12 +763,12 @@ and the derived files           expkv-cs.pdf
   {%
     \ekvc@keycount=0
     \def\ekvc@any@long{}%
-    \def\ekvc@defaults{}%
+    \def\ekvc@initials{}%
     \ekvparse\ekvc@err@value@required\ekvc@SetupSplitKeys@a{#1}%
   }
 %    \end{macrocode}
 %   Then we need to step the key counter for each key. Also we have to check
-%   whether this key has a |long| prefix.
+%   whether this key has a |long| prefix so we initialise |\ekvc@long|.
 %    \begin{macrocode}
 \protected\def\ekvc@SetupSplitKeys@a#1%
   {%
@@ -781,7 +781,7 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 %   If there was a space, there might be a prefix. If so call the prefix macro,
 %   else call the next step |\ekvc@SetupSplitKeys@c| which will define the key
-%   macro and add the key's value to the default list.
+%   macro and add the key's value to the initials list.
 %    \begin{macrocode}
 \protected\def\ekvc@SetupSplitKeys@b#1 #2\ekvc@stop
   {%
@@ -792,7 +792,7 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 %   The inner definition is grouped, because we don't want to actually define
 %   the marks we build with |\csname|. We have to append the value to the
-%   |\ekvc@defaults| list here with the correct split mark. The key macro will
+%   |\ekvc@initials| list here with the correct split mark. The key macro will
 %   read everything up to those split marks and change the value following it to
 %   the value given to the key. Additionally we'll need a sorting macro for each
 %   key count in use so we set it up with |\ekvc@setup@splitmacro|.
@@ -827,9 +827,9 @@ and the derived files           expkv-cs.pdf
                 {####1}%
             }%
         \fi
-        \def\unexpanded{\ekvc@defaults}%
+        \def\unexpanded{\ekvc@initials}%
           {%
-            \unexpanded\expandafter{\ekvc@defaults}%
+            \unexpanded\expandafter{\ekvc@initials}%
             \unexpanded\expandafter
               {\csname ekvc@splitmark@\the\ekvc@keycount\endcsname{#2}}%
           }%
@@ -921,7 +921,7 @@ and the derived files           expkv-cs.pdf
 %
 % \begin{macro}[internal]{\ekvcHashAndForward@}
 %   This is more or less the same as |\ekvcHashAndForward@|. Instead of an empty
-%   group we place a marker after the defaults, we don't use the sorting macros
+%   group we place a marker after the initials, we don't use the sorting macros
 %   of |split|, but instead pack all the values in one argument.
 %    \begin{macrocode}
 \protected\long\def\ekvcHashAndForward@#1#2#3%
@@ -932,7 +932,7 @@ and the derived files           expkv-cs.pdf
       {%
         \unexpanded{\ekvset}{\ekvc@set}{##1}%
         \unexpanded{\ekvc@hash@pack@argument}%
-        \unexpanded\expandafter{\ekvc@defaults\ekvc@stop#2}%
+        \unexpanded\expandafter{\ekvc@initials\ekvc@stop#2}%
       }%
   }
 %    \end{macrocode}
@@ -975,7 +975,7 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvc@SetupHashKeys#1%
   {%
     \def\ekvc@any@long{}%
-    \def\ekvc@defaults{}%
+    \def\ekvc@initials{}%
     \ekvparse\ekvc@err@value@required\ekvc@SetupHashKeys@a{#1}%
   }
 \protected\def\ekvc@SetupHashKeys@a#1%
@@ -1019,9 +1019,9 @@ and the derived files           expkv-cs.pdf
                 {####1}%
             }%
         \fi
-        \def\unexpanded{\ekvc@defaults}%
+        \def\unexpanded{\ekvc@initials}%
           {%
-            \unexpanded\expandafter{\ekvc@defaults}%
+            \unexpanded\expandafter{\ekvc@initials}%
             \unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname{#2}}%
           }%
       }%
@@ -1181,20 +1181,25 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[internal]{\ekvc@t@meta, \ekvc@t@nmeta}
-%   The |meta| and |nmeta| key type uses a nested |\ekvset| to set other keys in
+% \begin{macro}[internal]{\ekvc@t@meta, \ekvc@t@nmeta, \ekvc@type@meta}
+%   The |meta| and |nmeta| key types use a nested |\ekvset| to set other keys in
 %   the same macro's \set.
 %    \begin{macrocode}
-\protected\long\def\ekvc@t@meta#1#2%
+\protected\def\ekvc@t@meta
   {%
-    \ekvc@long\edef\ekvc@tmp##1{\unexpanded{\ekvset}{\ekvc@set}{#2}}%
-    \ekvlet\ekvc@set{#1}\ekvc@tmp
+    \edef\ekvc@tmp{\ekvc@set}%
+    \expandafter\ekvc@type@meta\expandafter{\ekvc@tmp}\ekvc@long{##1}\ekvlet
   }
-\protected\long\def\ekvc@t@nmeta#1#2%
+\protected\def\ekvc@t@nmeta#1%
   {%
     \ekvc@assert@not@long{nmeta #1}%
-    \edef\ekvc@tmp{\unexpanded{\ekvset}{\ekvc@set}{#2}}%
-    \ekvletNoVal\ekvc@set{#1}\ekvc@tmp
+    \edef\ekvc@tmp{\ekvc@set}%
+    \expandafter\ekvc@type@meta\expandafter{\ekvc@tmp}{}{}\ekvletNoVal{#1}%
+  }
+\protected\long\def\ekvc@type@meta#1#2#3#4#5#6%
+  {%
+    #2\def\ekvc@tmp#3{\ekvset{#1}{#6}}%
+    #4\ekvc@set{#5}\ekvc@tmp
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1249,8 +1254,8 @@ and the derived files           expkv-cs.pdf
 % \subsubsection{Helper Macros}
 %
 % \begin{macro}[internal]{\ekvc@ifspace,\ekvc@ifspace@}
-% A test which can be reduced to an if-empty, this time by gobbling everything
-  % up to the first space.
+% A test which can be reduced to an if-empty by gobbling everything up to the
+% first space.
 %    \begin{macrocode}
 \long\def\ekvc@ifspace#1%
   {%

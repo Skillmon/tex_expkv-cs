@@ -206,11 +206,11 @@ and the derived files           expkv-cs.pdf
 %
 % \begin{abstract}
 % \noindent\parfillskip=0pt
-% \expkvc\ provides two small interfaces to define expandable \kv\ macros
-% utilizing \expkv. It therefore lowers the entrance boundary to expandable \kv\
-% macros. The stylised name is \expkvc\ but the files use
-% \file{expkv-cs}, this is due to CTAN-rules which don't allow \string| in
-% package names since that is the pipe symbol in *nix shells.
+% \expkvc\ provides two small interfaces to define expandable \kv\ macros using
+% \expkv. It therefore lowers the entrance boundary to expandable \kv\ macros.
+% The stylised name is \expkvc\ but the files use \file{expkv-cs}, this is due
+% to CTAN-rules which don't allow \string| in package names since that is the
+% pipe symbol in *nix shells.
 % \end{abstract}
 %
 % \tableofcontents
@@ -528,9 +528,9 @@ and the derived files           expkv-cs.pdf
 % As one might see, the |lady| key could actually have been an |nmeta| key as
 % well, as all that is done with the argument is using it as a \kv\ list.
 %
-% Utilizing \pkg{xparse} and forwarding arguments one can easily define \kv\
-% macros with actual optional and mandatory arguments as well. A small nonsense
-% example (which should perhaps use |\ekvcSplitAndForward| instead of
+% Using \pkg{xparse} and forwarding arguments one can easily define \kv\ macros
+% with actual optional and mandatory arguments as well. A small nonsense example
+% (which should perhaps use |\ekvcSplitAndForward| instead of
 % |\ekvcHashAndForward| since it only uses four keys and one other argument --
 % and isn't expandable since it uses a \env{tabular} environment):
 % \begin{lstlisting}

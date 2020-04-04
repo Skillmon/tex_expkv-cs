@@ -1,0 +1,30 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: definitions
+============================================================
+============================================================
+============================================================
+TEST 2: using hash
+============================================================
+height: 1; length: 2
+height: a; length: 2
+height: 1; length: b
+height: a; length: \empty 
+height: a; length: par\par 
+============================================================
+============================================================
+TEST 3: using hash and forward
+============================================================
+height: 3; length: 4; mandatory: arg
+height: a; length: 4; mandatory: arg
+height: 3; length: b; mandatory: arg
+height: a; length: \empty ; mandatory: arg
+height: a; length: par\par ; mandatory: arg
+============================================================
+============================================================
+TEST 4: three steps for fast hash
+============================================================
+height: 1; length: \empty 
+height: 3; length: \empty ; mandatory: arg
+============================================================

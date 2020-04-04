@@ -1,0 +1,35 @@
+\input regression-test
+
+\RequirePackage{expkv-cs}
+
+\START
+\OMIT
+\newcommand\helper[3]{height: #1; length: \detokenize{#2}; mandatory: #3}
+\TIMO
+\TEST{definitions}
+  {%
+    \ekvcSplit\macroA{height=1,long length=2}
+      {height: #1; length: \detokenize{#2}}
+    \ekvcSplitAndForward\macroB\helper{height=3,long length=4}
+  }
+\OMIT
+\ekvcSplit\macroA{height=1,long length=2}{height: #1; length: \detokenize{#2}}
+\ekvcSplitAndForward\macroB\helper{height=3,long length=4}
+\TIMO
+\TESTEXP{using split}
+  {%
+    \macroA{}\NEWLINE
+    \macroA{height=a}\NEWLINE
+    \macroA{length=b}\NEWLINE
+    \macroA{height=a,length=b}\NEWLINE
+    \macroA{height=a,length=par\par}\NEWLINE
+  }
+\TESTEXP{using split and forward}
+  {%
+    \macroB{}{arg}\NEWLINE
+    \macroB{height=a}{arg}\NEWLINE
+    \macroB{length=b}{arg}\NEWLINE
+    \macroB{height=a,length=b}{arg}\NEWLINE
+    \macroB{height=a,length=par\par}{arg}\NEWLINE
+  }
+\END

@@ -1,0 +1,73 @@
+\input regression-test
+
+\RequirePackage{expkv-cs}
+
+\START
+\OMIT
+\newcommand\helper[3]{height: #1; length: \detokenize{#2}; mandatory: #3}
+\ekvcSplit\macroA{long height=1,long length=2}{height: #1; length: \detokenize{#2}}
+\ekvcSplitAndForward\macroB\helper{long height=3,long length=4}
+\ekvcHash\macroC{height=1, length=2}
+  {%
+    height: \ekvcValue{height}{#1};
+    length: \ekvcValue{length}{#1}%
+  }
+\TIMO
+\TEST{already defined}
+  {%
+    \ekvcHash\macroC{}{}
+  }
+\TEST{too many keys}
+  {%
+    \ekvcSplit\foo
+      {
+        ,key=foo
+        ,key=foo
+        ,key=foo
+        ,key=foo
+        ,key=foo
+        ,key=foo
+        ,key=foo
+        ,key=foo
+        ,key=foo
+        ,key=foo
+      }
+      {}
+  }
+\TEST{value required}
+  {%
+    \ekvcSplit\foo{key}{}
+  }
+\TEST{secondary definitions}
+  {%
+    \ekvcSecondaryKeys\macroA
+      {
+        ,default heigt=d
+        ,alias ht=heigt
+        ,long default height=d
+        ,long alias ht=height
+        ,long nmeta dot={ht=1pt,length=1pt}
+        ,key=d
+        ,long key=d
+        ,crababble key=d
+        ,long crababble key=d
+        ,key
+      }
+  }
+\OMIT
+\TIMO
+\TESTEXP{empty hashs}
+  {%
+    \ekvcValue{}{}\NEWLINE
+    \ekvcValueFast{}{}\NEWLINE
+  }
+\TESTEXP{missing hash}
+  {%
+    \ekvcValue{height}{}
+  }
+\TESTEXP{unknown hash}
+  {%
+    \ekvcValue{heigt}{}
+  }
+\END
+

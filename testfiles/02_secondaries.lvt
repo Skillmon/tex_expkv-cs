@@ -1,0 +1,67 @@
+\input regression-test
+
+\RequirePackage{expkv-cs}
+
+\START
+\OMIT
+\newcommand\helper[3]{height: #1; length: \detokenize{#2}; mandatory: #3}
+\ekvcSplit\macroA{long height=1,long length=2}{height: #1; length: \detokenize{#2}}
+\ekvcSplitAndForward\macroB\helper{long height=3,long length=4}
+\TIMO
+\TEST{definitions}
+  {%
+    \ekvcSecondaryKeys\macroA
+      {
+        ,default height=d
+        ,alias ht=height
+        ,meta square={ht={#1},length={#1}}
+        ,nmeta dot={ht=1pt,length=1pt}
+      }
+    \ekvcSecondaryKeys\macroB
+      {
+        ,default height=d
+        ,alias ht=height
+        ,long meta square={ht={#1},length={#1}}
+        ,nmeta dot={ht=1pt,length=1pt}
+      }
+  }
+\OMIT
+\ekvcSecondaryKeys\macroA
+  {
+    ,default height=d
+    ,alias ht=height
+    ,meta square={ht={#1},length={#1}}
+    ,nmeta square={ht=1cm,length=1cm}
+    ,nmeta dot={ht=1pt,length=1pt}
+  }
+\ekvcSecondaryKeys\macroB
+  {
+    ,default height=d
+    ,alias ht=height
+    ,long meta square={ht={#1},length={#1}}
+    ,nmeta square={ht=1cm,length=1cm}
+    ,nmeta dot={ht=1pt,length=1pt}
+  }
+\TIMO
+\TESTEXP{using split}
+  {%
+    \macroA{}\NEWLINE
+    \macroA{height}\NEWLINE
+    \macroA{ht}\NEWLINE
+    \macroA{ht=h}\NEWLINE
+    \macroA{square=5}\NEWLINE
+    \macroA{square}\NEWLINE
+    \macroA{dot}\NEWLINE
+  }
+\TESTEXP{using split and forward}
+  {%
+    \macroB{}{arg}\NEWLINE
+    \macroB{height}{arg}\NEWLINE
+    \macroB{ht}{arg}\NEWLINE
+    \macroB{ht=h}{arg}\NEWLINE
+    \macroB{square=5}{arg}\NEWLINE
+    \macroB{square=\par}{arg}\NEWLINE
+    \macroB{square}{arg}\NEWLINE
+    \macroB{dot}{arg}\NEWLINE
+  }
+\END

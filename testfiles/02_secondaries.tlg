@@ -1,0 +1,29 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: definitions
+============================================================
+============================================================
+============================================================
+TEST 2: using split
+============================================================
+height: 1; length: 2
+height: d; length: 2
+height: d; length: 2
+height: h; length: 2
+height: 5; length: 5
+height: 1cm; length: 1cm
+height: 1pt; length: 1pt
+============================================================
+============================================================
+TEST 3: using split and forward
+============================================================
+height: 3; length: 4; mandatory: arg
+height: d; length: 4; mandatory: arg
+height: d; length: 4; mandatory: arg
+height: h; length: 4; mandatory: arg
+height: 5; length: 5; mandatory: arg
+height: \par ; length: \par ; mandatory: arg
+height: 1cm; length: 1cm; mandatory: arg
+height: 1pt; length: 1pt; mandatory: arg
+============================================================

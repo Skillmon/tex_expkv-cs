@@ -1,0 +1,67 @@
+\input regression-test
+
+\RequirePackage{expkv-cs}
+
+\START
+\OMIT
+\newcommand\helper[2]
+  {%
+    height: \ekvcValueFast{height}{#1};
+    length: \gethash{length}{#1};
+    mandatory: #2%
+  }
+\newcommand\gethash[2]
+  {%
+    \detokenize\expandafter\expandafter\expandafter{\ekvcValue{#1}{#2}}%
+  }
+\TIMO
+\TEST{definitions}
+  {%
+    \ekvcHash\macroA{height=1,long length=2}
+      {%
+        height: \ekvcValueFast{height}{#1};
+        length: \gethash{length}{#1}%
+      }
+    \ekvcHashAndForward\macroB\helper{height=3,long length=4}
+  }
+\OMIT
+\ekvcHash\macroA{height=1,long length=2}
+  {%
+    height: \ekvcValueFast{height}{#1};
+    length: \gethash{length}{#1}%
+  }
+    \ekvcHashAndForward\macroB\helper{height=3,long length=4}
+\ekvcHashAndForward\macroB\helper{height=3,long length=4}
+\TIMO
+\TESTEXP{using hash}
+  {%
+    \macroA{}\NEWLINE
+    \macroA{height=a}\NEWLINE
+    \macroA{length=b}\NEWLINE
+    \macroA{height=a,length=\empty}\NEWLINE
+    \macroA{height=a,length=par\par}\NEWLINE
+  }
+\TESTEXP{using hash and forward}
+  {%
+    \macroB{}{arg}\NEWLINE
+    \macroB{height=a}{arg}\NEWLINE
+    \macroB{length=b}{arg}\NEWLINE
+    \macroB{height=a,length=\empty}{arg}\NEWLINE
+    \macroB{height=a,length=par\par}{arg}\NEWLINE
+  }
+\OMIT
+\renewcommand\gethash[2]
+  {%
+    \expandafter\exphelper\expandafter{\ekvcValueFast{#1}{#2}}%
+  }
+\newcommand\exphelper
+  {%
+    \detokenize\expandafter\expandafter\expandafter
+  }
+\TIMO
+\TESTEXP{three steps for fast hash}
+  {%
+    \macroA{length=\empty}\NEWLINE
+    \macroB{length=\empty}{arg}\NEWLINE
+  }
+\END

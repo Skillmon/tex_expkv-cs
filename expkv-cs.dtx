@@ -274,6 +274,13 @@ and the derived files           expkv-cs.pdf
 % macros will be |\long|. For obvious reasons there is no possibility to define
 % a macro or key as |\protected|.
 %
+% At the moment \expkvc\ doesn't require any internal keys, but I can't foresee
+% whether this will be the case in the future as well, as it might turn out that
+% some features I deem useful can't be implemented without such internal keys.
+% Because of this, please don't use key names starting with
+% \texttt{EKVC\string|} as that should be the private name space.
+%
+%
 % \subsubsection{Split}
 %
 % The split variants will provide the key values as separate arguments. This
@@ -331,7 +338,7 @@ and the derived files           expkv-cs.pdf
 %   \begin{syntax}
 %     \cs{ekvcHashAndForward}\meta{cs_1}\meta{cs_2}\marg{primary keys}
 %   \end{syntax}
-%   This defines \meta{cs} to be a macro taking one mandatory argument which
+%   This defines \meta{cs_1} to be a macro taking one mandatory argument which
 %   should contain a \kv\ list. You can use as many primary keys as you want.
 %   The primary keys will be forwarded as a single argument containing every key
 %   to the underlying macro. For the underlying macro \meta{cs_2} is used (so
@@ -347,10 +354,10 @@ and the derived files           expkv-cs.pdf
 %   This is a safe (but slow) way to access your keys in a hash variant. \key\
 %   is the key which's \val\ you want to use out of the \meta{key list}.
 %   \meta{key list} should be the key list argument forwarded to your underlying
-%   macro. It will be tested whether the hash function to access that \key\
-%   exists, the \key\ argument is not empty, and that the \meta{key list} really
-%   contains a \val\ of that \key. This macro needs exactly two steps of
-%   expansion.
+%   macro by |\ekvcHash| or |\ekvcHashAndForward|. It will be tested whether the
+%   hash function to access that \key\ exists, the \key\ argument is not empty,
+%   and that the \meta{key list} really contains a \val\ of that \key. This
+%   macro needs exactly two steps of expansion.
 % \end{function}
 %
 % \begin{function}{\ekvcValueFast}
@@ -372,15 +379,18 @@ and the derived files           expkv-cs.pdf
 % To remove some of the limitations with the approach that each primary key
 % matches an argument or hash entry, you can define secondary keys. Those have
 % to be defined for each macro but it doesn't matter whether that macro was a
-% split or a hash variant.
+% split or a hash variant. If a secondary key references another key it doesn't
+% matter whether that other key is primary or secondary.
 %
 % Secondary keys can have a prefix (like |long|) which are called |p|-type
 % prefix and must have a type (like |meta|) which are called |t|-type prefix.
 % Some types might require some |p|-prefixes, while others might forbid those.
 %
+% Please keep in mind that key names shouldn't start with \texttt{EKVC\string|}.
+%
 % \begin{function}{\ekvcSecondaryKeys}
 %   \begin{syntax}
-%     \cs{ekvcSecondaryKeys}\meta{cs}\marg{\kv, \ldots}
+%     \cs{ekvcSecondaryKeys}\meta{cs}\{\kv, \ldots\}
 %   \end{syntax}
 %   This is the front facing macro to define secondary keys. For the macro
 %   \meta{cs} define \key\ to have definition \val. The general syntax for \key\

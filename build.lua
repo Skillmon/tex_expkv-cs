@@ -60,7 +60,7 @@ uploadconfig  = {
   ctanPath    = "/macros/generic/expkv-cs",
   repository  = "https://github.com/Skillmon/tex_expkv-cs",
   bugtracker  = "https://github.com/Skillmon/tex_expkv-cs/issues",
-  update      = true,
+  update      = false,
   description = [[
 `expkv-cs` is a frontend to define expandable macros with key=val arguments.
 It provides four syntaxes, each of which will define `<cs>` to take a single

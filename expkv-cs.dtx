@@ -21,7 +21,7 @@
 \preamble
 
 --------------------------------------------------------------
-expkv-cs -- define expandable macros using expkv
+expkv-cs -- define expandable key=val macros using expkv
 E-mail: jspratte@yahoo.de
 Released under the LaTeX Project Public License v1.3c or later
 See http://www.latex-project.org/lppl.txt
@@ -58,7 +58,7 @@ and the derived files           expkv-cs.pdf
 %
 \IfFileExists{expkv-cs.tex}{\input{expkv-cs.tex}}{}
 \ProvidesFile{expkv-cs.dtx}
-  [\csname ekvcDate\endcsname\ define expandable macros using expkv]
+  [\csname ekvcDate\endcsname\ define expandable key=val macros using expkv]
 \PassOptionsToPackage{full}{textcomp}
 \documentclass{l3doc}
 \RequirePackage[oldstylenums,nott]{kpfonts}
@@ -191,8 +191,8 @@ and the derived files           expkv-cs.pdf
         {^^A
           \huge\expkvc
           \\[\medskipamount]
-          \Large define expandable macros using \expkv
-        }{expkv-cs - define expandable macros using expkv}^^A
+          \Large define expandable \kv\ macros using \expkv
+        }{expkv-cs - define expandable key=val macros using expkv}^^A
     }
   \date{\ekvcDate\space v\ekvcVersion}
   \author{Jonathan P. Spratte\thanks{\protect\randomize{jspratte@yahoo.de}}}
@@ -612,13 +612,16 @@ and the derived files           expkv-cs.pdf
   {%
     \ProvidesFile{expkv-cs.tex}%
       [%
-        \ekvcDate\space v\ekvcVersion\space define expandable macros using
-        expkv%
+        \ekvcDate\space v\ekvcVersion\space
+        define expandable key=val macros using expkv%
       ]%
   }
 \input{expkv-cs.tex}
 \ProvidesPackage{expkv-cs}%
-  [\ekvcDate\space v\ekvcVersion\space define expandable macros using expkv]
+  [%
+    \ekvcDate\space v\ekvcVersion\space
+    define expandable key=val macros using expkv%
+  ]
 %    \end{macrocode}
 % \gobbledocstriptag
 %</pkg>

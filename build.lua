@@ -55,16 +55,24 @@ uploadconfig  = {
   author      = "Jonathan P. Spratte",
   version     = pkgversion .. " " .. pkgdate,
   license     = "lppl1.3c",
-  summary     = "Define expandable macros using expkv",
+  summary     = "Define expandable key=val macros using expkv",
   topic       = "keyval",
   ctanPath    = "/macros/generic/expkv-cs",
   repository  = "https://github.com/Skillmon/tex_expkv-cs",
   bugtracker  = "https://github.com/Skillmon/tex_expkv-cs/issues",
   update      = true,
   description = [[
-`expkv-cs` is a frontend to define keys for the `expkv` key=val implementation.
-It provides the defining frontend
+`expkv-cs` is a frontend to define expandable macros with key=val arguments.
+It provides four syntaxes, each of which will define `<cs>` to take a single
+key=val argument:
 
-* `\ekvdefinekeys{<set>}{<prefix> <key>=<definition>, ...}`
+* `\ekvcSplit<cs>{<key>=<initial>, ...}{<definition>}`
+* `\ekvcSplitAndForward<cs><cs2>{<key>=<initial>, ...}`
+* `\ekvcHash<cs>{<key>=<initial>, ...}{<definition>}`
+* `\ekvcHashAndForward<cs><cs2>{<key>=<initial>, ...}`
+
+Additional keys for each `<cs>` might be defined using
+
+* `\ekvcSecondaryKeys<cs>{<prefix> <key>=<definition>, ...}`
   ]]
 }

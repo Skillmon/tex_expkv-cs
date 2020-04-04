@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-# expkv-cs -- define expandable macros using expkv
+# expkv-cs -- define expandable key=val macros using expkv
 
 Version 2020-04-03 v0.1
 

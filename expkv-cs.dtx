@@ -309,7 +309,7 @@ and the derived files           expkv-cs.pdf
 % The hash variants will provide the key values as a single argument in which
 % you can access specific values using a special macro. The implementation might
 % be more convenient and scale better, \emph{but} it is much slower (for a
-% primitive macro with a single key benchmarking was almost two times slower,
+% primitive macro with a single key benchmarking was almost $1.7$ times slower,
 % the root of which being the key access with |\ekvcValue|, not the parsing, and
 % for a key access using |\ekvcValueFast| it was still about $1.2$ times
 % slower). So if your macro uses less than ten primary keys, you should most
@@ -358,12 +358,12 @@ and the derived files           expkv-cs.pdf
 %     \cs{ekvcValueFast}\{\key\}\marg{key list}
 %   \end{syntax}
 %   This behaves just like |\ekvcValue|, but \emph{without any} safety tests. As
-%   a result this is about $1.6$ times faster \emph{but} will throw low level
-%   \TeX\ errors eventually if the hash function isn't defined, the \key\ isn't
-%   part of the \meta{key list} (\emph{e.g.}, because it was defined as a key
-%   for another macro -- all macros share the same hash function per \key), or
-%   \key\ is an empty argument. Use it if you know what you're doing. This macro
-%   needs exactly three steps of expansion.
+%   a result this is about $1.4$ times faster \emph{but} will throw low level
+%   \TeX\ errors eventually if the hash function isn't defined or the \key\
+%   isn't part of the \meta{key list} (\emph{e.g.}, because it was defined as a
+%   key for another macro -- all macros share the same hash function per \key).
+%   Use it if you know what you're doing. This macro needs exactly three steps
+%   of expansion in the no-errors case.
 % \end{function}
 %
 %
@@ -1107,12 +1107,9 @@ and the derived files           expkv-cs.pdf
 \long\def\ekvcValue#1#2%
   {%
     \romannumeral`\^^@%
-    \ekv@ifempty{#1}{\ekvc@err@empty@hash{} }% don't remove that space
-      {%
-        \ekv@ifdefined{ekvc@safehash@#1}
-          {\csname ekvc@safehash@#1\endcsname{#2}}%
-          {\ekvc@err@unknown@hash{#1} }% don't remove that space
-      }%
+    \ekv@ifdefined{ekvc@safehash@#1}
+      {\csname ekvc@safehash@#1\endcsname{#2}}%
+      {\ekvc@err@unknown@hash{#1} }% don't remove that space
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1124,6 +1121,23 @@ and the derived files           expkv-cs.pdf
 \long\def\ekvcValueFast#1#2%
   {%
     \csname ekvc@fasthash@#1\endcsname#2\ekvc@stop
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvc@safehash@,\ekvc@fasthash@}
+%   At least in the empty hash case we can provide a meaningful error message
+%   without affecting performance by just defining the macro that would be build
+%   in that case. There is of course a downside to this, the error will not be
+%   thrown by |\ekvcValueFast| in three expansion steps.
+%    \begin{macrocode}
+\long\def\ekvc@safehash@#1%
+  {%
+    \ekvc@err@empty@hash\@gobble{} % don't remove that space
+  }
+\long\def\ekvc@fasthash@#1\ekvc@stop
+  {%
+    \ekvc@err@empty@hash
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1152,7 +1166,7 @@ and the derived files           expkv-cs.pdf
       {%
         \ekv@ifdefined{ekvc@t@#1}%
           {\csname ekvc@t@#1\endcsname}%
-          {\ekvc@err@unknown@keytype{#1}}%
+          {\ekvc@err@unknown@keytype{#1}\expandafter\@gobble\@gobble}%
       }%
       {#2}%
   }
@@ -1179,7 +1193,7 @@ and the derived files           expkv-cs.pdf
   {%
     \ekv@ifdefined{ekvc@t@#1}%
       {\csname ekvc@t@#1\endcsname{#2}}%
-      {\ekvc@err@missing@type{#1 #2}\@gobble}%
+      {\ekvc@err@unknown@keytype{#1}\@gobble}%
   }
 %    \end{macrocode}
 % \end{macro}

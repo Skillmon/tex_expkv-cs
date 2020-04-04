@@ -672,11 +672,13 @@ and the derived files           expkv-cs.pdf
 % |\ekvc@tmp| will be reused later, but we don't need it to ever store
 % information long-term after \expkvc\ was initialized.
 %
-% We'll need to keep count how many keys must be defined for each macro in the
-% |split| variants.
+% \begin{macro}[internal]{\ekvc@keycount}
+%   We'll need to keep count how many keys must be defined for each macro in the
+%   |split| variants.
 %    \begin{macrocode}
 \newcount\ekvc@keycount
 %    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}[internal]{\ekvc@long,\ekvc@any@long}
 %   Some macros will have to be defined long. These two will be let to |\long|
@@ -861,10 +863,7 @@ and the derived files           expkv-cs.pdf
 %   This is needed to define a macro with 1-9 parameters programmatically.
 %   \LaTeX's \cs[no-index]{newcommand} does something similar for example.
 %    \begin{macrocode}
-\protected\def\ekvc@defarggobbler#1%
-  {%
-    \def\ekvc@tmp##1#1##2##{##1#1}%
-  }
+\protected\def\ekvc@defarggobbler#1{\def\ekvc@tmp##1#1##2##{##1#1}}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -963,10 +962,7 @@ and the derived files           expkv-cs.pdf
 %   All this macro does is pack the values into one argument and forward that to
 %   the next macro.
 %    \begin{macrocode}
-\long\def\ekvc@hash@pack@argument#1\ekvc@stop#2%
-  {%
-    #2{#1}%
-  }
+\long\def\ekvc@hash@pack@argument#1\ekvc@stop#2{#2{#1}}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1107,9 +1103,9 @@ and the derived files           expkv-cs.pdf
 \long\def\ekvcValue#1#2%
   {%
     \romannumeral`\^^@%
-    \ekv@ifdefined{ekvc@safehash@#1}
+    \ekv@ifdefined{ekvc@safehash@#1}%
       {\csname ekvc@safehash@#1\endcsname{#2}}%
-      {\ekvc@err@unknown@hash{#1} }% don't remove that space
+      {\ekvc@err@unknown@hash{#1} }% keep this space
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1118,10 +1114,7 @@ and the derived files           expkv-cs.pdf
 %   To be as fast as possible, this doesn't test for anything, assuming the user
 %   knows best.
 %    \begin{macrocode}
-\long\def\ekvcValueFast#1#2%
-  {%
-    \csname ekvc@fasthash@#1\endcsname#2\ekvc@stop
-  }
+\long\def\ekvcValueFast#1#2{\csname ekvc@fasthash@#1\endcsname#2\ekvc@stop}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1129,16 +1122,11 @@ and the derived files           expkv-cs.pdf
 %   At least in the empty hash case we can provide a meaningful error message
 %   without affecting performance by just defining the macro that would be build
 %   in that case. There is of course a downside to this, the error will not be
-%   thrown by |\ekvcValueFast| in three expansion steps.
+%   thrown by |\ekvcValueFast| in three expansion steps. The safe hash variant
+%   has to also stop the |\romannumeral| expansion.
 %    \begin{macrocode}
-\long\def\ekvc@safehash@#1%
-  {%
-    \ekvc@err@empty@hash\@gobble{} % don't remove that space
-  }
-\long\def\ekvc@fasthash@#1\ekvc@stop
-  {%
-    \ekvc@err@empty@hash
-  }
+\long\def\ekvc@safehash@#1{\ekvc@err@empty@hash\@gobble{} }% keep this space
+\long\def\ekvc@fasthash@#1\ekvc@stop{\ekvc@err@empty@hash}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1166,7 +1154,7 @@ and the derived files           expkv-cs.pdf
       {%
         \ekv@ifdefined{ekvc@t@#1}%
           {\csname ekvc@t@#1\endcsname}%
-          {\ekvc@err@unknown@keytype{#1}\expandafter\@gobble\@gobble}%
+          {\ekvc@err@unknown@keytype{#1}\@firstoftwo\@gobble}%
       }%
       {#2}%
   }
@@ -1292,10 +1280,7 @@ and the derived files           expkv-cs.pdf
 %   Some keys don't want to be |long| and we have to educate the user, so let's
 %   throw an error if someone wanted these to be long.
 %    \begin{macrocode}
-\long\def\ekvc@assert@not@long#1%
-  {%
-    \ifx\ekvc@long\long\ekvc@err@no@long{#1}\fi
-  }
+\long\def\ekvc@assert@not@long#1{\ifx\ekvc@long\long\ekvc@err@no@long{#1}\fi}
 %    \end{macrocode}
 % \end{macro}
 %

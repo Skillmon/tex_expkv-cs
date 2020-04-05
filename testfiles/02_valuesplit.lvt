@@ -1,0 +1,40 @@
+\input regression-test
+
+\RequirePackage{expkv-cs}
+
+\START
+\OMIT
+\ekvcHash\macroA
+  {
+    ,height=1
+    ,length=2
+    ,depth=3
+  }
+  {%
+    \ekvcValueSplit{length}{#1}{\newtestB{}}%
+  }
+\ekvcHash\macroB
+  {
+    ,height=1
+    ,length=2
+    ,depth=3
+  }
+  {%
+    \ekvcValueSplitFast{length}{#1}{\newtestB{}}%
+  }
+\newcommand\newtestB[3]
+  {%
+    height: \ekvcValue{height}{#2}\NEWLINE
+    length: #3\NEWLINE
+    depth: \ekvcValue{depth}{#2}\NEWLINE
+  }
+\TIMO
+\TESTEXP{value split}
+  {%
+    \macroA{}%
+  }
+\TESTEXP{fast value split}
+  {%
+    \macroB{}%
+  }
+\END

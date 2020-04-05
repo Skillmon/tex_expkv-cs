@@ -69,5 +69,20 @@
   {%
     \ekvcValue{heigt}{}
   }
+\OMIT
+\newcommand\mygobbletwo[2]{}
+\TIMO
+\TESTEXP{empty hashs splits}
+  {%
+    \ekvcValueSplit{}{}\mygobbletwo\NEWLINE
+    \ekvcValueSplitFast{}{}\mygobbletwo\NEWLINE
+  }
+\TESTEXP{missing hash splits}
+  {%
+    \ekvcValueSplit{height}{}\mygobbletwo
+  }
+\TESTEXP{unknown hash splits}
+  {%
+    \ekvcValueSplit{heigt}{}\mygobbletwo
+  }
 \END
-

@@ -1312,7 +1312,11 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[internal]{\ekvc@safehash@,\ekvc@fasthash@}
+% \begin{macro}[internal]
+%   {
+%     \ekvc@safehash@,\ekvc@fasthash@,
+%     \ekvc@safesplithash@,\ekvc@fastsplithash@
+%   }
 %   At least in the empty hash case we can provide a meaningful error message
 %   without affecting performance by just defining the macro that would be build
 %   in that case. There is of course a downside to this, the error will not be
@@ -1321,6 +1325,8 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \long\def\ekvc@safehash@#1{\ekvc@err@empty@hash\@gobble{} }% keep this space
 \long\def\ekvc@fasthash@#1\ekvc@stop{\ekvc@err@empty@hash}
+\long\def\ekvc@safesplithash@#1#2{\ekvc@err@empty@hash#2{#1}{}}
+\long\def\ekvc@fastsplithash@#1\ekvc@stop#2{\ekvc@err@empty@hash#2{#1}{}}
 %    \end{macrocode}
 % \end{macro}
 %

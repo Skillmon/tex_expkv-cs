@@ -92,7 +92,7 @@ and the derived files           expkv-cs.pdf
               {\}}{{\CodeSymbol\}}}{1}
     ^^A,literate=*{<key>}{\key}{4}{<set>}{\set}{4}
   }
-\newcommand*\CodeSymbol[1]{\textbf{#1}}
+\newcommand*\CodeSymbol[1]{\kern-1pt\textbf{#1}\kern1pt}
 \RequirePackage{randtext}
 \let\metaORIG\meta
 \protected\def\meta #1{\texttt{\metaORIG{#1}}}
@@ -222,13 +222,19 @@ and the derived files           expkv-cs.pdf
 % The \expkv\ package enables the new possibility of creating \kv\ macros which
 % are fully expandable. The creation of such macros is however cumbersome for
 % the average user. \expkvc\ tries to step in here. It provides interfaces to
-% define \kv\ macros without worrying too much about the implementation. There
-% are two different approaches supported by this package. The first is splitting
-% the keys up into individual arguments, the second is providing all the keys as
-% a single argument to the underlying macro and getting an individual \val\ by
-% using a hash. Well, actually there is no real hash, just some markers which
-% are parsed, but this shouldn't be apparent to the user, the behaviour matches
-% that of a hash-table.
+% define \kv\ macros without worrying too much about the implementation. In case
+% you're wondering now, the |cs| in \expkvc\ stands for control sequence,
+% because |def| was already taken by \expkvd\ and ``control sequence'' is the
+% term D.\,E.\,Knuth used in his \TeX book for named commands hence macros
+% (though he also used the term ``macro''). So \expkvc\ defines control
+% sequences for and with \expkv.
+%
+% There are two different approaches supported by this package. The first is
+% splitting the keys up into individual arguments, the second is providing all
+% the keys as a single argument to the underlying macro and getting an
+% individual \val\ by using a hash. Well, actually there is no real hash, just
+% some markers which are parsed, but this shouldn't be apparent to the user, the
+% behaviour matches that of a hash-table.
 %
 % In addition to these two methods of defining a macro with primary keys a way
 % to define secondary keys, which can reference the primary ones, is provided.
@@ -238,10 +244,11 @@ and the derived files           expkv-cs.pdf
 %
 % A word of advice you should consider: If your macro doesn't have to be
 % expandable (and often it doesn't) don't use \expkvc. The interface has some
-% overhead (though it still can be considered fast) and the approach has its
-% limits. If you don't need to be expandable, you should consider either
-% defining your keys manually using \expkv\ or using \expkvd\ for convenience.
-% Or you resort to another \kv\ interface.
+% overhead (though it still can be considered fast -- check \autoref{sec:speed})
+% and the approach has its limits in versatility. If you don't need to be
+% expandable, you should consider either defining your keys manually using
+% \expkv\ or using \expkvd\ for convenience. Or you resort to another \kv\
+% interface.
 %
 % \expkvc\ is usable as generic code and as a \LaTeX\ package. It'll
 % automatically load \expkv\ in the same mode as well. To use it, just use one
@@ -371,6 +378,30 @@ and the derived files           expkv-cs.pdf
 %   key for another macro -- all macros share the same hash function per \key).
 %   Use it if you know what you're doing. This macro needs exactly three steps
 %   of expansion in the no-errors case.
+% \end{function}
+%
+% \begin{function}{\ekvcValueSplit}
+%   \begin{syntax}
+%     \cs{ekvcValueSplit}\{\key\}\marg{key list}\marg{next}
+%   \end{syntax}
+%   If you need a specific \key\ from a \meta{key list} more than once, it'll
+%   be a good idea to only extract it once and from then on keep it as a
+%   separate argument. Hence the macro \cs{ekvcValueSplit} will extract one
+%   specific \key's value from the list and forward the remainder of the list
+%   as the first and the \key's value as the second argument to \meta{next}, so
+%   the result of this will be \meta{next}\marg{key list'}\marg{value} with
+%   \meta{key list'} the remaining list. This is almost as fast as |\ekvcValue|
+%   and runs the same tests. Keep in mind that you can't fetch for the same
+%   \key\ again from \meta{key list'} as it got removed.
+% \end{function}
+%
+% \begin{function}{\ekvcValueSplitFast}
+%   \begin{syntax}
+%     \cs{ekvcValueSplitFast}\{\key\}\marg{key list}\marg{next}
+%   \end{syntax}
+%   This behaves just like |\ekvcValueSplit|, but it won't run the same tests,
+%   hence it is faster but more error prone, just like the relation between
+%   |\ekvcValue| and |\ekvcValueFast|.
 % \end{function}
 %
 %
@@ -565,6 +596,80 @@ and the derived files           expkv-cs.pdf
 % \end{lstlisting}
 %
 %
+% \subsection{Speed Considerations}\label{sec:speed}
+%
+% As already mentioned in the introduction there are some speed considerations
+% implied if you choose to define macros via \expkvc. However the overhead isn't
+% the factor which should hinder you to use \expkvc\ if you found a reasonable
+% use case. The key-parsing is still faster than with most other \kv\ packages
+% (see the ``Comparisons'' subsection in the \expkv\ documentation).
+%
+% The speed considerations in this subsection use the first example in this
+% documentation as the benchmark. So we have seven keys and a short sentence
+% which should be typeset. For comparisons I use the following equivalent
+% \expkvd\ definitions. Each result is the average between changing no keys from
+% their initial values and altering four. Furthermore I'll compare three
+% variants of \expkvc\ with the \expkvd\ definitions, namely the split example
+% from above, a hash variant using |\ekvcValue| and a hash variant using
+% |\ekvcValueFast|.
+% \begin{lstlisting}
+% \usepackage{expkv-def}
+% \ekvdefinekeys{keys}
+%   {%
+%     ,store   name         = \KEYSname
+%     ,initial name         = John Doe
+%     ,store   age          = \KEYSage
+%     ,initial age          = any
+%     ,store   nationality  = \KEYSnationality
+%     ,initial nationality  = the Universe
+%     ,store   hobby        = \KEYShobby
+%     ,initial hobby        = to exist
+%     ,store   type         = \KEYStype
+%     ,initial type         = Mister
+%     ,store   pronoun      = \KEYSpronoun
+%     ,initial pronoun      = He
+%     ,store   possessive   = \KEYSpossessive
+%     ,initial possessive   = his
+%   }
+% \newcommand*\KEYS[1]
+%   {%
+%     \begingroup
+%       \ekvset{keys}{#1}%
+%       \KEYSname\ is a \KEYStype\ from \KEYSnationality. \KEYSpronoun\ is
+%       of \KEYSage\ age and \KEYSpossessive\ hobby is \KEYShobby.%
+%     \endgroup
+%   }
+% \end{lstlisting}
+%
+% The first comparison removes the typesetting part from all the definitions, so
+% that only the key parsing is compared. In this comparison the |\ekvcValue|
+% and |\ekvcValueFast| variants will not differ, as they are exactly the same
+% until the key usage. We find that the split approach is $1.4$ times slower
+% than the \expkvd\ setup and the hash variants end up in the middle at $1.17$
+% times slower.
+%
+% Next we put the typesetting part back in. Every call of the macros will
+% typeset the sentences into a box register in horizontal mode. With the
+% typesetting part (which includes the accessing of values) the fastest remains
+% the \expkvd\ definitions, but split is close at $1.16$ times slower, followed
+% by the hash variant with fast accesses at $1.36$ times slower, and the safe
+% hash access variant ranks in the slowest $1.8$ times slower than \expkvd.
+%
+% Just in case you're wondering now, a simple macro taking seven arguments is
+% $30$ to $40$ times faster than any of those in the argument grabbing and \kv\
+% parsing part and only $1.5$ to $2.8$ times faster if the typesetting part is
+% factored in. So the real choke isn't the parsing. 
+%
+% So to summarize this, if you have a reasonable use case for expandable \kv\
+% parsing macros you should go on and define them using \expkvc. If you have a
+% reasonable use case for \kv\ parsing macros but defining them expandable isn't
+% necessary for your use you should take advantage of the greater flexibility of
+% non-expandable \kv\ setups (but if you're after maximum speed there aren't
+% that many \kv\ parsers beating \expkvc). And if you are after maximum
+% performance maybe ditching the \kv\ interface altogether is a good idea, but
+% depending on the number of arguments your interface might get convoluted.
+%
+%
 % \subsection{Useless Macros}
 %
 % Perhaps these macros aren't completely useless, but I figured from a user's
@@ -661,8 +766,8 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}{\ekvcVersion,\ekvcDate}
 % We're on our first input, so lets store the version and date in a macro.
 %    \begin{macrocode}
-\def\ekvcVersion{0.1}
-\def\ekvcDate{2020-04-04}
+\def\ekvcVersion{0.2}
+\def\ekvcDate{2020-04-05}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1097,6 +1202,36 @@ and the derived files           expkv-cs.pdf
                 {%
                   ####4####2%
                 }%
+              \long\gdef\unexpanded\expandafter
+                {\csname ekvc@fastsplithash@#1\endcsname}%
+                  ####1%
+                  \unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname}%
+                  ####2####3\unexpanded{\ekvc@stop}####4%
+                {%
+                  ####4{####1####3}{####2}%
+                }%
+              \long\gdef\unexpanded\expandafter
+                {\csname ekvc@safesplithash@#1\endcsname}####1%
+                {%
+                  \unexpanded\expandafter
+                    {\csname ekvc@@safesplithash@#1\endcsname}%
+                  ####1\unexpanded{\ekvc@mark\ekvc@safe@found@hash}%
+                  \unexpanded\expandafter
+                    {%
+                      \csname ekvc@hashmark@#1\endcsname{}%
+                      \ekvc@mark{\ekvc@err@missing@hash{#1}\ekvc@safe@no@hash}%
+                      \ekvc@stop
+                    }%
+                }%
+              \long\gdef\unexpanded\expandafter
+                {\csname ekvc@@safesplithash@#1\endcsname}%
+                  ####1%
+                  \unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname}%
+                  ####2####3\unexpanded{\ekvc@mark}####4####5%
+                  \unexpanded{\ekvc@stop}%
+                {%
+                  ####4{####2}####1####3\unexpanded{\ekvc@stop}%
+                }%
             }%
           \ekvc@tmp
         \endgroup
@@ -1125,6 +1260,55 @@ and the derived files           expkv-cs.pdf
 %   knows best.
 %    \begin{macrocode}
 \long\def\ekvcValueFast#1#2{\csname ekvc@fasthash@#1\endcsname#2\ekvc@stop}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcValueSplit}
+%   This splits off a single version
+%    \begin{macrocode}
+\long\def\ekvcValueSplit#1#2#3%
+  {%
+    \ekv@ifdefined{ekvc@safesplithash@#1}%
+      {\csname ekvc@safesplithash@#1\endcsname{#2}{#3}}%
+      {\ekvc@err@unknown@hash{#1}#3{}{#2}}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvc@safe@found@hash, \ekvc@safe@no@hash}
+%    \begin{macrocode}
+\long\def\ekvc@safe@found@hash#1#2\ekvc@stop#3%
+  {%
+    #3{#2}{#1}%
+  }
+\long\def\ekvc@safe@no@hash#1#2\ekvc@mark\ekvc@safe@found@hash\ekvc@stop#3%
+  {%
+    #3{#2}{}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcValueSplitFast}
+%   Again a fast approach which doesn't provide too many safety measurements.
+%   This needs to build the hash function and expand it before passing the
+%   results to the next control sequence. The first step only builds the control
+%   sequence.
+%    \begin{macrocode}
+\long\def\ekvcValueSplitFast#1#2%
+  {%
+    \csname ekvc@fastsplithash@#1\endcsname#2\ekvc@stop
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvcValueSplitFast@a}
+%   This step then expands the hash function once and passes the result to |#3|
+%   which should be a single control sequence.
+%    \begin{macrocode}
+\long\def\ekvcValueSplitFast@#1#2#3%
+  {%
+    \expandafter#3\expandafter{#1#2\ekvc@stop}%
+  }
 %    \end{macrocode}
 % \end{macro}
 %

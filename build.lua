@@ -56,7 +56,7 @@ uploadconfig  = {
   version     = pkgversion .. " " .. pkgdate,
   license     = "lppl1.3c",
   summary     = "Define expandable key=val macros using expkv",
-  topic       = "keyval",
+  topic       = "keyval, macro-supp",
   ctanPath    = "/macros/generic/expkv-cs",
   repository  = "https://github.com/Skillmon/tex_expkv-cs",
   bugtracker  = "https://github.com/Skillmon/tex_expkv-cs/issues",

@@ -766,8 +766,8 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}{\ekvcVersion,\ekvcDate}
 % We're on our first input, so lets store the version and date in a macro.
 %    \begin{macrocode}
-\def\ekvcVersion{0.2}
-\def\ekvcDate{2020-04-05}
+\def\ekvcVersion{0.3}
+\def\ekvcDate{2020-04-29}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -804,6 +804,34 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[internal]
+%   {
+%     \ekvc@ekvset@per@expander,
+%     \ekvc@ekvset@per@expander@a,
+%     \ekvc@ekvset@per@expander@b
+%   }
+%   This macro expands |\ekvset| twice so that the first two steps of expansion
+%   don't have to be made every time the \expkvc\ macros are used. We have to do
+%   a little magic trick to get the macro parameter |#1| for the macro
+%   definition this is used in, even though we're calling |\unexpanded|. We do
+%   that by splitting the expanded |\ekvset| at some marks and place |##1| in
+%   between.
+%    \begin{macrocode}
+\def\ekvc@ekvset@pre@expander#1%
+  {%
+    \expandafter\ekvc@ekvset@pre@expander@a\ekvset{#1}\ekvc@stop\ekvc@stop
+  }
+\def\ekvc@ekvset@pre@expander@a
+  {%
+    \expandafter\ekvc@ekvset@pre@expander@b
+  }
+\def\ekvc@ekvset@pre@expander@b#1\ekvc@stop#2\ekvc@stop
+  {%
+    \unexpanded{#1}##1\unexpanded{#2}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\ekvcSplitAndForward}
 %   The first user macro we want to set up can be reused for
 %   \cs[no-index]{ekvcSplit}. We'll split this one up so that the test whether
@@ -831,7 +859,7 @@ and the derived files           expkv-cs.pdf
     \ekvc@SetupSplitKeys{#3}%
     \ekvc@any@long\edef#1##1%
       {%
-        \unexpanded{\ekvset}{\ekvc@set}{##1}%
+        \expandafter\ekvc@ekvset@pre@expander\expandafter{\ekvc@set}%
         \unexpanded\expandafter
           {\csname ekvc@split@\the\ekvc@keycount\endcsname}%
         \unexpanded\expandafter{\ekvc@initials{}#2}%
@@ -1047,7 +1075,7 @@ and the derived files           expkv-cs.pdf
     \ekvc@SetupHashKeys{#3}%
     \ekvc@any@long\edef#1##1%
       {%
-        \unexpanded{\ekvset}{\ekvc@set}{##1}%
+        \expandafter\ekvc@ekvset@pre@expander\expandafter{\ekvc@set}%
         \unexpanded{\ekvc@hash@pack@argument}%
         \unexpanded\expandafter{\ekvc@initials\ekvc@stop#2}%
       }%
@@ -1386,7 +1414,11 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[internal]{\ekvc@t@meta, \ekvc@t@nmeta, \ekvc@type@meta}
+% \begin{macro}[internal]
+%   {
+%     \ekvc@t@meta, \ekvc@t@nmeta,
+%     \ekvc@type@meta, \ekvc@type@meta@a, \ekvc@type@meta@b
+%   }
 %   The |meta| and |nmeta| key types use a nested |\ekvset| to set other keys in
 %   the same macro's \set.
 %    \begin{macrocode}
@@ -1403,8 +1435,16 @@ and the derived files           expkv-cs.pdf
   }
 \protected\long\def\ekvc@type@meta#1#2#3#4#5#6%
   {%
-    #2\def\ekvc@tmp#3{\ekvset{#1}{#6}}%
+    \expandafter\ekvc@type@meta@a\expandafter{\ekvset{#1}{#6}}{#2}{#3}%
     #4\ekvc@set{#5}\ekvc@tmp
+  }
+\protected\def\ekvc@type@meta@a
+  {%
+    \expandafter\ekvc@type@meta@b\expandafter
+  }
+\protected\long\def\ekvc@type@meta@b#1#2#3%
+  {%
+    #2\def\ekvc@tmp#3{#1}%
   }
 %    \end{macrocode}
 % \end{macro}

@@ -23,6 +23,7 @@
         length: \gethash{length}{#1}%
       }
     \ekvcHashAndForward\macroB\helper{height=3,long length=4}
+    \ekvcHashAndUse\macroC{height=3,long length=4}
   }
 \OMIT
 \ekvcHash\macroA{height=1,long length=2}
@@ -30,8 +31,8 @@
     height: \ekvcValueFast{height}{#1};
     length: \gethash{length}{#1}%
   }
-    \ekvcHashAndForward\macroB\helper{height=3,long length=4}
 \ekvcHashAndForward\macroB\helper{height=3,long length=4}
+\ekvcHashAndUse\macroC{height=3,long length=4}
 \TIMO
 \TESTEXP{using hash}
   {%
@@ -48,6 +49,14 @@
     \macroB{length=b}{arg}\NEWLINE
     \macroB{height=a,length=\empty}{arg}\NEWLINE
     \macroB{height=a,length=par\par}{arg}\NEWLINE
+  }
+\TESTEXP{using hash and use}
+  {%
+    \macroC{}\helper{arg}\NEWLINE
+    \macroC{height=a}\helper{arg}\NEWLINE
+    \macroC{length=b}\helper{arg}\NEWLINE
+    \macroC{height=a,length=\empty}\helper{arg}\NEWLINE
+    \macroC{height=a,length=par\par}\helper{arg}\NEWLINE
   }
 \OMIT
 \renewcommand\gethash[2]

@@ -22,3 +22,12 @@ height: 3; length: b; mandatory: arg
 height: a; length: b; mandatory: arg
 height: a; length: par\par ; mandatory: arg
 ============================================================
+============================================================
+TEST 4: using split and use
+============================================================
+height: 3; length: 4; mandatory: arg
+height: a; length: 4; mandatory: arg
+height: 3; length: b; mandatory: arg
+height: a; length: b; mandatory: arg
+height: a; length: par\par ; mandatory: arg
+============================================================

@@ -309,14 +309,34 @@ and the derived files           expkv-cs.pdf
 %
 % \begin{function}{\ekvcSplitAndForward}
 %   \begin{syntax}
-%     \cs{ekvcSplit}\meta{cs_1}\meta{cs_2}\marg{primary keys}
+%     \cs{ekvcSplitAndForward}\meta{cs}\marg{after}\marg{primary keys}
 %   \end{syntax}
-%   This defines \meta{cs_1} to be a macro taking one mandatory argument which
+%   This defines \meta{cs} to be a macro taking one mandatory argument which
 %   should contain a \kv\ list. You can use as many primary keys as you want
-%   with this. The primary keys will be forwarded to \meta{cs_2} as braced
+%   with this. The primary keys will be forwarded to \meta{after} as braced
 %   arguments (as many as necessary for your primary keys). The order of the
-%   braced arguments will be the order of your primary key definitions.
+%   braced arguments will be the order of your primary key definitions. In
+%   \meta{after} you can use just a single control sequence, or some arbitrary
+%   stuff which will be left in the input stream before your braced values (with
+%   one set of braces stripped from \meta{after}), so both of the following
+%   would be fine:
+% \begin{lstlisting}
+% \ekvcSplitAndForward\foo\foo@aux{keyA = A, keyB = B}
+% \ekvcSplitAndForward\foo{\foo@aux{more args}}{keyA = A, keyB = B}
+% \end{lstlisting}
 % \end{function}
+%
+% \begin{function}{\ekvcSplitAndUse}
+%   \begin{syntax}
+%     \cs{ekvcSplitAndUse}\meta{cs}\marg{primary keys}
+%   \end{syntax}
+%   This will roughly do the same as |\ekvcSplitAndForward|, but instead of
+%   specifying what will be used after splitting the keys, \meta{cs} will use
+%   what follows the \kv\ list. So its syntax will be
+% \end{function}
+%   \begin{syntax}
+%     \meta{cs}\{\key=\val, \ldots\}\marg{after}
+%   \end{syntax}
 %
 % \subsubsection{Hash}
 %
@@ -343,16 +363,30 @@ and the derived files           expkv-cs.pdf
 %
 % \begin{function}{\ekvcHashAndForward}
 %   \begin{syntax}
-%     \cs{ekvcHashAndForward}\meta{cs_1}\meta{cs_2}\marg{primary keys}
+%     \cs{ekvcHashAndForward}\meta{cs}\marg{after}\marg{primary keys}
 %   \end{syntax}
-%   This defines \meta{cs_1} to be a macro taking one mandatory argument which
+%   This defines \meta{cs} to be a macro taking one mandatory argument which
 %   should contain a \kv\ list. You can use as many primary keys as you want.
 %   The primary keys will be forwarded as a single argument containing every key
-%   to the underlying macro. For the underlying macro \meta{cs_2} is used (so
-%   this will provide the key list as a single argument to \meta{cs_2}). In the
-%   underlying macro you can access the \val\ of a \key\ by using
-%   \texttt{\cs[no-index]{ekvcValue}\{\key\}\{\#1\}}.
+%   to \meta{after}. You can use a single macro for \meta{after} or use some
+%   arbitrary stuff, which will be left in the input stream before the hashed
+%   \kv\ list with one set of braces stripped. In the
+%   macro called in \meta{after} you can access the \val\ of a \key\ by using
+%   \texttt{\cs[no-index]{ekvcValue}\{\key\}\{\#1\}} (or whichever argument the
+%   hashed \kv\ list will be).
 % \end{function}
+%
+% \begin{function}{\ekvcHashAndUse}
+%   \begin{syntax}
+%     \cs{ekvcHashAndUse}\meta{cs}\marg{primary keys}
+%   \end{syntax}
+%   This will roughly do the same as |\ekvcHashAndForward|, but instead of
+%   specifying what will be used after hashing the keys, \meta{cs} will use what
+%   follows the \kv\ list. So its syntax will be
+% \end{function}
+%   \begin{syntax}
+%     \meta{cs}\{\key=\val, \ldots\}\marg{after}
+%   \end{syntax}
 %
 % \begin{function}{\ekvcValue}
 %   \begin{syntax}
@@ -361,10 +395,10 @@ and the derived files           expkv-cs.pdf
 %   This is a safe (but slow) way to access your keys in a hash variant. \key\
 %   is the key which's \val\ you want to use out of the \meta{key list}.
 %   \meta{key list} should be the key list argument forwarded to your underlying
-%   macro by |\ekvcHash| or |\ekvcHashAndForward|. It will be tested whether the
-%   hash function to access that \key\ exists, the \key\ argument is not empty,
-%   and that the \meta{key list} really contains a \val\ of that \key. This
-%   macro needs exactly two steps of expansion.
+%   macro by |\ekvcHash|, |\ekvcHashAndForward|, or |\ekvcHashAndUse|. It will
+%   be tested whether the hash function to access that \key\ exists, the \key\
+%   argument is not empty, and that the \meta{key list} really contains a \val\
+%   of that \key. This macro needs exactly two steps of expansion.
 % \end{function}
 %
 % \begin{function}{\ekvcValueFast}
@@ -832,28 +866,29 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\ekvcSplitAndForward}
+% \begin{macro}{\ekvcSplitAndUse}
 %   The first user macro we want to set up can be reused for
-%   \cs[no-index]{ekvcSplit}. We'll split this one up so that the test whether
-%   the macro is already defined doesn't run twice.
+%   \cs[no-index]{ekvcSplitAndForward} and \cs[no-index]{ekvcSplit}. We'll split
+%   this one up so that the test whether the macro is already defined doesn't
+%   run twice.
 %    \begin{macrocode}
-\protected\long\def\ekvcSplitAndForward#1#2#3%
+\protected\long\def\ekvcSplitAndUse#1#2%
   {%
     \ekv@ifdefined{\expandafter\@gobble\string#1}%
-      {\ekvc@err@already@defined{#1}}%
-      {\ekvcSplitAndForward@{#1}{#2}{#3}}%
+      {\ekvc@err@already@defined#1}%
+      {\ekvcSplitAndUse@#1{}{#2}}%
   }
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[internal]{\ekvcSplitAndForward@}
+% \begin{macro}[internal]{\ekvcSplitAndUse@}
 %   The actual macro setting up things. We need to set some variables, forward
 %   the key list to |\ekvc@SetupSplitKeys|, and afterwards define the front
 %   facing macro to call |\ekvset| and put the initials and the argument sorting
 %   macro behind it. The internals |\ekvc@any@long|, |\ekvc@initials| and
 %   |\ekvc@keycount| will be set correctly by |\ekvc@SetupSplitKeys|.
 %    \begin{macrocode}
-\protected\long\def\ekvcSplitAndForward@#1#2#3%
+\protected\long\def\ekvcSplitAndUse@#1#2#3%
   {%
     \edef\ekvc@set{\string#1}%
     \ekvc@SetupSplitKeys{#3}%
@@ -868,6 +903,20 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+%
+% \begin{macro}{\ekvcSplitAndForward}
+%   This just reuses |\ekvcSplitAndUse@| with a non-empty second argument,
+%   resulting in that argument to be called after the splitting.
+%    \begin{macrocode}
+\protected\long\def\ekvcSplitAndForward#1#2#3%
+  {%
+    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+      {\ekvc@err@already@defined#1}%
+      {\ekvcSplitAndUse@#1{{#2}}{#3}}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\ekvcSplit}
 %   The first half is just |\ekvcSplitAndForward| then we define the macro to
 %   which the parsed key list is forwarded. There we need to allow for up to
@@ -876,10 +925,10 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcSplit#1#2#3%
   {%
     \ekv@ifdefined{\expandafter\@gobble\string#1}%
-      {\ekvc@err@already@defined{#1}}%
+      {\ekvc@err@already@defined#1}%
       {%
         \expandafter
-        \ekvcSplitAndForward@\expandafter#1\csname ekvc@\string#1\endcsname{#2}%
+        \ekvcSplitAndUse@\expandafter#1\csname ekvc@\string#1\endcsname{#2}%
         \ifnum\ekvc@keycount=0
           \def\ekvc@tmp##1##{}%
         \else
@@ -907,12 +956,12 @@ and the derived files           expkv-cs.pdf
 %   These macros parse the list of keys and set up the key macros. First we need
 %   to initialise some macros and start |\ekvparse|.
 %    \begin{macrocode}
-\protected\long\def\ekvc@SetupSplitKeys#1%
+\protected\long\def\ekvc@SetupSplitKeys
   {%
     \ekvc@keycount=0
     \def\ekvc@any@long{}%
     \def\ekvc@initials{}%
-    \ekvparse\ekvc@err@value@required\ekvc@SetupSplitKeys@a{#1}%
+    \ekvparse\ekvc@err@value@required\ekvc@SetupSplitKeys@a
   }
 %    \end{macrocode}
 %   Then we need to step the key counter for each key. Also we have to check
@@ -1052,24 +1101,24 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\ekvcHashAndForward}
-%   |\ekvcHashAndForward| works just like |\ekvcSplitAndForward|.
+% \begin{macro}{\ekvcHashAndUse}
+%   |\ekvcHashAndUse| works just like |\ekvcSplitAndUse|.
 %    \begin{macrocode}
-\protected\long\def\ekvcHashAndForward#1#2#3%
+\protected\long\def\ekvcHashAndUse#1#2%
   {%
     \ekv@ifdefined{\expandafter\@gobble\string#1}%
-      {\ekvc@err@already@defined{#1}}%
-      {\ekvcHashAndForward@{#1}{#2}{#3}}%
+      {\ekvc@err@already@defined#1}%
+      {\ekvcHashAndUse@#1{}{#2}}%
   }
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}[internal]{\ekvcHashAndForward@}
-%   This is more or less the same as |\ekvcHashAndForward@|. Instead of an empty
+%   This is more or less the same as |\ekvcSplitAndUse@|. Instead of an empty
 %   group we place a marker after the initials, we don't use the sorting macros
 %   of |split|, but instead pack all the values in one argument.
 %    \begin{macrocode}
-\protected\long\def\ekvcHashAndForward@#1#2#3%
+\protected\long\def\ekvcHashAndUse@#1#2#3%
   {%
     \edef\ekvc@set{\string#1}%
     \ekvc@SetupHashKeys{#3}%
@@ -1083,6 +1132,18 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\ekvcHashAndForward}
+%   |\ekvcHashAndForward| works just like |\ekvcSplitAndForward|.
+%    \begin{macrocode}
+\protected\long\def\ekvcHashAndForward#1#2#3%
+  {%
+    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+      {\ekvc@err@already@defined#1}%
+      {\ekvcHashAndUse@#1{{#2}}{#3}}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\ekvcHash}
 %   |\ekvcHash| does the same as |\ekvcSplit|, but has the advantage of not
 %   needing to count arguments, so the definition of the internal macro is a bit
@@ -1091,10 +1152,10 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcHash#1#2#3%
   {%
     \ekv@ifdefined{\expandafter\@gobble\string#1}%
-      {\ekvc@err@already@defined{#1}}%
+      {\ekvc@err@already@defined#1}%
       {%
         \expandafter
-        \ekvcHashAndForward@\expandafter#1\csname ekvc@\string#1\endcsname{#2}%
+        \ekvcHashAndUse@\expandafter#1\csname ekvc@\string#1\endcsname{#2}%
         \ekvc@any@long\expandafter\def\csname ekvc@\string#1\endcsname##1{#3}%
       }%
   }
@@ -1292,7 +1353,7 @@ and the derived files           expkv-cs.pdf
 % \end{macro}
 %
 % \begin{macro}{\ekvcValueSplit}
-%   This splits off a single version
+%   This splits off a single value.
 %    \begin{macrocode}
 \long\def\ekvcValueSplit#1#2#3%
   {%

@@ -11,10 +11,12 @@
     \ekvcSplit\macroA{height=1,long length=2}
       {height: #1; length: \detokenize{#2}}
     \ekvcSplitAndForward\macroB\helper{height=3,long length=4}
+    \ekvcSplitAndUse\macroC{height=3,long length=4}
   }
 \OMIT
 \ekvcSplit\macroA{height=1,long length=2}{height: #1; length: \detokenize{#2}}
 \ekvcSplitAndForward\macroB\helper{height=3,long length=4}
+\ekvcSplitAndUse\macroC{height=3,long length=4}
 \TIMO
 \TESTEXP{using split}
   {%
@@ -31,5 +33,13 @@
     \macroB{length=b}{arg}\NEWLINE
     \macroB{height=a,length=b}{arg}\NEWLINE
     \macroB{height=a,length=par\par}{arg}\NEWLINE
+  }
+\TESTEXP{using split and use}
+  {%
+    \macroC{}\helper{arg}\NEWLINE
+    \macroC{height=a}\helper{arg}\NEWLINE
+    \macroC{length=b}\helper{arg}\NEWLINE
+    \macroC{height=a,length=b}\helper{arg}\NEWLINE
+    \macroC{height=a,length=par\par}\helper{arg}\NEWLINE
   }
 \END

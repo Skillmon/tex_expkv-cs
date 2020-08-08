@@ -23,7 +23,16 @@ height: a; length: \empty ; mandatory: arg
 height: a; length: par\par ; mandatory: arg
 ============================================================
 ============================================================
-TEST 4: three steps for fast hash
+TEST 4: using hash and use
+============================================================
+height: 3; length: 4; mandatory: arg
+height: a; length: 4; mandatory: arg
+height: 3; length: b; mandatory: arg
+height: a; length: \empty ; mandatory: arg
+height: a; length: par\par ; mandatory: arg
+============================================================
+============================================================
+TEST 5: three steps for fast hash
 ============================================================
 height: 1; length: \empty 
 height: 3; length: \empty ; mandatory: arg

@@ -81,8 +81,8 @@ and the derived files           expkv-cs.pdf
     ,basicstyle=\fontfamily{jkp}\itshape
     ,morekeywords=^^A
       {^^A
-        \ekvcSplit,\ekvcSplitAndForward,
-        \ekvcHash,\ekvcHashAndForward,
+        \ekvcSplit,\ekvcSplitAndForward,\ekvcSplitAndUse
+        \ekvcHash,\ekvcHashAndForward,\ekvcHashAndUse
         \ekvcValue,\ekvcValueFast,
         \ekvcSecondaryKeys
       }
@@ -874,6 +874,7 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \protected\long\def\ekvcSplitAndUse#1#2%
   {%
+    \let\ekvc@helpers@needed\@firstoftwo
     \ekv@ifdefined{\expandafter\@gobble\string#1}%
       {\ekvc@err@already@defined#1}%
       {\ekvcSplitAndUse@#1{}{#2}}%
@@ -892,12 +893,23 @@ and the derived files           expkv-cs.pdf
   {%
     \edef\ekvc@set{\string#1}%
     \ekvc@SetupSplitKeys{#3}%
-    \ekvc@any@long\edef#1##1%
+    \ekvc@helpers@needed
       {%
-        \expandafter\ekvc@ekvset@pre@expander\expandafter{\ekvc@set}%
-        \unexpanded\expandafter
-          {\csname ekvc@split@\the\ekvc@keycount\endcsname}%
-        \unexpanded\expandafter{\ekvc@initials{}#2}%
+        \ekvc@any@long\edef#1##1%
+          {%
+            \expandafter\ekvc@ekvset@pre@expander\expandafter{\ekvc@set}%
+            \unexpanded\expandafter
+              {\csname ekvc@split@\the\ekvc@keycount\endcsname}%
+            \unexpanded\expandafter{\ekvc@initials{}#2}%
+          }%
+      }%
+      {%
+        \ekvc@any@long\edef#1##1%
+          {%
+            \expandafter\ekvc@ekvset@pre@expander\expandafter{\ekvc@set}%
+            \unexpanded{#2}%
+            \unexpanded\expandafter{\ekvc@initials}%
+          }%
       }%
   }
 %    \end{macrocode}
@@ -910,6 +922,7 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \protected\long\def\ekvcSplitAndForward#1#2#3%
   {%
+    \let\ekvc@helpers@needed\@firstoftwo
     \ekv@ifdefined{\expandafter\@gobble\string#1}%
       {\ekvc@err@already@defined#1}%
       {\ekvcSplitAndUse@#1{{#2}}{#3}}%
@@ -924,25 +937,47 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \protected\long\def\ekvcSplit#1#2#3%
   {%
+    \let\ekvc@helpers@needed\@secondoftwo
     \ekv@ifdefined{\expandafter\@gobble\string#1}%
       {\ekvc@err@already@defined#1}%
       {%
         \expandafter
         \ekvcSplitAndUse@\expandafter#1\csname ekvc@\string#1\endcsname{#2}%
-        \ifnum\ekvc@keycount=0
-          \def\ekvc@tmp##1##{}%
+        \ifnum\ekvc@keycount<1
+          \ekvc@any@long\expandafter\def\csname ekvc@\string#1\endcsname{#3}%
         \else
           \ifnum\ekvc@keycount>9
             \ekvc@err@toomany{#1}%
-            \ekvc@defarggobbler9%
+            \let#1\ekvc@undefined
           \else
-            \expandafter\ekvc@defarggobbler\the\ekvc@keycount
+            \ekvcSplit@build@argspec
+            \ekvc@any@long\expandafter
+            \def\csname ekvc@\string#1\expandafter\endcsname\ekvc@tmp{#3}%
           \fi
         \fi
-        \ekvc@any@long\expandafter
-        \def\csname ekvc@\string#1\expandafter\endcsname
-            \ekvc@tmp##1##2##3##4##5##6##7##8##9%
-          {#3}%
+      }%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internel]{\ekvcSplit@build@argspec,\ekvcSplit@build@argspec@}
+%    \begin{macrocode}
+\protected\def\ekvcSplit@build@argspec
+  {%
+    \begingroup
+      \edef\ekvc@tmp
+        {\endgroup\def\unexpanded{\ekvc@tmp}{\ekvcSplit@build@argspec@{1}}}%
+    \ekvc@tmp
+  }
+\def\ekvcSplit@build@argspec@#1%
+  {%
+    \ifnum#1>\ekvc@keycount
+      \ekv@fi@gobble
+    \fi
+    \@firstofone
+      {%
+        \unexpanded\expandafter{\csname ekvc@splitmark@#1\endcsname####}#1%
+        \expandafter\ekvcSplit@build@argspec@\expandafter{\the\numexpr#1+1}%
       }%
   }
 %    \end{macrocode}
@@ -1033,7 +1068,9 @@ and the derived files           expkv-cs.pdf
       }%
     \ekvc@tmp
     \ekvlet\ekvc@set{#1}\ekvc@tmp
-    \expandafter\ekvc@setup@splitmacro\expandafter{\the\ekvc@keycount}%
+    \ekvc@helpers@needed
+      {\expandafter\ekvc@setup@splitmacro\expandafter{\the\ekvc@keycount}}%
+      {}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1059,12 +1096,18 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[internal]{\ekvc@setup@splitmacro, \ekvc@split@1}
-%   Since the first split macro is different from the others we manually set
-%   that one up now. All the others will be defined as needed (always globally).
-%   The split macros just read up until the correct split mark, move that
-%   argument into a list and reinsert the rest, calling the next split macro
-%   afterwards.
+% \begin{macro}[internal]
+%   {
+%     \ekvc@setup@splitmacro,
+%     \ekvc@split@1, \ekvc@split@2, \ekvc@split@3,
+%     \ekvc@split@4, \ekvc@split@5, \ekvc@split@6,
+%     \ekvc@split@7
+%   }
+%   Since the first few split macros are different from the others we manually
+%   set those up now. All the others will be defined as needed (always
+%   globally).  The split macros just read up until the correct split mark, move
+%   that argument into a list and reinsert the rest, calling the next split
+%   macro afterwards.
 %    \begin{macrocode}
 \begingroup
 \edef\ekvc@tmp
@@ -1073,6 +1116,51 @@ and the derived files           expkv-cs.pdf
         \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}%
         ##1##2##3%
       {##3{##1}##2}%
+    \long\gdef\unexpanded\expandafter{\csname ekvc@split@2\endcsname}%
+        \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
+        \unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
+        ##3##4%
+      {##4{##1}{##2}##3}%
+    \long\gdef\unexpanded\expandafter{\csname ekvc@split@3\endcsname}%
+        \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
+        \unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
+        \unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
+        ##4##5%
+      {##5{##1}{##2}{##3}##4}%
+    \long\gdef\unexpanded\expandafter{\csname ekvc@split@4\endcsname}%
+        \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
+        \unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
+        \unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
+        \unexpanded\expandafter{\csname ekvc@splitmark@4\endcsname}##4%
+        ##5##6%
+      {##6{##1}{##2}{##3}{##4}##5}%
+    \long\gdef\unexpanded\expandafter{\csname ekvc@split@5\endcsname}%
+        \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
+        \unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
+        \unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
+        \unexpanded\expandafter{\csname ekvc@splitmark@4\endcsname}##4%
+        \unexpanded\expandafter{\csname ekvc@splitmark@5\endcsname}##5%
+        ##6##7%
+      {##7{##1}{##2}{##3}{##4}{##5}##6}%
+    \long\gdef\unexpanded\expandafter{\csname ekvc@split@6\endcsname}%
+        \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
+        \unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
+        \unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
+        \unexpanded\expandafter{\csname ekvc@splitmark@4\endcsname}##4%
+        \unexpanded\expandafter{\csname ekvc@splitmark@5\endcsname}##5%
+        \unexpanded\expandafter{\csname ekvc@splitmark@6\endcsname}##6%
+        ##7##8%
+      {##8{##1}{##2}{##3}{##4}{##5}{##6}##7}%
+    \long\gdef\unexpanded\expandafter{\csname ekvc@split@7\endcsname}%
+        \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
+        \unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
+        \unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
+        \unexpanded\expandafter{\csname ekvc@splitmark@4\endcsname}##4%
+        \unexpanded\expandafter{\csname ekvc@splitmark@5\endcsname}##5%
+        \unexpanded\expandafter{\csname ekvc@splitmark@6\endcsname}##6%
+        \unexpanded\expandafter{\csname ekvc@splitmark@7\endcsname}##7%
+        ##8##9%
+      {##9{##1}{##2}{##3}{##4}{##5}{##6}{##7}##8}%
   }
 \ekvc@tmp
 \endgroup
@@ -1106,6 +1194,7 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \protected\long\def\ekvcHashAndUse#1#2%
   {%
+    \let\ekvc@helpers@needed\@firstoftwo
     \ekv@ifdefined{\expandafter\@gobble\string#1}%
       {\ekvc@err@already@defined#1}%
       {\ekvcHashAndUse@#1{}{#2}}%
@@ -1113,7 +1202,7 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[internal]{\ekvcHashAndForward@}
+% \begin{macro}[internal]{\ekvcHashAndUse@}
 %   This is more or less the same as |\ekvcSplitAndUse@|. Instead of an empty
 %   group we place a marker after the initials, we don't use the sorting macros
 %   of |split|, but instead pack all the values in one argument.
@@ -1122,11 +1211,22 @@ and the derived files           expkv-cs.pdf
   {%
     \edef\ekvc@set{\string#1}%
     \ekvc@SetupHashKeys{#3}%
-    \ekvc@any@long\edef#1##1%
+    \ekvc@helpers@needed
       {%
-        \expandafter\ekvc@ekvset@pre@expander\expandafter{\ekvc@set}%
-        \unexpanded{\ekvc@hash@pack@argument}%
-        \unexpanded\expandafter{\ekvc@initials\ekvc@stop#2}%
+        \ekvc@any@long\edef#1##1%
+          {%
+            \expandafter\ekvc@ekvset@pre@expander\expandafter{\ekvc@set}%
+            \unexpanded{\ekvc@hash@pack@argument}%
+            \unexpanded\expandafter{\ekvc@initials\ekvc@stop#2}%
+          }%
+      }%
+      {%
+        \ekvc@any@long\edef#1##1%
+          {%
+            \expandafter\ekvc@ekvset@pre@expander\expandafter{\ekvc@set}%
+            \unexpanded{#2}%
+            \unexpanded\expandafter{\ekvc@initials\ekvc@stop}%
+          }%
       }%
   }
 %    \end{macrocode}
@@ -1137,6 +1237,7 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \protected\long\def\ekvcHashAndForward#1#2#3%
   {%
+    \let\ekvc@helpers@needed\@firstoftwo
     \ekv@ifdefined{\expandafter\@gobble\string#1}%
       {\ekvc@err@already@defined#1}%
       {\ekvcHashAndUse@#1{{#2}}{#3}}%
@@ -1151,12 +1252,15 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \protected\long\def\ekvcHash#1#2#3%
   {%
+    \let\ekvc@helpers@needed\@secondoftwo
     \ekv@ifdefined{\expandafter\@gobble\string#1}%
       {\ekvc@err@already@defined#1}%
       {%
         \expandafter
         \ekvcHashAndUse@\expandafter#1\csname ekvc@\string#1\endcsname{#2}%
-        \ekvc@any@long\expandafter\def\csname ekvc@\string#1\endcsname##1{#3}%
+        \ekvc@any@long\expandafter\def\csname ekvc@\string#1\endcsname
+            ##1\ekvc@stop
+          {#3}%
       }%
   }
 %    \end{macrocode}

@@ -1511,17 +1511,6 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[internal]{\ekvcValueSplitFast@a}
-%   This step then expands the hash function once and passes the result to |#3|
-%   which should be a single control sequence.
-%    \begin{macrocode}
-\long\def\ekvcValueSplitFast@#1#2#3%
-  {%
-    \expandafter#3\expandafter{#1#2\ekvc@stop}%
-  }
-%    \end{macrocode}
-% \end{macro}
-%
 % \begin{macro}[internal]
 %   {
 %     \ekvc@safehash@,\ekvc@fasthash@,

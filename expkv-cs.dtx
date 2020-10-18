@@ -821,6 +821,20 @@ and the derived files           expkv-cs.pdf
 % |\ekvc@tmp| will be reused later, but we don't need it to ever store
 % information long-term after \expkvc\ was initialized.
 %
+% \begin{macro}[internal]{\ekvc@zero}
+%   There are different ways to define a |\romannumeral| expansion. If the
+%   control is never given to user input, the fastest way is to just execute
+%   your code and use a chardefed zero to end it afterwards. This is what we're
+%   doing here. If the control is given to user input (so user input should be
+%   expanded) the fastest and best way is to use |\romannumeral`\^^@|, this will
+%   expand the user input until something unexpandable is found or a space
+%   (which would then be gobbled). However, since we want to use the |\chardef|
+%   variant, we have to actually provide such a token.
+%    \begin{macrocode}
+\chardef\ekvc@zero0
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}[internal]{\ekvc@keycount}
 %   We'll need to keep count how many keys must be defined for each macro in the
 %   |split| variants.
@@ -1378,12 +1392,11 @@ and the derived files           expkv-cs.pdf
                   ####1%
                 {%
                   \unexpanded\expandafter{\csname ekvc@@safehash@#1\endcsname}%
-                  ####1\unexpanded{\ekvc@mark}{ }%
+                  ####1\unexpanded{\ekvc@mark\ekvc@zero}%
                   \unexpanded\expandafter
                     {%
-                      \csname ekvc@hashmark@#1\endcsname
-                      {\ekvc@err@missing@hash{#1} }%
-                      \ekvc@mark{}\ekvc@stop
+                      \csname ekvc@hashmark@#1\endcsname\ekvc@zero
+                      \ekvc@mark{\ekvc@err@missing@hash{#1}}\ekvc@stop
                     }%
                 }%
               \long\gdef
@@ -1440,10 +1453,10 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \long\def\ekvcValue#1#2%
   {%
-    \romannumeral`\^^@%
+    \romannumeral
     \ekv@ifdefined{ekvc@safehash@#1}%
       {\csname ekvc@safehash@#1\endcsname{#2}}%
-      {\ekvc@err@unknown@hash{#1} }% keep this space
+      {\ekvc@err@unknown@hash{#1}\ekvc@zero}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1516,7 +1529,7 @@ and the derived files           expkv-cs.pdf
 %   thrown by |\ekvcValueFast| in three expansion steps. The safe hash variant
 %   has to also stop the |\romannumeral| expansion.
 %    \begin{macrocode}
-\long\def\ekvc@safehash@#1{\ekvc@err@empty@hash\@gobble{} }% keep this space
+\long\def\ekvc@safehash@#1{\ekvc@err@empty@hash\ekvc@zero}
 \long\def\ekvc@fasthash@#1\ekvc@stop{\ekvc@err@empty@hash}
 \long\def\ekvc@safesplithash@#1#2{\ekvc@err@empty@hash#2{#1}{}}
 \long\def\ekvc@fastsplithash@#1\ekvc@stop#2{\ekvc@err@empty@hash#2{#1}{}}

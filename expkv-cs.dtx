@@ -800,8 +800,8 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}{\ekvcVersion,\ekvcDate}
 % We're on our first input, so lets store the version and date in a macro.
 %    \begin{macrocode}
-\def\ekvcVersion{0.5}
-\def\ekvcDate{2020-10-11}
+\def\ekvcVersion{0.6}
+\def\ekvcDate{2020-10-18}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -824,12 +824,14 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}[internal]{\ekvc@zero}
 %   There are different ways to define a |\romannumeral| expansion. If the
 %   control is never given to user input, the fastest way is to just execute
-%   your code and use a chardefed zero to end it afterwards. This is what we're
-%   doing here. If the control is given to user input (so user input should be
-%   expanded) the fastest and best way is to use |\romannumeral`\^^@|, this will
-%   expand the user input until something unexpandable is found or a space
-%   (which would then be gobbled). However, since we want to use the |\chardef|
-%   variant, we have to actually provide such a token.
+%   your code and use a |\chardef|ed zero to end it afterwards.  If the control
+%   is given to user input (so user input should be expanded) the fastest and
+%   best way is to use |\romannumeral`\^^@|, this will expand the user input
+%   until something unexpandable is found or a space (which would then be
+%   gobbled). However, we want to use the former approach since we don't want to
+%   expand any user input, just make sure own code is expanded in two steps.
+%   Since we want to use the |\chardef| variant, we have to actually provide
+%   such a token.
 %    \begin{macrocode}
 \chardef\ekvc@zero0
 %    \end{macrocode}

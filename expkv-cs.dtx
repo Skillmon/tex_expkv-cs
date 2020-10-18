@@ -1451,12 +1451,12 @@ and the derived files           expkv-cs.pdf
 %   hash macro exists) and then call that hash-grabbing macro that will also
 %   test whether the hash is inside of |#2| or not.
 %    \begin{macrocode}
-\long\def\ekvcValue#1#2%
+\long\def\ekvcValue#1%
   {%
     \romannumeral
     \ekv@ifdefined{ekvc@safehash@#1}%
-      {\csname ekvc@safehash@#1\endcsname{#2}}%
-      {\ekvc@err@unknown@hash{#1}\ekvc@zero}%
+      {\csname ekvc@safehash@#1\endcsname}%
+      {\ekvc@err@unknown@hash{#1}\@firstoftwo\ekvc@zero}%
   }
 %    \end{macrocode}
 % \end{macro}

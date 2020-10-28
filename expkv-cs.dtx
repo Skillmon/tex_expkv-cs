@@ -164,7 +164,7 @@ and the derived files           expkv-cs.pdf
   }
 \hypersetup{linkcolor=red!80!black,urlcolor=purple!80!black}
 \DoNotIndex{\def,\edef,\,,\=,\begingroup,\catcode,\chardef,\csname,\endcsname}
-\DoNotIndex{\endgroup,\endinput,\errmessage,\expandafter,\input,\let,\long}
+\DoNotIndex{\endgroup,\endinput,\errmessage,\expandafter,\input,\let,\long,\z@}
 \DoNotIndex{\protected,\ProvidesFile,\ProvidesPackage,\relax,\space,\advance}
 \DoNotIndex{\@,\unexpanded,\string,\expanded,\dimexpr,\global,\glueexpr,\hbox}
 \DoNotIndex{\numexpr,\RequirePackage,\setbox,\the,\unless,\xdef,\gdef,\newcount}
@@ -824,16 +824,17 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}[internal]{\ekvc@zero}
 %   There are different ways to define a |\romannumeral| expansion. If the
 %   control is never given to user input, the fastest way is to just execute
-%   your code and use a |\chardef|ed zero to end it afterwards.  If the control
+%   your code and use a |\dimendef|ed zero to end it afterwards.  If the control
 %   is given to user input (so user input should be expanded) the fastest and
 %   best way is to use |\romannumeral`\^^@|, this will expand the user input
 %   until something unexpandable is found or a space (which would then be
 %   gobbled). However, we want to use the former approach since we don't want to
 %   expand any user input, just make sure own code is expanded in two steps.
-%   Since we want to use the |\chardef| variant, we have to actually provide
-%   such a token.
+%   Since we want to use the |\dimendef| variant, we have to actually provide
+%   such a token. Since both plain \TeX\ and \LaTeX\ define |\z@| we can use
+%   that (but we use a private name for it).
 %    \begin{macrocode}
-\chardef\ekvc@zero0
+\let\ekvc@zero\z@
 %    \end{macrocode}
 % \end{macro}
 %

@@ -1745,19 +1745,12 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}[internal]{\ekvc@err,\ekvc@err@}
 %   We need a way to throw error messages expandably in some contexts.
 %    \begin{macrocode}
-\begingroup
-\edef\ekvc@err
+\def\ekvc@err#1%
   {%
-    \endgroup
-    \unexpanded{\long\def\ekvc@err}##1%
-      {%
-        \unexpanded{\expandafter\ekvc@err@\@firstofone}%
-        {\unexpanded\expandafter{\csname ! expkv-cs Error:\endcsname}##1.}%
-        \unexpanded{\ekv@stop}%
-      }%
+    \long\def\ekvc@err##1{\expandafter\ekv@err@\@firstofone{#1##1.}\ekv@stop}%
   }
-\ekvc@err
-\def\ekvc@err@{\expandafter\ekv@gobbleto@stop}
+\begingroup\expandafter\endgroup
+\expandafter\ekvc@err\csname ! expkv-cs Error:\endcsname
 %    \end{macrocode}
 % \end{macro}
 %

@@ -836,6 +836,14 @@ and the derived files           expkv-cs.pdf
 %   |\ekv@zero|, which we can use in \expkvc.
 % \end{macro}
 %
+% \begin{macro}[internal]{\ekvc@tripledots}
+%   This macro just serves as a marker for a comparison to allow the syntax
+%   for the unknown key handlers.
+%    \begin{macrocode}
+\def\ekvc@tripledots{...}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}[internal]{\ekvc@keycount}
 %   We'll need to keep count how many keys must be defined for each macro in the
 %   |split| variants.
@@ -1001,7 +1009,8 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}[internal]
 %   {
 %     \ekvc@SetupSplitKeys, \ekvc@SetupSplitKeys@a, \ekvc@SetupSplitKeys@b,
-%     \ekvc@SetupSplitKeys@c
+%     \ekvc@SetupSplitKeys@c,
+%     \ekvc@SetupSplitKeys@check@unknown
 %   }
 %   These macros parse the list of keys and set up the key macros. First we need
 %   to initialise some macros and start |\ekvparse|.
@@ -1011,7 +1020,9 @@ and the derived files           expkv-cs.pdf
     \ekvc@keycount=0
     \def\ekvc@any@long{}%
     \def\ekvc@initials{}%
-    \ekvparse\ekvc@err@value@required\ekvc@SetupSplitKeys@a
+    \let\ekvc@if@supports@unknown\@gobble
+    \def\ekvc@unknown@handlers{}%
+    \ekvparse\ekvc@SetupSplitKeys@check@unknown\ekvc@SetupSplitKeys@a
   }
 %    \end{macrocode}
 %   Then we need to step the key counter for each key. Also we have to check
@@ -1086,6 +1097,19 @@ and the derived files           expkv-cs.pdf
     \ekvc@helpers@needed
       {\expandafter\ekvc@setup@splitmacro\expandafter{\the\ekvc@keycount}}%
       {}%
+  }
+\protected\long\def\ekvc@SetupSplitKeys@check@unknown#1%
+  {%
+    \begingroup
+      \edef\ekvc@tmp{\detokenize{#1}}%
+      \expandafter
+    \endgroup
+    \ifx\ekvc@tripledots\ekvc@tmp
+      \let\ekvc@any@long\long
+      \let\ekvc@if@supports@unknown\@firstofone
+    \else
+      \ekvc@err@value@required{#1}%
+    \fi
   }
 %    \end{macrocode}
 % \end{macro}

@@ -832,10 +832,8 @@ and the derived files           expkv-cs.pdf
 %   expand any user input, just make sure own code is expanded in two steps.
 %   Since we want to use the |\dimendef| variant, we have to actually provide
 %   such a token. Since both plain \TeX\ and \LaTeX\ define |\z@| we can use
-%   that (but we use a private name for it).
-%    \begin{macrocode}
-\let\ekvc@zero\z@
-%    \end{macrocode}
+%   that (but we use a private name for it). Luckily, \expkv\ already contains
+%   |\ekv@zero|, which we can use in \expkvc.
 % \end{macro}
 %
 % \begin{macro}[internal]{\ekvc@keycount}
@@ -1395,10 +1393,10 @@ and the derived files           expkv-cs.pdf
                   ####1%
                 {%
                   \unexpanded\expandafter{\csname ekvc@@safehash@#1\endcsname}%
-                  ####1\unexpanded{\ekvc@mark\ekvc@zero}%
+                  ####1\unexpanded{\ekvc@mark\ekv@zero}%
                   \unexpanded\expandafter
                     {%
-                      \csname ekvc@hashmark@#1\endcsname\ekvc@zero
+                      \csname ekvc@hashmark@#1\endcsname\ekv@zero
                       \ekvc@mark{\ekvc@err@missing@hash{#1}}\ekvc@stop
                     }%
                 }%
@@ -1459,7 +1457,7 @@ and the derived files           expkv-cs.pdf
     \romannumeral
     \ekv@ifdefined{ekvc@safehash@#1}%
       {\csname ekvc@safehash@#1\endcsname}%
-      {\ekvc@err@unknown@hash{#1}\@firstoftwo\ekvc@zero}%
+      {\ekvc@err@unknown@hash{#1}\@firstoftwo\ekv@zero}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1525,7 +1523,7 @@ and the derived files           expkv-cs.pdf
 %   thrown by |\ekvcValueFast| in three expansion steps. The safe hash variant
 %   has to also stop the |\romannumeral| expansion.
 %    \begin{macrocode}
-\long\def\ekvc@safehash@#1{\ekvc@err@empty@hash\ekvc@zero}
+\long\def\ekvc@safehash@#1{\ekvc@err@empty@hash\ekv@zero}
 \long\def\ekvc@fasthash@#1\ekvc@stop{\ekvc@err@empty@hash}
 \long\def\ekvc@safesplithash@#1#2{\ekvc@err@empty@hash#2{#1}{}}
 \long\def\ekvc@fastsplithash@#1\ekvc@stop#2{\ekvc@err@empty@hash#2{#1}{}}

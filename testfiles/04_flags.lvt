@@ -1,0 +1,135 @@
+\input regression-test
+
+\RequirePackage{expkv-cs}
+
+\START
+\OMIT
+\ekvcFlagNew\aflag
+\TIMO
+
+\TEST{defining flags}
+  {%
+    \ekvcFlagNew\aflag
+    \ekvcFlagNew\bflag
+  }
+
+\TESTEXP{using flags}
+  {%
+    .\ekvcFlagIfRaised\aflag{raised}{not raised}.\NEWLINE
+    .\aflag.\NEWLINE
+    .\ekvcFlagRaise\aflag.%
+    .\aflag.\NEWLINE
+    .\ekvcFlagHeight\aflag.\NEWLINE
+    .\ekvcFlagRaise\aflag.%
+    .\ekvcFlagRaise\aflag.%
+    .\ekvcFlagHeight\aflag.\NEWLINE
+    .\ekvcFlagSetFalse\aflag.%
+    .\ekvcFlagSetTrue\aflag.%
+    .\ekvcFlagIf\aflag{true}{false}.\NEWLINE
+    .\ekvcFlagSetTrue\aflag.%
+    .\ekvcFlagIf\aflag{true}{false}.\NEWLINE
+    .\ekvcFlagSetFalse\aflag.%
+    .\ekvcFlagIf\aflag{true}{false}.\NEWLINE
+    .\ekvcFlagSetFalse\aflag.%
+    .\ekvcFlagIf\aflag{true}{false}.\NEWLINE
+    .\ekvcFlagIfRaised\aflag{raised}{not raised}.\NEWLINE
+  }
+
+\TEST{resetting a flag}
+  {%
+    \ekvcFlagRaise\aflag
+    \TYPE{\ekvcFlagHeight\aflag}%
+    \ekvcFlagReset\aflag
+    \TYPE{\ekvcFlagHeight\aflag}%
+  }
+
+\OMIT
+\ekvcFlagNew\bflag
+\ekvcFlagNew\cflag
+\newcommand\showflag[2]{Height#1: #2}
+\TIMO
+
+\TESTEXP{get flag heights}
+  {%
+    \ekvcFlagRaise\aflag
+    \ekvcFlagRaise\bflag
+    \ekvcFlagRaise\bflag
+    \ekvcFlagRaise\cflag
+    \ekvcFlagRaise\cflag
+    \ekvcFlagRaise\cflag
+    .\ekvcFlagGetHeight\aflag{\showflag{ is}}.\NEWLINE
+    .\ekvcFlagGetHeights{\aflag\bflag\cflag}{\showflag{s are}}.\NEWLINE
+  }
+
+\OMIT
+\ekvcSplitAndForward\testKV\testOUT{a=b}
+\newcommand\test[1]{\ekvcFlagGetHeight\bflag{\testKV{#1}}}
+\newcommand\testOUT[2]
+  {%
+    a `#1'. bool \ekvcFlagIf\aflag{true. }{false.}
+    flag \ifnum#2=\bflag not \fi raised%
+  }
+\TIMO
+
+\TEST{define secondary flag keys}
+  {%
+    \ekvcSecondaryKeys\testKV
+      {%
+         flag-true true=\aflag
+        ,flag-false false=\aflag
+        ,flag-bool bool=\aflag
+        ,flag-raise raise=\bflag
+      }%
+  }
+
+\OMIT
+\ekvcSecondaryKeys\testKV
+  {%
+     flag-true  true =\aflag
+    ,flag-false false=\aflag
+    ,flag-bool  bool =\aflag
+    ,flag-raise raise=\bflag
+  }
+\ekvcFlagReset\aflag
+\TIMO
+
+\TESTEXP{use secondary flag keys}
+  {%
+    .\test{}.\NEWLINE
+    .\test{true}.\NEWLINE
+    .\test{}.\NEWLINE
+    .\test{false}.\NEWLINE
+    .\test{}.\NEWLINE
+    .\test{bool=true}.\NEWLINE
+    .\test{}.\NEWLINE
+    .\test{bool=false}.\NEWLINE
+    .\test{}.\NEWLINE
+    .\test{raise}.\NEWLINE
+    .\test{}.\NEWLINE
+  }
+
+\TEST{errors during definition}
+  {%
+    \ekvcSecondaryKeys\testKV
+      {
+         flag-true  key
+        ,flag-false key
+        ,flag-bool  key
+        ,flag-raise key
+        ,long flag-true  key = \aflag
+        ,long flag-false key = \aflag
+        ,long flag-bool  key = \aflag
+        ,long flag-raise key = \bflag
+      }
+  }
+
+\TESTEXP{errors during usage}
+  {%
+    \test{true=true}\NEWLINE
+    \test{false=false}\NEWLINE
+    \test{raise=raise}\NEWLINE
+    \test{bool}\NEWLINE
+    \test{bool=False}\NEWLINE
+  }
+
+\END

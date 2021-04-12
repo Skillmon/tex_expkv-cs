@@ -529,6 +529,151 @@ and the derived files           expkv-cs.pdf
 %   secondary key.
 % \end{function}
 %
+% \begin{function}{flag-bool}
+%   \begin{syntax}
+%     flag-bool \key\ = \meta{cs} \prefixes3
+%   \end{syntax}
+%   This is a secondary key that doesn't directly involve any of the primary or
+%   secondary keys.
+%   This defines \key\ to take a value, which should be either |true| or
+%   |false|, and set the flag called \meta{cs} accordingly as a boolean.
+%   If \meta{cs} isn't defined yet it will be initialised as a flag.
+%   Please also read \autoref{sec:flags}.
+% \end{function}
+%
+% \begin{function}{flag-true,flag-false}
+%   \begin{syntax}
+%     flag-true \key\ = \meta{cs} \prefixes3
+%   \end{syntax}
+%   This is a secondary key that doesn't directly involve any of the primary or
+%   secondary keys.
+%   This defines \key\ to take no value and set the flag called \meta{cs} to
+%   |true| or |false|, respectively.
+%   If \meta{cs} isn't defined yet it will be initialised as a flag.
+%   Please also read \autoref{sec:flags}.
+% \end{function}
+%
+% \begin{function}{flag-raise}
+%   \begin{syntax}
+%     flag-raise \key\ = \meta{cs} \prefixes3
+%   \end{syntax}
+%   This is a secondary key that doesn't directly involve any of the primary or
+%   secondary keys.
+%   This defines \key\ to take no value and raise the flag called \meta{cs}.
+%   If \meta{cs} isn't defined yet it will be initialised as a flag.
+%   Please also read \autoref{sec:flags}.
+% \end{function}
+%
+%
+% \subsection{Flags}\label{sec:flags}
+%
+% The idea of flags is taken from \pkg{expl3}. They provide a way to store
+% numerical information expandably, however only incrementing and accessing
+% works expandably, decrementing is unexpandable. A flag has a height, which
+% is a numerical value, and which can be raised by $1$. Flags come at a high
+% computational cost (accessing them is slow and they require more memory than
+% normal \TeX\ data types like registers, both getting linearly worse with the
+% height), so don't use them if not necessary.
+%
+% The state of flags is always changed locally to the current group, but not to
+% the current macro, so if you're using one of the |t|-types involving flags
+% bear in mind that they can affect other macros at the current group level!
+%
+% \expkvc\ provides some macros to access, alter, and use flags. Flags of
+% \expkvc\ don't share a name space with the flags of \pkg{expl3}.
+%
+% \begin{function}{\ekvcFlagNew}
+%   \begin{syntax}
+%     \cs{ekvcFlagNew}\meta{flag}
+%   \end{syntax}
+%   This initialises the macro \meta{flag} as a new flag. It isn't checked
+%   whether the macro \meta{flag} is currently undefined.  A \meta{flag} will
+%   expand to the flag's current height with a trailing space (so you can use it
+%   directly with |\ifnum| for example and it will terminate the number scanning
+%   itself).
+% \end{function}
+%
+%  All other macros dealing with flags take as a parameter a macro defined as a
+%  \meta{flag} with |\ekvcFlagNew|.
+%
+% \begin{function}{\ekvcFlagHeight}
+%   \begin{syntax}
+%     \cs{ekvcFlagHeight}\meta{flag}
+%   \end{syntax}
+%   This expands to the current height of \meta{flag} in a single step of
+%   expansion (without a trailing space).
+% \end{function}
+%
+% \begin{function}{\ekvcFlagRaise}
+%   \begin{syntax}
+%     \cs{ekvcFlagRaise}\meta{flag}
+%   \end{syntax}
+%   This expandably raises the height of \meta{flag} by $1$.
+% \end{function}
+%
+% \begin{function}{\ekvcFlagSetTrue,\ekvcFlagSetFalse}
+%   \begin{syntax}
+%     \cs{ekvcFlagSetTrue}\meta{flag}
+%   \end{syntax}
+%   By interpreting an even value as false and an odd value as true we can use a
+%   flag as a boolean. This expandably sets \meta{flag} to true or false,
+%   respectively, by raising it if necessary.
+% \end{function}
+%
+% \begin{function}{\ekvcFlagIf}
+%   \begin{syntax}
+%     \cs{ekvcFlagIf}\meta{flag}\marg{true}\marg{false}
+%   \end{syntax}
+%   This interprets a \meta{flag} as a boolean and expands to either \meta{true}
+%   or \meta{false}.
+% \end{function}
+%
+% \begin{function}{\ekvcFlagIfRaised}
+%   \begin{syntax}
+%     \cs{ekvcFlagIfRaised}\meta{flag}\marg{true}\marg{false}
+%   \end{syntax}
+%   This tests whether the \meta{flag} is raised, meaning it has a height
+%   greater than zero, and if so expands to \meta{true} else to \meta{false}.
+% \end{function}
+%
+% \begin{function}{\ekvcFlagReset}
+%   \begin{syntax}
+%     \cs{ekvcFlagReset}\meta{flag}
+%   \end{syntax}
+%   This resets a flag (so restores its height to $0$). This operation is
+%   \emph{not} expandable and done locally. If you really intend to use flags
+%   you can reset them every now and then to keep the performance hit low.
+% \end{function}
+%
+% \begin{function}{\ekvcFlagGetHeight}
+%   \begin{syntax}
+%     \cs{ekvcFlagGetHeight}\meta{flag}\marg{next}
+%   \end{syntax}
+%   This retrieves the current height of the \meta{flag} and provides it as a
+%   braced argument to \meta{next}, leaving \meta{next}\marg{height} in the
+%   input stream.
+% \end{function}
+%
+% \begin{function}{\ekvcFlagGetHeights}
+%   \begin{syntax}
+%     \cs{ekvcFlagGetHeights}\marg{flag-list}\marg{next}
+%   \end{syntax}
+%   This retrieves the current height of each \meta{flag} in the
+%   \meta{flag-list} and provides them as a single argument to \meta{next}.
+%   Inside that argument each height is enclosed in a set of braces
+%   individually. The \meta{flag-list} is just a single argument containing the
+%   \meta{flag}s.
+%   So a usage like
+%   \texttt
+%     {^^A
+%       \cs[no-index]{ekvcFlagGetHeights}\hskip0pt^^A
+%       \{\cs[no-index]{myflagA}\cs[no-index]{myflagB}\}\hskip0pt^^A
+%       \{\cs[no-index]{stuff}\}^^A
+%     }
+%   will expand to
+%   \texttt{\cs[no-index]{stuff}\{\marg{height-A}\marg{height-B}\}}.
+% \end{function}
+%
 %
 % \subsection{Example}
 %
@@ -692,7 +837,7 @@ and the derived files           expkv-cs.pdf
 % Just in case you're wondering now, a simple macro taking seven arguments is
 % $30$ to $40$ times faster than any of those in the argument grabbing and \kv\
 % parsing part and only $1.5$ to $2.8$ times faster if the typesetting part is
-% factored in. So the real choke isn't the parsing. 
+% factored in. So the real choke isn't the parsing.
 %
 % So to summarize this, if you have a reasonable use case for expandable \kv\
 % parsing macros you should go on and define them using \expkvc. If you have a
@@ -1667,6 +1812,258 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[internal]{\ekvc@t@flag-bool}
+%    \begin{macrocode}
+\protected\expandafter\def\csname ekvc@t@flag-bool\endcsname#1#2%
+  {%
+    \ekvc@assert@not@long{flag-bool #1}%
+    \unless\ifdefined#2\ekvcFlagNew#2\fi
+    \ekvdef\ekvc@set{#1}%
+      {%
+        \ekv@ifdefined{ekvc@flag@set@##1}%
+          {%
+            \csname ekvc@flag@set@##1\expandafter\endcsname
+              \ekvcFlagHeight#2\ekv@stop#2%
+          }%
+          {\ekvc@err@invalid@bool{##1}}%
+      }%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]
+%   {\ekvc@t@flag-true,\ekvc@t@flag-false,\ekvc@t@flag-raise,\ekvc@type@flag}
+%    \begin{macrocode}
+\protected\def\ekvc@type@flag#1#2#3#4%
+  {%
+    \ekvc@assert@not@long{flag-#1 #3}%
+    \unless\ifdefined#4\ekvcFlagNew#4\fi
+    \ekv@exparg{\ekvdefNoVal\ekvc@set{#3}}{#2#4}%
+  }
+\protected\expandafter\def\csname ekvc@t@flag-true\endcsname
+  {\ekvc@type@flag{true}\ekvcFlagSetTrue}
+\protected\expandafter\def\csname ekvc@t@flag-false\endcsname
+  {\ekvc@type@flag{false}\ekvcFlagSetFalse}
+\protected\expandafter\def\csname ekvc@t@flag-raise\endcsname
+  {\ekvc@type@flag{raise}\ekvcFlagRaise}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsubsection{Flags}
+%
+% The basic idea of flags is to store information by the fact that \TeX\
+% expandably assigns the meaning |\relax| to undefined control sequences which
+% were built with |\csname|. This mechanism is borrowed from \pkg{expl3}.
+%
+% \begin{macro}[internal]{\ekvc@flag@name,\ekvc@flag@namescheme}
+%   Flags follow a simple naming scheme which we define here. |\ekvc@flag@name|
+%   will store the name of an internal function that is used to build names of
+%   the second naming scheme defined by |\ekvc@flag@namescheme|.
+%    \begin{macrocode}
+\def\ekvc@flag@name{ekvcf\string}
+\def\ekvc@flag@namescheme#1#2{ekvch#2#1}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagHeight}
+%   For semantic reasons we use |\number| with another name.
+%    \begin{macrocode}
+\let\ekvcFlagHeight\number
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagNew}
+%   This macro defines a new flag. It stores the function build with the
+%   |\ekvc@flag@name| naming scheme after the internal function
+%   |\ekvc@flag@height| that'll determine the current flag height. It'll also
+%   define the macro named via |\ekvc@flag@name| to build names according to
+%   |\ekvc@flag@namescheme|.
+%    \begin{macrocode}
+\protected\def\ekvcFlagNew#1%
+  {%
+    \edef#1%
+      {%
+        \unexpanded{\ekvc@flag@height}%
+          \unexpanded\expandafter{\csname\ekvc@flag@name#1\endcsname}%
+      }%
+    \ekv@expargtwice
+      {\expandafter\def\csname\ekvc@flag@name#1\endcsname##1}%
+      {\expandafter\ekvc@flag@namescheme\expandafter{\string#1}{##1}}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvc@flag@height,\ekvc@flag@height@}
+%   This macro gets the height of a flag by a simple loop. The first loop
+%   iteration differs a bit from the following in that it doesn't have to get
+%   the current iteration count. The space at the end of |\ekvc@flag@height|
+%   ends the |\number| evaluation.
+%    \begin{macrocode}
+\def\ekvc@flag@height#1%
+  {%
+    \ifcsname#10\endcsname
+      \ekvc@flag@height@1\ekv@stop#1%
+    \fi
+    \@firstofone{0} % leave this space
+  }
+\def\ekvc@flag@height@#1\ekv@stop#2\fi\@firstofone#3%
+  {%
+    \fi
+    \ifcsname#2{#1}\endcsname
+      \expandafter\ekvc@flag@height@\the\numexpr#1+1\relax\ekv@stop#2%
+    \fi
+    \@firstofone{#1}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagRaise}
+%   Raising a flag simply means letting the |\ekvc@flag@namescheme| macro for
+%   the current height to relax. The result of raising a flag is that its height
+%   is bigger by $1$.
+%    \begin{macrocode}
+\ekv@exparg{\def\ekvcFlagRaise#1}%
+  {%
+    \expandafter\expandafter\expandafter\@gobble\expandafter
+      \csname\ekvc@flag@namescheme{\string#1}{\ekvcFlagHeight#1}\endcsname
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagSetTrue,\ekvcFlagSetFalse}
+% \begin{macro}[internal]{\ekvc@flag@set@true,\ekvc@flag@set@false}
+%   A flag is considered true if its current height is odd, and as false if it
+%   is even. Therefore |\ekvcFlagSetTrue| and |\ekvcFlagSetFalse| only need to
+%   raise the flag if the opposing boolean value is the current one.
+%    \begin{macrocode}
+\def\ekvcFlagSetTrue#1%
+  {\expandafter\ekvc@flag@set@true\ekvcFlagHeight#1\ekv@stop#1}
+\def\ekvcFlagSetFalse#1%
+  {\expandafter\ekvc@flag@set@false\ekvcFlagHeight#1\ekv@stop#1}
+%    \end{macrocode}
+%   We can expand |\ekvc@flag@namescheme| at definition time here, which is why
+%   we're using a temporary definition to set up |\ekvc@flag@set@true| and
+%   |\ekvc@flag@set@false|.
+%    \begin{macrocode}
+\def\ekvc@flag@set@true#1%
+  {%
+    \def\ekvc@flag@set@true##1\ekv@stop##2%
+      {%
+        \ifodd##1
+          \ekv@fi@gobble
+        \fi
+        \@firstofone{\expandafter\@gobble\csname#1\endcsname}%
+      }%
+    \def\ekvc@flag@set@false##1\ekv@stop##2%
+      {%
+        \ifodd##1
+          \ekv@fi@firstofone
+        \fi
+        \@gobble{\expandafter\@gobble\csname#1\endcsname}%
+      }%
+  }
+\expandafter\ekvc@flag@set@true\expandafter
+  {\ekvc@flag@namescheme{\string#2}{#1}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagIf}
+%   As already explained, truthiness is defined as a flag's height is odd, so we
+%   just branch accordingly here.
+%    \begin{macrocode}
+\def\ekvcFlagIf#1%
+  {%
+    \ifodd#1%
+      \ekv@fi@firstoftwo
+    \fi
+    \@secondoftwo
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagIfRaised}
+%   This macro uses flags as a switch, if a flag's current height is bigger than
+%   $0$ this test yields true.
+%    \begin{macrocode}
+\ekv@exparg{\def\ekvcFlagIfRaised#1}%
+  {%
+    \expandafter\ifcsname\ekvc@flag@namescheme{\string#1}0\endcsname
+      \ekv@fi@firstoftwo
+    \fi
+    \@secondoftwo
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagReset}
+% \begin{macro}[internal]{\ekvc@flag@reset,\ekvc@flag@reset@}
+%   Resetting works by locally letting all the defined internal macros named
+%   after |\ekvc@flag@namescheme| to undefined.
+%    \begin{macrocode}
+\protected\def\ekvcFlagReset#1%
+  {\expandafter\ekvc@flag@reset\csname\ekvc@flag@name#1\endcsname}
+\protected\def\ekvc@flag@reset#1%
+  {%
+    \ifcsname#10\endcsname
+      \expandafter\let\csname#10\endcsname\ekvc@undefined
+      \ekvc@flag@reset@1\ekv@stop#1%
+    \fi
+  }
+\protected\def\ekvc@flag@reset@#1\ekv@stop#2\fi
+  {%
+    \fi
+    \ifcsname#2{#1}\endcsname
+      \expandafter\let\csname#2{#1}\endcsname\ekvc@undefined
+      \expandafter\ekvc@flag@reset@\the\numexpr#1+1\relax\ekv@stop#2%
+    \fi
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagGetHeight}
+% \begin{macro}[internal]{\ekvc@flag@get@height@single}
+%   These are just small helpers, first getting the height of the flag and then
+%   passing it on to the user supplied code.
+%    \begin{macrocode}
+\def\ekvcFlagGetHeight#1%
+  {\expandafter\ekvc@flag@get@height@single\ekvcFlagHeight#1\ekv@stop}
+\long\def\ekvc@flag@get@height@single#1\ekv@stop#2{#2{#1}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagGetHeights}
+% \begin{macro}[internal]
+%   {\ekvc@flag@get@heights,\ekvc@flag@get@heights@,\ekvc@flag@get@heights@done}
+%   This works by a simple loop that stops at |\ekv@stop|. As long as that
+%   marker isn't hit, get the next flags height and put it into a list after
+%   |\ekv@stop|. |\ekvc@flag@get@heights@| uses the same marker name for the
+%   end of the height, which shouldn't clash in any case. Once we're done we
+%   remove the remainder of the current iteration and leave the user supplied
+%   code in the input stream with all the flags' heights as a single argument.
+%    \begin{macrocode}
+\def\ekvcFlagGetHeights#1%
+  {%
+    \ekvc@flag@get@heights#1\ekv@stop{}%
+  }
+\def\ekvc@flag@get@heights#1%
+  {%
+    \ekv@gobbleto@stop#1\ekvc@flag@get@heights@done\ekv@stop
+    \expandafter\ekvc@flag@get@heights@\ekvcFlagHeight#1\ekv@stop
+  }
+\def\ekvc@flag@get@heights@#1\ekv@stop#2\ekv@stop#3%
+  {\ekvc@flag@get@heights#2\ekv@stop{#3{#1}}}
+\long\def\ekvc@flag@get@heights@done
+    \ekv@stop
+    \expandafter\ekvc@flag@get@heights@\ekvcFlagHeight\ekv@stop\ekv@stop#1#2%
+  {#2{#1}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 %
 % \subsubsection{Helper Macros}
 %
@@ -1753,12 +2150,16 @@ and the derived files           expkv-cs.pdf
 % \end{macro}
 %
 % \begin{macro}[internal]
-%   {\ekvc@err@unknown@hash,\ekvc@err@empty@hash,\ekvc@err@missing@hash}
+%   {
+%     \ekvc@err@unknown@hash,\ekvc@err@empty@hash,\ekvc@err@missing@hash,
+%     \ekvc@err@invalid@bool
+%   }
 %   And here are the expandable error messages.
 %    \begin{macrocode}
 \long\def\ekvc@err@unknown@hash#1{\ekvc@err{unknown hash `#1'}}
 \long\def\ekvc@err@missing@hash#1{\ekvc@err{hash `#1' not found}}
 \long\def\ekvc@err@empty@hash{\ekvc@err{empty hash}}
+\def\ekvc@err@invalid@bool#1{\ekvc@err{invalid boolean value `#1'}}
 %    \end{macrocode}
 % \end{macro}
 %

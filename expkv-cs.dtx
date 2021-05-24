@@ -2140,7 +2140,7 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}[internal]{\ekvc@err}
 %   We need a way to throw error messages expandably in some contexts.
 %    \begin{macrocode}
-\ekv@exparg{\def\ekvc@err#1}{\ekverr{expkv-cs}{#1}}
+\ekv@exparg{\long\def\ekvc@err#1}{\ekverr{expkv-cs}{#1}}
 %    \end{macrocode}
 % \end{macro}
 %

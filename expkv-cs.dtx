@@ -998,6 +998,24 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[internal]{\ekvc@ifdefined}
+%   We want to test whether a macro is already defined. This test checks for a
+%   defined macro that isn't |\relax|.
+%    \begin{macrocode}
+\long\def\ekvc@ifdefined#1%
+  {%
+    \ifdefined#1%
+      \ifx\relax#1%
+        \ekv@fi@gobble
+      \fi
+      \@firstofone
+      \ekv@fi@firstoftwo
+    \fi
+    \@secondoftwo
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}[internal]
 %   {
 %     \ekvc@ekvset@pre@expander,
@@ -1035,7 +1053,7 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcSplitAndUse#1#2%
   {%
     \let\ekvc@helpers@needed\@firstoftwo
-    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+    \ekvc@ifdefined#1%
       {\ekvc@err@already@defined#1}%
       {\ekvcSplitAndUse@#1{}{#2}}%
   }
@@ -1083,7 +1101,7 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcSplitAndForward#1#2#3%
   {%
     \let\ekvc@helpers@needed\@firstoftwo
-    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+    \ekvc@ifdefined#1%
       {\ekvc@err@already@defined#1}%
       {\ekvcSplitAndUse@#1{{#2}}{#3}}%
   }
@@ -1098,7 +1116,7 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcSplit#1#2#3%
   {%
     \let\ekvc@helpers@needed\@secondoftwo
-    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+    \ekvc@ifdefined#1%
       {\ekvc@err@already@defined#1}%
       {%
         \expandafter
@@ -1355,7 +1373,7 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcHashAndUse#1#2%
   {%
     \let\ekvc@helpers@needed\@firstoftwo
-    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+    \ekvc@ifdefined#1%
       {\ekvc@err@already@defined#1}%
       {\ekvcHashAndUse@#1{}{#2}}%
   }
@@ -1398,7 +1416,7 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcHashAndForward#1#2#3%
   {%
     \let\ekvc@helpers@needed\@firstoftwo
-    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+    \ekvc@ifdefined#1%
       {\ekvc@err@already@defined#1}%
       {\ekvcHashAndUse@#1{{#2}}{#3}}%
   }
@@ -1413,7 +1431,7 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcHash#1#2#3%
   {%
     \let\ekvc@helpers@needed\@secondoftwo
-    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+    \ekvc@ifdefined#1%
       {\ekvc@err@already@defined#1}%
       {%
         \expandafter

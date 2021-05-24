@@ -993,8 +993,8 @@ and the derived files           expkv-cs.pdf
 %   Some macros will have to be defined long. These two will be let to |\long|
 %   when this should be the case.
 %    \begin{macrocode}
-\def\ekvc@long{}
-\def\ekvc@any@long{}
+\let\ekvc@long\ekv@empty
+\let\ekvc@any@long\ekv@empty
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1154,8 +1154,8 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvc@SetupSplitKeys
   {%
     \ekvc@keycount=0
-    \def\ekvc@any@long{}%
-    \def\ekvc@initials{}%
+    \let\ekvc@any@long\ekv@empty
+    \let\ekvc@initials\ekv@empty
     \ekvparse\ekvc@err@value@required\ekvc@SetupSplitKeys@a
   }
 %    \end{macrocode}
@@ -1165,7 +1165,7 @@ and the derived files           expkv-cs.pdf
 \protected\def\ekvc@SetupSplitKeys@a#1%
   {%
     \advance\ekvc@keycount1
-    \def\ekvc@long{}%
+    \let\ekvc@long\ekv@empty
     \ekvc@ifspace{#1}%
       {\ekvc@SetupSplitKeys@b#1\ekvc@stop}%
       {\ekvc@SetupSplitKeys@c{#1}}%
@@ -1441,13 +1441,13 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \protected\long\def\ekvc@SetupHashKeys#1%
   {%
-    \def\ekvc@any@long{}%
-    \def\ekvc@initials{}%
+    \let\ekvc@any@long\ekv@empty
+    \let\ekvc@initials\ekv@empty
     \ekvparse\ekvc@err@value@required\ekvc@SetupHashKeys@a{#1}%
   }
 \protected\def\ekvc@SetupHashKeys@a#1%
   {%
-    \def\ekvc@long{}%
+    \let\ekvc@long\ekv@empty
     \ekvc@ifspace{#1}%
       {\ekvc@SetupHashKeys@b#1\ekvc@stop}%
       {\ekvc@SetupHashKeys@c{#1}}%
@@ -1687,7 +1687,7 @@ and the derived files           expkv-cs.pdf
   }
 \protected\def\ekvcSecondaryKeys@a#1%
   {%
-    \def\ekvc@long{}%
+    \let\ekvc@long\ekv@empty
     \ekvc@ifspace{#1}%
       {\ekvcSecondaryKeys@b#1\ekvc@stop}%
       {\ekvc@err@missing@type{#1}\@gobble}%

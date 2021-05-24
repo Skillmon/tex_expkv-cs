@@ -64,6 +64,19 @@ and the derived files           expkv-cs.pdf
 \RequirePackage[oldstylenums,nott]{kpfonts}
 \input{glyphtounicode}
 \pdfgentounicode=1
+\RequirePackage{tcolorbox}
+\newtcolorbox{exresult}[2][]
+  {colback=expkvgrey!10!white,colframe=expkvgrey,fontupper=\small,width={#2},#1}
+\newtcbox\exres[1][]
+  {
+     colback=expkvgrey!10!white
+    ,colframe=expkvgrey
+    ,size=small
+    ,nobeforeafter
+    ,tcbox raise base
+    ,fontupper=\small
+    ,#1
+  }
 \RequirePackage{listings}
 \RequirePackage{booktabs}
 \RequirePackage{array}
@@ -73,26 +86,127 @@ and the derived files           expkv-cs.pdf
 \RequirePackage{caption}
 \RequirePackage{microtype}
 \RequirePackage{accsupp}
+\lstdefinelanguage{expkvd}[primitive]{TeX}
+  {
+    ,moretexcs=[4]^^A e-TeX
+      {
+        expanded,
+        numexpr,
+        protected,
+      }
+    ,moretexcs=[5]^^A plain/LaTeX
+      {
+        approx,
+        begin,
+        empty,
+        item,
+        LaTeX,
+        makeatletter,makeatother,multicolumn,
+        newcommand,newdimen,
+        RequirePackage,
+        rule,
+        TeX,
+        textit,texttt,
+        usepackage,
+      }
+    ,moretexcs=[6]^^A used packages
+      {
+        ^^A xfp
+        fpeval,
+        ^^A keyval
+        setkeys,
+        ^^A yax
+        defactiveparameter,storevalue,setparameterlist
+      }
+    ,moretexcs=[2]^^A expkv-cs macros
+      {
+        ekvcSplit,ekvcSplitAndForward,ekvcSplitAndUse,
+        ekvcHash,ekvcHashAndForward,ekvcHashAndUse,
+        ekvcValue,ekvcValueFast,ekvcValueSplit,ekvcValueSplitFast,
+        ekvcSecondaryKeys,
+        ekvcFlagNew,
+        ekvcFlagHeight,
+        ekvcFlagRaise,
+        ekvcFlagSetTrue,ekvcFlagSetFalse,
+        ekvcFlagIf,ekvcFlagIfRaised,
+        ekvcFlagReset,
+        ekvcFlagGetHeight,ekvcFlagGetHeights
+      }
+    ,moretexcs=[3]^^A expkv-pkg macros
+      {
+        ^^A expkv
+        ekvdef,ekvdefNoVal,^^A
+        ekvlet,ekvletNoVal,ekvletkv,ekvletkvNoVal,^^A
+        ekvdefunknown,ekvdefunknownNoVal,^^A
+        ekvredirectunknown,ekvredirectunknownNoVal,^^A
+        ekvset,ekvsetSneaked,^^A
+        ekvsetdef,ekvsetSneakeddef,ekvsetdefSneaked,^^A
+        ekvparse,^^A
+        ekvVersion,ekvDate,^^A
+        ekvifdefined,ekvifdefinedNoVal,ekvifdefinedset,^^A
+        ekvbreak,ekvbreakPreSneak,ekvbreakPostSneak,^^A
+        ekvsneak,ekvsneakPre,^^A
+        ekvchangeset,^^A
+        ekvoptarg,ekvoptargTF,^^A
+        ekverr,
+        ^^A expkv-def
+        ekvdefinekeys
+      }
+  }
+\colorlet{codeparam}{cyan!65!black}
+\def\mylstwd{.55em}
 \lstset
   {
+    ,language=expkvd
     ,flexiblecolumns=false
-    ,basewidth=.53em
+    ,basewidth=\mylstwd
     ,gobble=2
     ,basicstyle=\fontfamily{jkp}\itshape
-    ,morekeywords=^^A
-      {^^A
-        \ekvcSplit,\ekvcSplitAndForward,\ekvcSplitAndUse
-        \ekvcHash,\ekvcHashAndForward,\ekvcHashAndUse
-        \ekvcValue,\ekvcValueFast,
-        \ekvcSecondaryKeys
-      }
-    ,morecomment=[l]\%
+    ,texcsstyle=*[1]{\bfseries\color{expkvgrey}} ^^A primitives
+    ,texcsstyle=*[2]{\bfseries\color{expkvred}}  ^^A expkv
+    ,texcsstyle=*[3]{\color{expkvred}}           ^^A expkv-pkg
+    ,texcsstyle=*[4]{\bfseries\color{expkvgrey}} ^^A e-TeX
+    ,texcsstyle=*[5]{\bfseries\color{expkvgrey}} ^^A plain/LaTeX macros
+    ,texcsstyle=*[6]{}                           ^^A macros of other packages
     ,commentstyle=\color[gray]{0.4}
-    ,literate={\{}{{\CodeSymbol\{}}{1}
-              {\}}{{\CodeSymbol\}}}{1}
+    ,literate=
+              {\{} {{\CodeUpBf\{}}{1}
+              {\}} {{\CodeUpBf\}}}{1}
+              {$}  {{\CodeUpBf\$}}{1}
+              {[}  {{\CodeUp[}}{1}
+              {]}  {{\CodeUp]}}{1}
+              {(}  {{\CodeUp(}}{1}
+              {)}  {{\CodeUp)}}{1}
+              {*}  {{$*$}}{1}
+              {1}  {{\CodeUp{1}}}{1}
+              {2}  {{\CodeUp{2}}}{1}
+              {3}  {{\CodeUp{3}}}{1}
+              {4}  {{\CodeUp{4}}}{1}
+              {5}  {{\CodeUp{5}}}{1}
+              {6}  {{\CodeUp{6}}}{1}
+              {7}  {{\CodeUp{7}}}{1}
+              {8}  {{\CodeUp{8}}}{1}
+              {9}  {{\CodeUp{9}}}{1}
+              {0}  {{\CodeUp{0}}}{1}
+              {##} {{\CodeColored{codeparam}{1}{\#}}}{1}
+              {##1}{{\CodeColored{codeparam}{2}{\#1}}}{2}
+              {##2}{{\CodeColored{codeparam}{2}{\#2}}}{2}
+              {##3}{{\CodeColored{codeparam}{2}{\#3}}}{2}
+              {##4}{{\CodeColored{codeparam}{2}{\#4}}}{2}
+              {##5}{{\CodeColored{codeparam}{2}{\#5}}}{2}
+              {##6}{{\CodeColored{codeparam}{2}{\#6}}}{2}
+              {##7}{{\CodeColored{codeparam}{2}{\#7}}}{2}
+              {##8}{{\CodeColored{codeparam}{2}{\#8}}}{2}
+              {##9}{{\CodeColored{codeparam}{2}{\#9}}}{2}
+              {<key>}{{$\langle$}key{$\rangle$}}{5}
+              {<set>}{{$\langle$}set{$\rangle$}}{5}
+              {<set1>}{{$\langle$}set1{$\rangle$}}{6}
+              {<set2>}{{$\langle$}set2{$\rangle$}}{6}
     ^^A,literate=*{<key>}{\key}{4}{<set>}{\set}{4}
   }
-\newcommand*\CodeSymbol[1]{\kern-1pt\textbf{#1}\kern1pt}
+\newcommand*\CodeColored[3]{\textcolor{#1}{\makebox[\dimexpr\mylstwd*#2]{#3}}}
+\newcommand*\CodeUpBf[1]{\makebox[\mylstwd]{\textup{\textbf{#1}}}}
+\newcommand*\CodeUp[1]{\makebox[\mylstwd]{\textup{#1}}}
 \RequirePackage{randtext}
 \let\metaORIG\meta
 \protected\def\meta #1{\texttt{\metaORIG{#1}}}
@@ -705,7 +819,7 @@ and the derived files           expkv-cs.pdf
 %     alias pos = possessive,
 %     nmeta me =
 %       {
-%         name=Jonathan P. Spratte,
+%         name=Jonathan,
 %         age=a young,
 %         nationality=Germany,
 %         hobby=\TeX\ coding,
@@ -738,15 +852,54 @@ and the derived files           expkv-cs.pdf
 % As one might see, the |lady| key could actually have been an |nmeta| key as
 % well, as all that is done with the argument is using it as a \kv\ list.
 %
-% Using \pkg{xparse} and forwarding arguments one can easily define \kv\ macros
-% with actual optional and mandatory arguments as well. A small nonsense example
-% (which should perhaps use |\ekvcSplitAndForward| instead of
-% |\ekvcHashAndForward| since it only uses four keys and one other argument --
-% and isn't expandable since it uses a \env{tabular} environment):
+% The result of all the first two usages would be:
+% \begin{exresult}{\linewidth}
+%   \ekvcSplit\character
+%     {
+%       name=John Doe,
+%       age=any,
+%       nationality=the Universe,
+%       hobby=to exist,
+%       type=Mister,
+%       pronoun=He,
+%       possessive=his,
+%     }
+%     {#1 is a #5 from #3. #6 is of #2 age and #7 hobby is #4.\par}
+%   \ekvcSecondaryKeys\character
+%     {
+%       alias pro = pronoun,
+%       alias pos = possessive,
+%       nmeta me =
+%         {
+%           name=Jonathan,
+%           age=a young,
+%           nationality=Germany,
+%           hobby=\TeX\ coding,
+%         },
+%       meta lady =
+%         {type=Lady, pronoun=She, possessive=her, name=Jane Doe, #1},
+%       nmeta paulo =
+%         {
+%           name=Paulo,
+%           type=duck,
+%           age=a young,
+%           nationality=Brazil,
+%           hobby=to quack,
+%         }
+%     }
+%   \character{}
+%   \character{me}
+% \end{exresult}
+%
+% Using \pkg{xparse} or \expkv's \cs{ekvoptarg} or \cs{ekvoptargTF} and
+% forwarding arguments one can easily define \kv\ macros with actual optional
+% and mandatory arguments as well. A small nonsense example (which should
+% perhaps use |\ekvcSplitAndForward| instead of |\ekvcHashAndForward| since it
+% only uses four keys and one other argument -- and isn't expandable since it
+% uses a \env{tabular} environment):
 % \begin{lstlisting}
-% \usepackage{xparse}
 % \makeatletter
-% \NewExpandableDocumentCommand\nonsense{O{} m}{\nonsense@a{#1}{#2}}
+% \newcommand*\nonsense{\ekvoptarg\nonsense@a{}}
 % \ekvcHashAndForward\nonsense@a\nonsense@b
 %   {
 %     keyA = A,
@@ -762,17 +915,44 @@ and the derived files           expkv-cs.pdf
 %           & C & \ekvcValue{keyC}{#1} \\
 %           & D & \ekvcValue{keyD}{#1} \\
 %       \multicolumn{2}{l}{mandatory} & #2 \\
-%     \end{tabular}\par
+%     \end{tabular}%
 %   }
 % \makeatother
 % \end{lstlisting}
-% And then we would be able to do some nonsense:
+% And then we would be able to do some nonsense
 % \begin{lstlisting}
 % \nonsense{}
 % \nonsense[keyA=hihi]{haha}
 % \nonsense[keyA=hihi, keyB=A]{hehe}
 % \nonsense[keyC=huhu, keyA=hihi, keyB=A]{haha}
 % \end{lstlisting}
+% resulting in
+% \begin{exresult}{\linewidth}
+%   \makeatletter
+%   \newcommand*\nonsense{\ekvoptarg\nonsense@a{}}
+%   \ekvcHashAndForward\nonsense@a\nonsense@b
+%     {
+%       keyA = A,
+%       keyB = B,
+%       keyC = c,
+%       keyD = d,
+%     }
+%   \newcommand*\nonsense@b[2]
+%     {%
+%       \begin{tabular}{lll}
+%         key & A & \ekvcValue{keyA}{#1} \\
+%             & B & \ekvcValue{keyB}{#1} \\
+%             & C & \ekvcValue{keyC}{#1} \\
+%             & D & \ekvcValue{keyD}{#1} \\
+%         \multicolumn{2}{l}{mandatory} & #2 \\
+%       \end{tabular}%
+%     }
+%   \makeatother
+%   \nonsense{}
+%   \nonsense[keyA=hihi]{haha}
+%   \nonsense[keyA=hihi, keyB=A]{hehe}
+%   \nonsense[keyC=huhu, keyA=hihi, keyB=A]{haha}
+% \end{exresult}
 %
 %
 % \subsection{Speed Considerations}\label{sec:speed}

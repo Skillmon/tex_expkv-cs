@@ -1027,7 +1027,8 @@ and the derived files           expkv-cs.pdf
 %   a little magic trick to get the macro parameter |#1| for the macro
 %   definition this is used in, even though we're calling |\unexpanded|. We do
 %   that by splitting the expanded |\ekvset| at some marks and place |##1| in
-%   between.
+%   between. At this spot we also add |\ekv@alignsafe| and |\ekv@endalignsafe|
+%   to ensure that macros created with \expkvc\ are alignment safe.
 %    \begin{macrocode}
 \def\ekvc@ekvset@pre@expander#1%
   {%
@@ -1039,7 +1040,9 @@ and the derived files           expkv-cs.pdf
   }
 \def\ekvc@ekvset@pre@expander@b#1\ekvc@stop#2\ekvc@stop
   {%
+    \unexpanded\expandafter{\ekv@alignsafe}%
     \unexpanded{#1}##1\unexpanded{#2}%
+    \unexpanded\expandafter{\ekv@endalignsafe}%
   }
 %    \end{macrocode}
 % \end{macro}

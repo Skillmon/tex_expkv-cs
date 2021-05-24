@@ -74,96 +74,144 @@ l. ...  }
 ============================================================
 TEST 5: empty hashs
 ============================================================
-! Undefined control sequence.
-<argument> \! expkv-cs Error: 
-                              empty hash.
+Runaway argument?
+! expkv-cs Error: empty hash
+! Paragraph ended before \<an-expandable-macro>
+completed due to above exception.  If the error
+summary is  not comprehensible  see the package
+documentation.
+I will try to recover now.  If you're in inter-
+active mode hit <return>  at the ? prompt and I
+continue hoping recovery was complete.
+<to be read again> 
+                   \par 
 l. ...  }
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-! Undefined control sequence.
-<argument> \! expkv-cs Error: 
-                              empty hash.
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
+Runaway argument?
+! expkv-cs Error: empty hash
+! Paragraph ended before \<an-expandable-macro>
+completed due to above exception.  If the error
+summary is  not comprehensible  see the package
+documentation.
+I will try to recover now.  If you're in inter-
+active mode hit <return>  at the ? prompt and I
+continue hoping recovery was complete.
+<to be read again> 
+                   \par 
 l. ...  }
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
 ============================================================
 ============================================================
 TEST 6: missing hash
 ============================================================
-! Undefined control sequence.
-<argument> \! expkv-cs Error: 
-                              hash `height' not found.
+Runaway argument?
+! expkv-cs Error: hash `height' not found
+! Paragraph ended before \<an-expandable-macro>
+completed due to above exception.  If the error
+summary is  not comprehensible  see the package
+documentation.
+I will try to recover now.  If you're in inter-
+active mode hit <return>  at the ? prompt and I
+continue hoping recovery was complete.
+<to be read again> 
+                   \par 
 l. ...  }
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
 ============================================================
 ============================================================
 TEST 7: unknown hash
 ============================================================
-! Undefined control sequence.
-<argument> \! expkv-cs Error: 
-                              unknown hash `heigt'.
+Runaway argument?
+! expkv-cs Error: unknown hash `heigt'
+! Paragraph ended before \<an-expandable-macro>
+completed due to above exception.  If the error
+summary is  not comprehensible  see the package
+documentation.
+I will try to recover now.  If you're in inter-
+active mode hit <return>  at the ? prompt and I
+continue hoping recovery was complete.
+<to be read again> 
+                   \par 
 l. ...  }
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
 ============================================================
 ============================================================
 TEST 8: empty hashs splits
 ============================================================
-! Undefined control sequence.
-<argument> \! expkv-cs Error: 
-                              empty hash.
+Runaway argument?
+! expkv-cs Error: empty hash
+! Paragraph ended before \<an-expandable-macro>
+completed due to above exception.  If the error
+summary is  not comprehensible  see the package
+documentation.
+I will try to recover now.  If you're in inter-
+active mode hit <return>  at the ? prompt and I
+continue hoping recovery was complete.
+<to be read again> 
+                   \par 
 l. ...  }
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-! Undefined control sequence.
-<argument> \! expkv-cs Error: 
-                              empty hash.
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
+Runaway argument?
+! expkv-cs Error: empty hash
+! Paragraph ended before \<an-expandable-macro>
+completed due to above exception.  If the error
+summary is  not comprehensible  see the package
+documentation.
+I will try to recover now.  If you're in inter-
+active mode hit <return>  at the ? prompt and I
+continue hoping recovery was complete.
+<to be read again> 
+                   \par 
 l. ...  }
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
 ============================================================
 ============================================================
 TEST 9: missing hash splits
 ============================================================
-! Undefined control sequence.
-<argument> \! expkv-cs Error: 
-                              hash `height' not found.
+Runaway argument?
+! expkv-cs Error: hash `height' not found
+! Paragraph ended before \<an-expandable-macro>
+completed due to above exception.  If the error
+summary is  not comprehensible  see the package
+documentation.
+I will try to recover now.  If you're in inter-
+active mode hit <return>  at the ? prompt and I
+continue hoping recovery was complete.
+<to be read again> 
+                   \par 
 l. ...  }
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
 ============================================================
 ============================================================
 TEST 10: unknown hash splits
 ============================================================
-! Undefined control sequence.
-<argument> \! expkv-cs Error: 
-                              unknown hash `heigt'.
+Runaway argument?
+! expkv-cs Error: unknown hash `heigt'
+! Paragraph ended before \<an-expandable-macro>
+completed due to above exception.  If the error
+summary is  not comprehensible  see the package
+documentation.
+I will try to recover now.  If you're in inter-
+active mode hit <return>  at the ? prompt and I
+continue hoping recovery was complete.
+<to be read again> 
+                   \par 
 l. ...  }
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
 ============================================================

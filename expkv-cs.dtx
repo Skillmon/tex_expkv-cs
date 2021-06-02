@@ -282,7 +282,7 @@ and the derived files           expkv-cs.pdf
 \DoNotIndex{\protected,\ProvidesFile,\ProvidesPackage,\relax,\space,\advance}
 \DoNotIndex{\@,\unexpanded,\string,\expanded,\dimexpr,\global,\glueexpr,\hbox}
 \DoNotIndex{\numexpr,\RequirePackage,\setbox,\the,\unless,\xdef,\gdef,\newcount}
-\DoNotIndex{\romannumeral,\^,\@firstofone,\@firstoftwo,\@gobble}
+\DoNotIndex{\^,\@firstofone,\@firstoftwo,\@gobble}
 \DoNotIndex{\ifcsname}
 \DoNotIndex{\ifx}
 \DoNotIndex{\ifnum}
@@ -506,13 +506,15 @@ and the derived files           expkv-cs.pdf
 %   \begin{syntax}
 %     \cs{ekvcValue}\{\key\}\marg{key list}
 %   \end{syntax}
-%   This is a safe (but slow) way to access your keys in a hash variant. \key\
+%   This is a safe way to access your keys in a hash variant. \key\
 %   is the key which's \val\ you want to use out of the \meta{key list}.
 %   \meta{key list} should be the key list argument forwarded to your underlying
 %   macro by |\ekvcHash|, |\ekvcHashAndForward|, or |\ekvcHashAndUse|. It will
 %   be tested whether the hash function to access that \key\ exists, the \key\
 %   argument is not empty, and that the \meta{key list} really contains a \val\
-%   of that \key. This macro needs exactly two steps of expansion.
+%   of that \key. This macro needs exactly two steps of expansion and if used
+%   inside of an |\edef| or |\expanded| context will protect the \val\ from
+%   further expanding.
 % \end{function}
 %
 % \begin{function}{\ekvcValueFast}
@@ -1146,21 +1148,6 @@ and the derived files           expkv-cs.pdf
 % |\ekvc@tmp| will be reused later, but we don't need it to ever store
 % information long-term after \expkvc\ was initialized.
 %
-% \begin{macro}[internal]{\ekvc@zero}
-%   There are different ways to define a |\romannumeral| expansion. If the
-%   control is never given to user input, the fastest way is to just execute
-%   your code and use a |\dimendef|ed zero to end it afterwards.  If the control
-%   is given to user input (so user input should be expanded) the fastest and
-%   best way is to use |\romannumeral`\^^@|, this will expand the user input
-%   until something unexpandable is found or a space (which would then be
-%   gobbled). However, we want to use the former approach since we don't want to
-%   expand any user input, just make sure own code is expanded in two steps.
-%   Since we want to use the |\dimendef| variant, we have to actually provide
-%   such a token. Since both plain \TeX\ and \LaTeX\ define |\z@| we can use
-%   that (but we use a private name for it). Luckily, \expkv\ already contains
-%   |\ekv@zero|, which we can use in \expkvc.
-% \end{macro}
-%
 % \begin{macro}[internal]{\ekvc@keycount}
 %   We'll need to keep count how many keys must be defined for each macro in the
 %   |split| variants.
@@ -1713,8 +1700,8 @@ and the derived files           expkv-cs.pdf
 % \end{macro}
 %
 % \begin{macro}[internal]{\ekvc@setup@hashmacro}
-%   The safe hash macros will be executed inside of a |\romannumeral| expansion
-%   context, so they have to insert a stop mark for that once they are done.
+%   The safe hash macros will be executed inside of an |\unexpanded| expansion
+%   context, so they have to insert braces for that once they are done.
 %   Most of the tests which have to be executed will already be done, but we
 %   have to play safe if the hash doesn't show up in the hash list. Therefore we
 %   use some |\ekvc@mark|s and |\ekvc@stop| to throw errors if the hash isn't
@@ -1723,7 +1710,7 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \protected\def\ekvc@setup@hashmacro#1%
   {%
-    \ekv@ifdefined{ekvc@hash@#1}{}%
+    \ekv@ifdefined{ekvc@fasthash@#1}{}%
       {%
         \begingroup
           \edef\ekvc@tmp
@@ -1739,10 +1726,10 @@ and the derived files           expkv-cs.pdf
                   ####1%
                 {%
                   \unexpanded\expandafter{\csname ekvc@@safehash@#1\endcsname}%
-                  ####1\unexpanded{\ekvc@mark\ekv@zero}%
+                  ####1\unexpanded{\ekvc@mark}{}%
                   \unexpanded\expandafter
                     {%
-                      \csname ekvc@hashmark@#1\endcsname\ekv@zero
+                      \csname ekvc@hashmark@#1\endcsname{}%
                       \ekvc@mark{\ekvc@err@missing@hash{#1}}\ekvc@stop
                     }%
                 }%
@@ -1753,7 +1740,7 @@ and the derived files           expkv-cs.pdf
                   ####2####3\unexpanded{\ekvc@mark}####4####5%
                   \unexpanded{\ekvc@stop}%
                 {%
-                  ####4####2%
+                  ####4{####2}%
                 }%
               \long\gdef\unexpanded\expandafter
                 {\csname ekvc@fastsplithash@#1\endcsname}%
@@ -1800,10 +1787,10 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \long\def\ekvcValue#1%
   {%
-    \romannumeral
+    \unexpanded
     \ekv@ifdefined{ekvc@safehash@#1}%
       {\csname ekvc@safehash@#1\endcsname}%
-      {\ekvc@err@unknown@hash{#1}\@firstoftwo\ekv@zero}%
+      {\ekvc@err@unknown@hash{#1}\@firstoftwo{{}}}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1867,9 +1854,9 @@ and the derived files           expkv-cs.pdf
 %   without affecting performance by just defining the macro that would be build
 %   in that case. There is of course a downside to this, the error will not be
 %   thrown by |\ekvcValueFast| in three expansion steps. The safe hash variant
-%   has to also stop the |\romannumeral| expansion.
+%   has to also stop the |\unexpanded| expansion.
 %    \begin{macrocode}
-\long\def\ekvc@safehash@#1{\ekvc@err@empty@hash\ekv@zero}
+\long\def\ekvc@safehash@#1{\ekvc@err@empty@hash{}}
 \long\def\ekvc@fasthash@#1\ekvc@stop{\ekvc@err@empty@hash}
 \long\def\ekvc@safesplithash@#1#2{\ekvc@err@empty@hash#2{#1}{}}
 \long\def\ekvc@fastsplithash@#1\ekvc@stop#2{\ekvc@err@empty@hash#2{#1}{}}

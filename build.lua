@@ -1,7 +1,7 @@
 -- Build script for expkv-cs
 module     = "expkv-cs"
-pkgversion = "0.9"
-pkgdate    = "2021-05-24"
+pkgversion = "0.10"
+pkgdate    = "2021-06-03"
 
 -- update package date and version
 tagfiles = {"expkv-cs.dtx", "README.md", "CTAN.md"}
@@ -12,14 +12,14 @@ function update_tag(file, content, tagname, tagdate)
   end
   if string.match(file, "%.md") then
     return string.gsub(content,
-      "%d%d%d%d%-%d%d%-%d%d v%d%.%d%w?",
+      "%d%d%d%d%-%d%d%-%d%d v%d%.%d+%w?",
       tagdate .. " v" .. tagname)
   elseif file == "expkv-cs.dtx" then
     content = string.gsub(content,
       "\\def\\ekvcDate{%d%d%d%d%-%d%d%-%d%d}",
       "\\def\\ekvcDate{" .. tagdate .. "}")
     return string.gsub(content,
-      "\\def\\ekvcVersion{%d%.%d%w?}",
+      "\\def\\ekvcVersion{%d%.%d+%w?}",
       "\\def\\ekvcVersion{" .. tagname .. "}")
   end
   return content

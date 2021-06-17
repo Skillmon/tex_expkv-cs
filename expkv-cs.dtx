@@ -132,7 +132,7 @@ and the derived files           expkv-cs.pdf
         ekvcFlagIf,ekvcFlagIfRaised,
         ekvcFlagReset,
         ekvcFlagGetHeight,ekvcFlagGetHeights,
-        ekvcPassTo
+        ekvcPass
       }
     ,moretexcs=[3]^^A expkv-pkg macros
       {
@@ -688,19 +688,17 @@ and the derived files           expkv-cs.pdf
 %
 % \subsection{Changing the Defaults}\label{sec:change}
 %
-% It is possible to change the default values of primary keys for a macro
-% created with \expkvc. This can be done with
-%
 % \begin{function}{\ekvcChange}
 %   \begin{syntax}
 %     \cs{ekvcChange}\meta{cs}\{\kv,\ldots\}
 %   \end{syntax}
-%   This processes the \kv\ list to set new defaults for the macro \meta{cs}
-%   defined with \expkvc. Inside the \kv\ list both primary and secondary keys
-%   can be used. If \meta{cs} was defined |\long| earlier it will still be
-%   |\long|, every other \TeX\ prefix will be stripped (but \expkvc\ doesn't
-%   support them anywhere else so that should be fine). The resulting new
-%   defaults will be stored inside the \meta{cs} locally.
+%   This processes the \kv\ list (just like it would be processed by \meta{cs})
+%   to set new defaults for the macro \meta{cs} defined with \expkvc. Inside the
+%   \kv\ list both primary and secondary keys can be used. If \meta{cs} was
+%   defined |\long| earlier it will still be |\long|, every other \TeX\ prefix
+%   will be stripped (but \expkvc\ doesn't support them anywhere else so that
+%   should be fine). The resulting new defaults will be stored inside the
+%   \meta{cs} locally (just as the original defaults were).
 % \end{function}
 %
 % Consider the following example:\\
@@ -725,6 +723,16 @@ and the derived files           expkv-cs.pdf
 %   \foo{}
 % \end{exresult}
 %
+% As a result with this the typical setup macro could be implemented:
+% \begin{lstlisting}
+% \ekvcHashAndUse\foo{key=a,key=b}
+% \newcommand\foosetup{\ekvcChange\foo}
+% \end{lstlisting}
+% Of course the usage is limited to a single macro |\foo|, hence this might be
+% not as powerful as similar macros used with other \kv\ interfaces. But at
+% least a few similar macros could be grouped using the same key parsing macro
+% internally.
+%
 %
 % \subsection{Flags}\label{sec:flags}
 %
@@ -738,7 +746,8 @@ and the derived files           expkv-cs.pdf
 %
 % The state of flags is always changed locally to the current group, but not to
 % the current macro, so if you're using one of the |t|-types involving flags
-% bear in mind that they can affect other macros at the current group level!
+% bear in mind that they can affect other macros using the same flags at the
+% current group level!
 %
 % \expkvc\ provides some macros to access, alter, and use flags. Flags of
 % \expkvc\ don't share a name space with the flags of \pkg{expl3}.
@@ -1024,10 +1033,10 @@ and the derived files           expkv-cs.pdf
 % This would define a key named |c| that will store its value inside a macro.
 % The issue with this is that this can't be done expandably. As a result, the
 % macro |\foo| isn't always expandable any more (not that bad if this was never
-% required) and as soon as the key |c| is used, it is also no longer alignment
-% safe\footnote{This means that the \kv-list can't contain alignment markers
-%   that are not inside an additional set of braces if used inside a \TeX\
-%   alignment.}
+% required; killjoy if it was) and as soon as the key |c| is used, it is also no
+% longer alignment safe\footnote{This means that the \kv-list can't contain
+%   alignment markers that are not inside an additional set of braces if used
+%   inside a \TeX\ alignment.}
 % (might be bad depending on the usage).
 %
 % So why do I show you this? Because we could as well do something useful like
@@ -1035,9 +1044,9 @@ and the derived files           expkv-cs.pdf
 % on. This parsing would have to be completely expandable though. For the
 % pass-on part we can use the following function:
 %
-% \begin{function}{\ekvcPassTo}
+% \begin{function}{\ekvcPass}
 %   \begin{syntax}
-%     \cs{ekvcPassTo}\meta{cs}\marg{key}\marg{value}
+%     \cs{ekvcPass}\meta{cs}\marg{key}\marg{value}
 %   \end{syntax}
 %   This passes \meta{value} on to \meta{key} for the \expkvc-macro \meta{cs}.
 %   It should be used inside the key parsing of a macro defined with \expkvc,
@@ -1051,7 +1060,7 @@ and the derived files           expkv-cs.pdf
 % \ekvcSplit\foo{a=A,b=B}{a is #1.\par b is #2.\par}
 % \ekvdef{\string\foo}{c}{\fooSplit#1\par}
 % \def\fooSplit#1-#2\par
-%   {\ekvcPassTo\foo{a}{#1}\ekvcPassTo\foo{b}{#2}}
+%   {\ekvcPass\foo{a}{#1}\ekvcPass\foo{b}{#2}}
 % \foo{}
 % \foo{c=1-2}
 % \end{lstlisting}
@@ -1059,7 +1068,7 @@ and the derived files           expkv-cs.pdf
 % \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
 %   \ekvcSplit\foo{a=A,b=B}{a is #1.\par b is #2.\par}
 %   \ekvdef{\string\foo}{c}{\fooSplit#1\par}
-%   \def\fooSplit#1-#2\par{\ekvcPassTo\foo{a}{#1}\ekvcPassTo\foo{b}{#2}}
+%   \def\fooSplit#1-#2\par{\ekvcPass\foo{a}{#1}\ekvcPass\foo{b}{#2}}
 %   \foo{}
 %   \foo{c=1-2}
 % \end{exresult}
@@ -2098,12 +2107,12 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\ekvcPassTo}
+% \begin{macro}{\ekvcPass}
 %   This macro can be used to pass a value to a key of some macro (this way
 %   more complicated key codes are possible that in the end pass processed
 %   values on to some macro). The implemantation is pretty straight forward.
 %    \begin{macrocode}
-\long\def\ekvcPassTo#1#2%
+\long\def\ekvcPass#1#2%
   {%
     \ekvifdefined{\string#1}{#2}%
       {\csname\ekv@name{\string#1}{#2}\endcsname}%

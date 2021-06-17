@@ -124,6 +124,7 @@ and the derived files           expkv-cs.pdf
         ekvcHash,ekvcHashAndForward,ekvcHashAndUse,
         ekvcValue,ekvcValueFast,ekvcValueSplit,ekvcValueSplitFast,
         ekvcSecondaryKeys,
+        ekvcChange,
         ekvcFlagNew,
         ekvcFlagHeight,
         ekvcFlagRaise,
@@ -683,6 +684,46 @@ and the derived files           expkv-cs.pdf
 %   If \meta{cs} isn't defined yet it will be initialised as a flag.
 %   Please also read \autoref{sec:flags}.
 % \end{function}
+%
+%
+% \subsection{Changing the Defaults}\label{sec:change}
+%
+% It is possible to change the default values of primary keys for a macro
+% created with \expkvc. This can be done with
+%
+% \begin{function}{\ekvcChange}
+%   \begin{syntax}
+%     \cs{ekvcChange}\meta{cs}\{\kv,\ldots\}
+%   \end{syntax}
+%   This processes the \kv\ list to set new defaults for the macro \meta{cs}
+%   defined with \expkvc. Inside the \kv\ list both primary and secondary keys
+%   can be used. If \meta{cs} was defined |\long| earlier it will still be
+%   |\long|, every other \TeX\ prefix will be stripped (but \expkvc\ doesn't
+%   support them anywhere else so that should be fine). The resulting new
+%   defaults will be stored inside the \meta{cs} locally.
+% \end{function}
+%
+% Consider the following example:\\
+% \begin{minipage}[c]{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcSplit\foo{a=a,b=b}{a is #1.\par b is #2.\par}
+% \foo{} % initial defaults
+% \ekvcChange\foo{b=B}
+% \foo{} % new defaults
+% \ekvcSecondaryKeys\foo{meta c={a={#1},b={#1}}}
+% \ekvcChange\foo{c=c}
+% \foo{} % newer defaults
+% \end{lstlisting}
+% \end{minipage}%
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcSplit\foo{a=a,b=b}{a is #1.\par b is #2.\par}
+%   \foo{}
+%   \ekvcChange\foo{b=B}
+%   \foo{}
+%   \ekvcSecondaryKeys\foo{meta c={a={#1},b={#1}}}
+%   \ekvcChange\foo{c=c}
+%   \foo{}
+% \end{exresult}
 %
 %
 % \subsection{Flags}\label{sec:flags}
@@ -1961,6 +2002,102 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\ekvcChange}
+%   This can be used to change the defaults of an \expkvc\ defined macro. It
+%   checks whether there is a set with the correct name and that the macro is
+%   defined. If both is true the real work is done by |\ekvc@change|.
+%    \begin{macrocode}
+\protected\long\def\ekvcChange#1%
+  {%
+    \ekvifdefinedset{\string#1}%
+      {%
+        \ekvc@ifdefined#1%
+          {\ekvc@change#1}%
+          {\ekvc@err@no@key@macro#1\@gobble}%
+      }%
+      {\ekvc@err@no@key@macro#1\@gobble}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]
+%   {\ekvc@change,\ekvc@change@a,\ekvc@change@b,\ekvc@change@c}
+%   First we need to see whether the macro is currently |\long|. For this we get
+%   the meaning and will parse it. |#1| is the macro name in which we want to
+%   change the defaults.
+%    \begin{macrocode}
+\protected\def\ekvc@change#1%
+  {\expandafter\ekvc@change@a\meaning#1\ekv@stop#1}
+%    \end{macrocode}
+%   A temporary definition to get the stringified |macro:|. |##1| will be the
+%   list of prefixes, we don't care for the exact contents of |##2| and |##3|.
+%    \begin{macrocode}
+\def\ekvc@change@a#1%
+  {%
+    \protected\def\ekvc@change@a##1#1##2->##3\ekv@stop
+      {%
+        \ekvc@change@iflong{##1}%
+          {\ekvc@change@b{}}%
+          {\ekvc@change@b{\long}}%
+      }%
+  }
+\expandafter\ekvc@change@a\expandafter{\detokenize{macro:}}
+%    \end{macrocode}
+%   Next we expand the macro once to get its contents (including the current
+%   default values with their markers). |#1| is either |\long| or empty, |#2| is
+%   the macro.
+%    \begin{macrocode}
+\protected\def\ekvc@change@b#1#2%
+  {\expandafter\ekvc@change@c\expandafter{#2{##1}}{#1}#2}
+%    \end{macrocode}
+%   Here we place an unbalanced closing brace after the expansion of the macro.
+%   Then we just parse the \kv-list with |\ekvset|, that will exchange the
+%   values behind the markers. Once those are changed we give control to
+%   |\ekvc@change@d|. The |\ekvset| step might horribly fail if the user defined
+%   some keys that don't behave nice. |#1| is the expansion of the macro, |#2|
+%   is either |\long| or empty, |#3| is the macro, and |#4| is the \kv-list
+%   containing the new defaults.
+%    \begin{macrocode}
+\ekv@exparg{\protected\long\def\ekvc@change@c#1#2#3#4}%
+  {%
+    \expandafter\iffalse\expandafter{\expandafter\fi
+      \ekvset{\string#3}{#4}%
+      \ekvc@change@d{#2}{#3}%
+      #1%
+    }%
+  }
+%    \end{macrocode}
+%   The final step needs to put an unbalanced opening brace after |\def|. We do
+%   that with the help of a temporary macro which stores everything necessary
+%   for |\def| and expand an |\iffalse}\fi| construct to leave a single
+%   opening brace. |#1| will be either empty or |\long| and |#2| is the macro.
+%   Each of the macros defined with \expkvc\ takes exactly one parameter, so we
+%   put that here as |####1|.
+%    \begin{macrocode}
+\protected\def\ekvc@change@d#1#2%
+  {%
+    \def\ekvc@tmp{#1\def#2####1}%
+    \expandafter\ekvc@tmp\expandafter{\iffalse}\fi
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvc@change@iflong,\ekvc@change@iflong@}
+%   Checking whether a string contains the string representation of |\long| can
+%   be done by gobbling everything up to the first |\long| and checking whether
+%   the result is completely empty. We need a temporary macro to get the result
+%   of |\string\long| inside the definitions.
+%    \begin{macrocode}
+\def\ekvc@change@iflong#1%
+  {%
+    \protected\def\ekvc@change@iflong##1%
+      {\expandafter\ekv@ifempty\expandafter{\ekvc@change@iflong@##1#1}}%
+    \def\ekvc@change@iflong@##1#1{}
+  }
+\expandafter\ekvc@change@iflong\expandafter{\string\long}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\ekvcPassTo}
 %   This macro can be used to pass a value to a key of some macro (this way
 %   more complicated key codes are possible that in the end pass processed
@@ -2368,7 +2505,7 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}[internal]
 %   {
 %     \ekvc@err@toomany,\ekvc@err@value@required,\ekvc@err@missing@type,
-%     \ekvc@err@already@defined
+%     \ekvc@err@already@defined,\ekvc@err@no@key@macro
 %   }
 %   Boring unexpandable error messages.
 %    \begin{macrocode}
@@ -2403,6 +2540,8 @@ and the derived files           expkv-cs.pdf
     \errmessage
       {expkv-cs Error: Unknown key `\unexpanded{#1}' for macro `\ekvc@set'}%
   }
+\long\def\ekvc@err@no@key@macro#1%
+  {\errmessage{expkv-cs Error: \string#1 is no key=val macro}}
 %    \end{macrocode}
 % \end{macro}
 %

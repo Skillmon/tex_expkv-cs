@@ -86,7 +86,7 @@ and the derived files           expkv-cs.pdf
 \RequirePackage{caption}
 \RequirePackage{microtype}
 \RequirePackage{accsupp}
-\lstdefinelanguage{expkvd}[primitive]{TeX}
+\lstdefinelanguage{expkvc}[primitive]{TeX}
   {
     ,moretexcs=[4]^^A e-TeX
       {
@@ -130,7 +130,8 @@ and the derived files           expkv-cs.pdf
         ekvcFlagSetTrue,ekvcFlagSetFalse,
         ekvcFlagIf,ekvcFlagIfRaised,
         ekvcFlagReset,
-        ekvcFlagGetHeight,ekvcFlagGetHeights
+        ekvcFlagGetHeight,ekvcFlagGetHeights,
+        ekvcPassTo
       }
     ,moretexcs=[3]^^A expkv-pkg macros
       {
@@ -157,7 +158,7 @@ and the derived files           expkv-cs.pdf
 \def\mylstwd{.55em}
 \lstset
   {
-    ,language=expkvd
+    ,language=expkvc
     ,flexiblecolumns=false
     ,basewidth=\mylstwd
     ,gobble=2
@@ -282,15 +283,18 @@ and the derived files           expkv-cs.pdf
 \DoNotIndex{\protected,\ProvidesFile,\ProvidesPackage,\relax,\space,\advance}
 \DoNotIndex{\@,\unexpanded,\string,\expanded,\dimexpr,\global,\glueexpr,\hbox}
 \DoNotIndex{\numexpr,\RequirePackage,\setbox,\the,\unless,\xdef,\gdef,\newcount}
-\DoNotIndex{\^,\@firstofone,\@firstoftwo,\@gobble}
+\DoNotIndex{\number}
+\DoNotIndex{\^,\@firstofone,\@firstoftwo,\@gobble,\@secondoftwo}
 \DoNotIndex{\ifcsname}
 \DoNotIndex{\ifx}
+\DoNotIndex{\ifodd}
 \DoNotIndex{\ifnum}
 \DoNotIndex{\ifdefined}
 \DoNotIndex{\iffalse}
 \DoNotIndex{\iftrue}
 \DoNotIndex{\else}
 \DoNotIndex{\fi}
+\@gobble\fi ^^A ignoring \ifx, \ifcsname, etc., but only one \fi
 \@gobble\fi ^^A ignoring \ifx, \ifcsname, etc., but only one \fi
 \@gobble\fi ^^A ignoring \ifx, \ifcsname, etc., but only one \fi
 \@gobble\fi ^^A ignoring \ifx, \ifcsname, etc., but only one \fi
@@ -357,12 +361,12 @@ and the derived files           expkv-cs.pdf
 % has its own set of primary and secondary keys.
 %
 % A word of advice you should consider: If your macro doesn't have to be
-% expandable (and often it doesn't) don't use \expkvc. The interface has some
-% overhead (though it still can be considered fast -- check \autoref{sec:speed})
-% and the approach has its limits in versatility. If you don't need to be
-% expandable, you should consider either defining your keys manually using
-% \expkv\ or using \expkvd\ for convenience. Or you resort to another \kv\
-% interface.
+% expandable (and often it doesn't) consider not using \expkvc. The interface
+% has some overhead (though it still can be considered fast -- check
+% \autoref{sec:speed}) and the approach has its limits in versatility. If you
+% don't need to be expandable, you should consider either defining your keys
+% manually using \expkv\ or using \expkvd\ for convenience. Or you resort to
+% another \kv\ interface.
 %
 % \expkvc\ is usable as generic code and as a \LaTeX\ package. It'll
 % automatically load \expkv\ in the same mode as well. To use it, just use one
@@ -555,7 +559,7 @@ and the derived files           expkv-cs.pdf
 % \end{function}
 %
 %
-% \subsection{Secondary Keys}
+% \subsection{Secondary Keys}\label{sec:secondaries}
 %
 % To remove some of the limitations with the approach that each primary key
 % matches an argument or hash entry, you can define secondary keys. Those have
@@ -954,6 +958,69 @@ and the derived files           expkv-cs.pdf
 %   \nonsense[keyA=hihi]{haha}
 %   \nonsense[keyA=hihi, keyB=A]{hehe}
 %   \nonsense[keyC=huhu, keyA=hihi, keyB=A]{haha}
+% \end{exresult}
+%
+%
+% \subsection{Freedom for Keys!}
+%
+% If this was the \TeX book this subsection would have a double bend sign. Not
+% because it is overly complicated, but because it shows things which could
+% break \expkvc's expandability and its alignment safety. This is for
+% experienced users wanting to get the most flexibility and knowing what they
+% are doing.
+%
+% In case you're wondering, it is possible to define other keys than the
+% primaries and the secondary types listed in \autoref{sec:secondaries} for a
+% macro defined with \expkvc\ by using the low-level interface of \expkv\ or
+% even the interface provided by \expkvd. The set name used for \expkvc's keys
+% is the macro name, including the leading backslash, or more precisely
+% |\string|\meta{cs} is used. This can be exploited to define additional keys
+% with arbitrary code. Consider the following \emph{bad} example:
+% \begin{lstlisting}
+% \ekvcSplit\foo{a=A,b=B}{a is #1.\par b is #2}
+% \protected\ekvdef{\string\foo}{c}{\def\fooC{#1}}
+% \end{lstlisting}
+% This would define a key named |c| that will store its value inside a macro.
+% The issue with this is that this can't be done expandably. As a result, the
+% macro |\foo| isn't always expandable any more (not that bad if this was never
+% required) and as soon as the key |c| is used, it is also no longer alignment
+% safe\footnote{This means that the \kv-list can't contain alignment markers
+%   that are not inside an additional set of braces if used inside a \TeX\
+%   alignment.}
+% (might be bad depending on the usage).
+%
+% So why do I show you this? Because we could as well do something useful like
+% create a key that pre-parses the input and after that passes the parsed value
+% on. This parsing would have to be completely expandable though. For the
+% pass-on part we can use the following function:
+%
+% \begin{function}{\ekvcPassTo}
+%   \begin{syntax}
+%     \cs{ekvcPassTo}\meta{cs}\marg{key}\marg{value}
+%   \end{syntax}
+%   This passes \meta{value} on to \meta{key} for the \expkvc-macro \meta{cs}.
+%   It should be used inside the key parsing of a macro defined with \expkvc,
+%   else this most likely results in a low level \TeX\ error.
+% \end{function}
+%
+% With this we could for example split the value of a key at a hyphen and pass
+% the parts to different keys:\\
+% \begin{minipage}[c]{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcSplit\foo{a=A,b=B}{a is #1.\par b is #2.\par}
+% \ekvdef{\string\foo}{c}{\fooSplit#1\par}
+% \def\fooSplit#1-#2\par
+%   {\ekvcPassTo\foo{a}{#1}\ekvcPassTo\foo{b}{#2}}
+% \foo{}
+% \foo{c=1-2}
+% \end{lstlisting}
+% \end{minipage}
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcSplit\foo{a=A,b=B}{a is #1.\par b is #2.\par}
+%   \ekvdef{\string\foo}{c}{\fooSplit#1\par}
+%   \def\fooSplit#1-#2\par{\ekvcPassTo\foo{a}{#1}\ekvcPassTo\foo{b}{#2}}
+%   \foo{}
+%   \foo{c=1-2}
 % \end{exresult}
 %
 %
@@ -1894,6 +1961,20 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\ekvcPassTo}
+%   This macro can be used to pass a value to a key of some macro (this way
+%   more complicated key codes are possible that in the end pass processed
+%   values on to some macro). The implemantation is pretty straight forward.
+%    \begin{macrocode}
+\long\def\ekvcPassTo#1#2%
+  {%
+    \ekvifdefined{\string#1}{#2}%
+      {\csname\ekv@name{\string#1}{#2}\endcsname}%
+      {\ekvc@err@unknown@key{#1}{#2}\@gobble}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 %
 % \subsubsection{Secondary Key Types}
 %
@@ -2343,6 +2424,7 @@ and the derived files           expkv-cs.pdf
 \long\def\ekvc@err@missing@hash#1{\ekvc@err{hash `#1' not found}}
 \long\def\ekvc@err@empty@hash{\ekvc@err{empty hash}}
 \def\ekvc@err@invalid@bool#1{\ekvc@err{invalid boolean value `#1'}}
+\long\def\ekvc@err@unknown@key#1#2{\ekvc@err{unknown key `#2' for macro #1}}
 %    \end{macrocode}
 % \end{macro}
 %

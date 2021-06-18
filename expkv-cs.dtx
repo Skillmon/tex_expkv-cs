@@ -580,32 +580,33 @@ and the derived files           expkv-cs.pdf
 %   If you need a specific \key\ from a \meta{key list} more than once, it'll
 %   be a good idea to only extract it once and from then on keep it as a
 %   separate argument. Hence the macro \cs{ekvcValueSplit} will extract one
-%   specific \key's value from the list and forward the remainder of the list
-%   as the first and the \key's value as the second argument to \meta{next}, so
-%   the result of this will be \meta{next}\marg{key list'}\marg{value} with
-%   \meta{key list'} the remaining list. This is almost as fast as |\ekvcValue|
-%   and runs the same tests. Keep in mind that you can't fetch for the same
-%   \key\ again from \meta{key list'} as it got removed.
+%   specific \key's value from the list and forward it as the first and the
+%   remainder of the list as the second argument to \meta{next}, so the result
+%   of this will be \meta{next}\marg{value}\marg{key list'} with \meta{key
+%   list'} the remaining list. This is almost as fast as |\ekvcValue| and runs
+%   the same tests. Keep in mind that you can't fetch for the same \key\ again
+%   from \meta{key list'} as it got removed.
 % \end{function}
 % \example The following defines a macro |\foo| which will take three keys.
 % Since the next parsing step will need the value of one of the keys multiple
-% times we split that key off the list:\\
+% times we split that key off the list (in this example the next step doesn't
+% use the key multiple times for simplicity though):\\
 % \begin{minipage}{.75\linewidth}
 % \begin{lstlisting}
 % \ekvcHash\foo{a=a,b=b,c=c}
 %   {\ekvcValueSplit{a}{#1}\foobar}
-% \newcommand*\foobar[2]{a is #2.\par
-%                        b is \ekvcValue{b}{#1}.\par
-%                        c is \ekvcValue{c}{#1}.\par}
+% \newcommand*\foobar[2]{a is #1.\par
+%                        b is \ekvcValue{b}{#2}.\par
+%                        c is \ekvcValue{c}{#2}.\par}
 % \foo{}
 % \end{lstlisting}
 % \end{minipage}^^A
 % \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
 %   \ekvcHash\foo{a=a,b=b,c=c}
 %     {\ekvcValueSplit{a}{#1}\foobar}
-%   \newcommand*\foobar[2]{a is #2.\par
-%                          b is \ekvcValue{b}{#1}.\par
-%                          c is \ekvcValue{c}{#1}.\par}
+%   \newcommand*\foobar[2]{a is #1.\par
+%                          b is \ekvcValue{b}{#2}.\par
+%                          c is \ekvcValue{c}{#2}.\par}
 %   \foo{}
 % \end{exresult}
 %
@@ -1927,7 +1928,7 @@ and the derived files           expkv-cs.pdf
                   \unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname}%
                   ####2####3\unexpanded{\ekvc@stop}####4%
                 {%
-                  ####4{####1####3}{####2}%
+                  ####4{####2}{####1####3}%
                 }%
               \long\gdef\unexpanded\expandafter
                 {\csname ekvc@safesplithash@#1\endcsname}####1%
@@ -1993,7 +1994,7 @@ and the derived files           expkv-cs.pdf
   }
 \long\def\ekvcValueSplit@recover#1#2%
   {%
-    #2{#1}{}%
+    #2{}{#1}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -2002,11 +2003,11 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \long\def\ekvc@safe@found@hash#1#2\ekvc@stop#3%
   {%
-    #3{#2}{#1}%
+    #3{#1}{#2}%
   }
 \long\def\ekvc@safe@no@hash#1#2\ekvc@mark\ekvc@safe@found@hash\ekvc@stop#3%
   {%
-    #3{#2}{}%
+    #3{}{#2}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -2037,8 +2038,8 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \long\def\ekvc@safehash@#1{\ekvc@err@empty@hash{}}
 \long\def\ekvc@fasthash@#1\ekvc@stop{\ekvc@err@empty@hash}
-\long\def\ekvc@safesplithash@#1#2{\ekvc@err@empty@hash#2{#1}{}}
-\long\def\ekvc@fastsplithash@#1\ekvc@stop#2{\ekvc@err@empty@hash#2{#1}{}}
+\long\def\ekvc@safesplithash@#1#2{\ekvc@err@empty@hash#2{}{#1}}
+\long\def\ekvc@fastsplithash@#1\ekvc@stop#2{\ekvc@err@empty@hash#2{}{#1}}
 %    \end{macrocode}
 % \end{macro}
 %

@@ -580,32 +580,33 @@ and the derived files           expkv-cs.pdf
 %   If you need a specific \key\ from a \meta{key list} more than once, it'll
 %   be a good idea to only extract it once and from then on keep it as a
 %   separate argument. Hence the macro \cs{ekvcValueSplit} will extract one
-%   specific \key's value from the list and forward the remainder of the list
-%   as the first and the \key's value as the second argument to \meta{next}, so
-%   the result of this will be \meta{next}\marg{key list'}\marg{value} with
-%   \meta{key list'} the remaining list. This is almost as fast as |\ekvcValue|
-%   and runs the same tests. Keep in mind that you can't fetch for the same
-%   \key\ again from \meta{key list'} as it got removed.
+%   specific \key's value from the list and forward it as the first and the
+%   remainder of the list as the second argument to \meta{next}, so the result
+%   of this will be \meta{next}\marg{value}\marg{key list'} with \meta{key
+%   list'} the remaining list. This is almost as fast as |\ekvcValue| and runs
+%   the same tests. Keep in mind that you can't fetch for the same \key\ again
+%   from \meta{key list'} as it got removed.
 % \end{function}
 % \example The following defines a macro |\foo| which will take three keys.
 % Since the next parsing step will need the value of one of the keys multiple
-% times we split that key off the list:\\
+% times we split that key off the list (in this example the next step doesn't
+% use the key multiple times for simplicity though):\\
 % \begin{minipage}{.75\linewidth}
 % \begin{lstlisting}
 % \ekvcHash\foo{a=a,b=b,c=c}
 %   {\ekvcValueSplit{a}{#1}\foobar}
-% \newcommand*\foobar[2]{a is #2.\par
-%                        b is \ekvcValue{b}{#1}.\par
-%                        c is \ekvcValue{c}{#1}.\par}
+% \newcommand*\foobar[2]{a is #1.\par
+%                        b is \ekvcValue{b}{#2}.\par
+%                        c is \ekvcValue{c}{#2}.\par}
 % \foo{}
 % \end{lstlisting}
 % \end{minipage}^^A
 % \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
 %   \ekvcHash\foo{a=a,b=b,c=c}
 %     {\ekvcValueSplit{a}{#1}\foobar}
-%   \newcommand*\foobar[2]{a is #2.\par
-%                          b is \ekvcValue{b}{#1}.\par
-%                          c is \ekvcValue{c}{#1}.\par}
+%   \newcommand*\foobar[2]{a is #1.\par
+%                          b is \ekvcValue{b}{#2}.\par
+%                          c is \ekvcValue{c}{#2}.\par}
 %   \foo{}
 % \end{exresult}
 %

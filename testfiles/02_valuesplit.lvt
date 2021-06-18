@@ -24,9 +24,9 @@
   }
 \newcommand\newtestB[3]
   {%
-    height: \ekvcValue{height}{#2}\NEWLINE
-    length: #3\NEWLINE
-    depth: \ekvcValue{depth}{#2}\NEWLINE
+    height: \ekvcValue{height}{#3}\NEWLINE
+    length: #2\NEWLINE
+    depth: \ekvcValue{depth}{#3}\NEWLINE
   }
 \TIMO
 \TESTEXP{value split}

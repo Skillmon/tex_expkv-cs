@@ -216,6 +216,7 @@ and the derived files           expkv-cs.pdf
 \definecolor{expkvred}{HTML}{9F393D}
 \colorlet{expkvgrey}{black!75}
 \makeatletter
+\newcommand*\example{\par\smallskip\noindent\textit{Example:} \ignorespaces}
 \newcommand*\expkv
   {^^A
     \texorpdfstring
@@ -363,11 +364,13 @@ and the derived files           expkv-cs.pdf
 %
 % A word of advice you should consider: If your macro doesn't have to be
 % expandable (and often it doesn't) consider not using \expkvc. The interface
-% has some overhead (though it still can be considered fast -- check
-% \autoref{sec:speed}) and the approach has its limits in versatility. If you
-% don't need to be expandable, you should consider either defining your keys
-% manually using \expkv\ or using \expkvd\ for convenience. Or you resort to
-% another \kv\ interface.
+% has some overhead (though it still is fast -- check \autoref{sec:speed}) and
+% the approach has its limits in versatility. If you don't need to be
+% expandable, you should consider either defining your keys manually using
+% \expkv\ or using \expkvd\ for convenience. Or you resort to another \kv\
+% interface. Nevertheless setting up macros with \expkvc, especially with
+% |\ekvcSplit|, is very convenient in my opinion, so if you just want to define
+% a single macro with just a few keys this might be the way to go.
 %
 % \expkvc\ is usable as generic code and as a \LaTeX\ package. It'll
 % automatically load \expkv\ in the same mode as well. To use it, just use one
@@ -381,10 +384,11 @@ and the derived files           expkv-cs.pdf
 % \subsection{Define Macros and Primary Keys}
 %
 % All macros defined with \expkvc\ have to be previously undefined or have the
-% |\meaning| of |\relax|. This is necessary as there is no way to undefine keys
-% once they are set up (neither \expkv\ nor \expkvc\ keep track of defined
-% keys) -- so to make sure there are no conflicts only new definitions are
-% allowed (that's not the case for individual keys, only for frontend macros).
+% |\meaning| of |\relax|. This is necessary as there is no way to automatically
+% undefine keys once they are set up (neither \expkv\ nor \expkvc\ keep track of
+% defined keys) -- so to make sure there are no conflicts only new definitions
+% are allowed (that's not the case for individual keys, only for frontend
+% macros).
 %
 %
 % \subsubsection{Primary Keys}\label{sec:primaries}
@@ -425,6 +429,20 @@ and the derived files           expkv-cs.pdf
 %   key defined first). With |\ekvcSplit| you can define macros using at most
 %   nine primary keys.
 % \end{function}
+% \example The following defines a macro |\foo| that takes the keys |a| and |b|
+% and outputs their values in a textual form:\\
+% \begin{minipage}{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcSplit\foo{a=a,b=b}{a is #1.\par b is #2.\par}
+% \foo{}
+% \foo{b=e}
+% \end{lstlisting}
+% \end{minipage}^^A
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcSplit\foo{a=a,b=b}{a is #1.\par b is #2.\par}
+%   \foo{}
+%   \foo{b=e}
+% \end{exresult}
 %
 % \begin{function}{\ekvcSplitAndForward}
 %   \begin{syntax}
@@ -444,6 +462,8 @@ and the derived files           expkv-cs.pdf
 % \ekvcSplitAndForward\foo{\foo@aux{more args}}{keyA = A, keyB = B}
 % \end{lstlisting}
 % \end{function}
+% In the first case |\foo@aux| should take at least two arguments (|keyA| and
+% |keyB|), in the second case at least three (|more args|, |keyA|, and |keyB|).
 %
 % \begin{function}{\ekvcSplitAndUse}
 %   \begin{syntax}
@@ -456,6 +476,8 @@ and the derived files           expkv-cs.pdf
 %   \begin{syntax}
 %     \meta{cs}\{\key=\val, \ldots\}\marg{after}
 %   \end{syntax}
+% and the code in |after| should expect at least as many arguments as the number
+% of keys defined for \meta{cs}.
 %
 % \subsubsection{Hash}
 %
@@ -465,8 +487,8 @@ and the derived files           expkv-cs.pdf
 % primitive macro with a single key benchmarking was almost $1.7$ times slower,
 % the root of which being the key access with |\ekvcValue|, not the parsing, and
 % for a key access using |\ekvcValueFast| it was still about $1.2$ times
-% slower). So if your macro uses less than ten primary keys, you should most
-% likely use the split approach.
+% slower). So if your macro uses less than ten primary keys, you should consider
+% using the split approach.
 %
 % \begin{function}{\ekvcHash}
 %   \begin{syntax}
@@ -479,6 +501,22 @@ and the derived files           expkv-cs.pdf
 %   \meta{definition}, in which you can access the \val\ of a \key\ by using
 %   \texttt{\cs[no-index]{ekvcValue}\{\key\}\{\#1\}}.
 % \end{function}
+% \example This defines an equivalent macro like the |\foo| defined with
+% |\ekvcSplit| earlier:\\
+% \begin{minipage}{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcHash\foo{a=a,b=b}{a is \ekvcValue{a}{#1}.\par
+%                        b is \ekvcValue{b}{#1}.\par}
+% \foo{}
+% \foo{b=e}
+% \end{lstlisting}
+% \end{minipage}^^A
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcHash\foo{a=a,b=b}{a is \ekvcValue{a}{#1}.\par
+%                          b is \ekvcValue{b}{#1}.\par}
+%   \foo{}
+%   \foo{b=e}
+% \end{exresult}
 %
 % \begin{function}{\ekvcHashAndForward}
 %   \begin{syntax}
@@ -549,6 +587,27 @@ and the derived files           expkv-cs.pdf
 %   and runs the same tests. Keep in mind that you can't fetch for the same
 %   \key\ again from \meta{key list'} as it got removed.
 % \end{function}
+% \example The following defines a macro |\foo| which will take three keys.
+% Since the next parsing step will need the value of one of the keys multiple
+% times we split that key off the list:\\
+% \begin{minipage}{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcHash\foo{a=a,b=b,c=c}
+%   {\ekvcValueSplit{a}{#1}\foobar}
+% \newcommand*\foobar[2]{a is #2.\par
+%                        b is \ekvcValue{b}{#1}.\par
+%                        c is \ekvcValue{c}{#1}.\par}
+% \foo{}
+% \end{lstlisting}
+% \end{minipage}^^A
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcHash\foo{a=a,b=b,c=c}
+%     {\ekvcValueSplit{a}{#1}\foobar}
+%   \newcommand*\foobar[2]{a is #2.\par
+%                          b is \ekvcValue{b}{#1}.\par
+%                          c is \ekvcValue{c}{#1}.\par}
+%   \foo{}
+% \end{exresult}
 %
 % \begin{function}{\ekvcValueSplitFast}
 %   \begin{syntax}
@@ -686,19 +745,20 @@ and the derived files           expkv-cs.pdf
 % \end{function}
 %
 %
-% \subsection{Changing the Defaults}\label{sec:change}
+% \subsection{Changing the Initial Values}\label{sec:change}
 %
 % \begin{function}{\ekvcChange}
 %   \begin{syntax}
 %     \cs{ekvcChange}\meta{cs}\{\kv,\ldots\}
 %   \end{syntax}
 %   This processes the \kv\ list (just like it would be processed by \meta{cs})
-%   to set new defaults for the macro \meta{cs} defined with \expkvc. Inside the
-%   \kv\ list both primary and secondary keys can be used. If \meta{cs} was
-%   defined |\long| earlier it will still be |\long|, every other \TeX\ prefix
-%   will be stripped (but \expkvc\ doesn't support them anywhere else so that
-%   should be fine). The resulting new defaults will be stored inside the
-%   \meta{cs} locally (just as the original defaults were).
+%   to set new defaults for the macro \meta{cs} defined with \expkvc\ (meaning
+%   the values used if you don't provide anything at use time). Inside the \kv\
+%   list both primary and secondary keys can be used. If \meta{cs} was defined
+%   |\long| earlier it will still be |\long|, every other \TeX\ prefix will be
+%   stripped (but \expkvc\ doesn't support them anywhere else so that should be
+%   fine). The resulting new defaults will be stored inside the \meta{cs}
+%   locally (just as the original defaults were).
 % \end{function}
 %
 % Consider the following example:\\
@@ -712,7 +772,7 @@ and the derived files           expkv-cs.pdf
 % \ekvcChange\foo{c=c}
 % \foo{} % newer defaults
 % \end{lstlisting}
-% \end{minipage}%
+% \end{minipage}^^A
 % \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
 %   \ekvcSplit\foo{a=a,b=b}{a is #1.\par b is #2.\par}
 %   \foo{}
@@ -845,26 +905,26 @@ and the derived files           expkv-cs.pdf
 % \end{function}
 %
 %
-% \subsection{Example}
+% \subsection{Further Examples}
 %
 % How could a documentation be a good documentation without some basic examples?
 % Say we want to define a small macro expanding to some character description
 % (who knows why this has to be expandable?). A character description will not
-% have too many items to it, so we use |\ekvcSplit|.
+% have too many items to it, so we use |\ekvcSplit| (the comments with the
+% parameter numbers are of course not necessary and just ease reading the
+% example).
 % \begin{lstlisting}
 % \ekvcSplit\character
 %   {
-%     name=John Doe,
-%     age=any,
-%     nationality=the Universe,
-%     hobby=to exist,
-%     type=Mister,
-%     pronoun=He,
-%     possessive=his,
+%     name=John Doe,            % #1
+%     age=any,                  % #2
+%     nationality=the Universe, % #3
+%     hobby=to exist,           % #4
+%     type=Mister,              % #5
+%     pronoun=He,               % #6
+%     possessive=his,           % #7
 %   }
-%   {%
-%     #1 is a #5 from #3. #6 is of #2 age and #7 hobby is #4.\par
-%   }
+%   {#1 is a #5 from #3. #6 is of #2 age and #7 hobby is #4.\par}
 % \end{lstlisting}
 % Also we want to give some short cuts so that it's easier to describe several
 % persons.
@@ -908,7 +968,7 @@ and the derived files           expkv-cs.pdf
 % As one might see, the |lady| key could actually have been an |nmeta| key as
 % well, as all that is done with the argument is using it as a \kv\ list.
 %
-% The result of all the first two usages would be:
+% The result of only the first two usages would be:
 % \begin{exresult}{\linewidth}
 %   \ekvcSplit\character
 %     {
@@ -952,7 +1012,9 @@ and the derived files           expkv-cs.pdf
 % and mandatory arguments as well. A small nonsense example (which should
 % perhaps use |\ekvcSplitAndForward| instead of |\ekvcHashAndForward| since it
 % only uses four keys and one other argument -- and isn't expandable since it
-% uses a \env{tabular} environment):
+% uses a \env{tabular} environment, so it would've been better to use a more
+% feature rich \kv\ interface most likely, \emph{e.g.}, the one provided by
+% \expkvd):
 % \begin{lstlisting}
 % \makeatletter
 % \newcommand*\nonsense{\ekvoptarg\nonsense@a{}}

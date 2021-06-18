@@ -2178,7 +2178,7 @@ and the derived files           expkv-cs.pdf
   {%
     \ekvifdefined{\string#1}{#2}%
       {\csname\ekv@name{\string#1}{#2}\endcsname}%
-      {\ekvc@err@unknown@key{#1}{#2}\@gobble}%
+      {\ekvc@err@unknown@key@or@macro{#1}{#2}\@gobble}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -2634,7 +2634,8 @@ and the derived files           expkv-cs.pdf
 \long\def\ekvc@err@missing@hash#1{\ekvc@err{hash `#1' not found}}
 \long\def\ekvc@err@empty@hash{\ekvc@err{empty hash}}
 \def\ekvc@err@invalid@bool#1{\ekvc@err{invalid boolean value `#1'}}
-\long\def\ekvc@err@unknown@key#1#2{\ekvc@err{unknown key `#2' for macro #1}}
+\long\def\ekvc@err@unknown@key@or@macro#1#2%
+  {\ekvc@err{unknown key `#2' for macro #1}}
 %    \end{macrocode}
 % \end{macro}
 %

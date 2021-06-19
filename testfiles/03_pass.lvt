@@ -1,0 +1,19 @@
+\input regression-test
+
+\RequirePackage{expkv-cs}
+
+\START
+\OMIT
+\ekvcSplit\split{a=a,b=b}{a=#1,b=#2}
+\ekvdefNoVal{\string\split}{c}{\ekvcPass\split{a}{c}\ekvcPass\split{b}{c}}
+\ekvcHash\hash{a=a,b=b}{a=\ekvcValue{a}{#1},b=\ekvcValue{b}{#1}}
+\ekvdefNoVal{\string\hash}{c}{\ekvcPass\hash{a}{c}\ekvcPass\hash{b}{c}}
+\TIMO
+
+\TESTEXP{Pass}
+  {%
+    \split{c}\NEWLINE
+    \hash{c}%
+  }
+
+\END

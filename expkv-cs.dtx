@@ -381,7 +381,7 @@ and the derived files           expkv-cs.pdf
 % \end{lstlisting}
 %
 %
-% \subsection{Define Macros and Primary Keys}
+% \subsection{Define Macros and Primary Keys}\label{sec:define}
 %
 % All macros defined with \expkvc\ have to be previously undefined or have the
 % |\meaning| of |\relax|. This is necessary as there is no way to automatically
@@ -398,11 +398,31 @@ and the derived files           expkv-cs.pdf
 % primary key and \val\ the associated initial value. By default all keys are
 % defined short, but you can define long keys by prefixing \key\ with |long|
 % (\emph{e.g.}, \texttt{long name=Jonathan P. Spratte}). You only need |long| if
-% the key should be able to take a |\par| token. Note however that |long| keys
-% are a microscopic grain faster (due to some internals of \expkvc). Only if at
-% least one of the keys was |long| the \meta{cs} in the following defining
-% macros will be |\long|. For obvious reasons there is no possibility to define
-% a macro or key as |\protected|.
+% the key should be able to take an explicit |\par| token. Note however that
+% |long| keys are a microscopic grain faster (due to some internals of \expkvc).
+% Only if at least one of the keys was |long| the \meta{cs} in the following
+% defining macros will be |\long|. For obvious reasons there is no possibility
+% to define a macro or key as |\protected|.
+%
+% To allow keys not defined |long| which key names should start with |long|, you
+% can also use the prefix |short| (|short| and |long| are mutually exclusive,
+% which ever comes first defines the behaviour, the latter is considered part of
+% the key name). Note that this is the only reason for |short|'s existance,
+% essentially it does nothing.
+%
+% The consequence culminates in the following:
+% \begin{lstlisting}
+% \ekvcSplit\foo
+%   {
+%      long short = abc\par
+%     ,short long = def
+%   }
+%   {#1#2}
+% \end{lstlisting}
+% will define a macro |\foo| that knows two primary keys, the first one is
+% called |short|, and accepts explicit |\par| tokens inside its values, the
+% second one is called |long| and will not accept |\par| tokens (leading to a
+% low level \TeX\ error). A description of |\ekvcSplit| follows shortly.
 %
 % At the moment \expkvc\ doesn't require any internal keys, but I can't foresee
 % whether this will be the case in the future as well, as it might turn out that
@@ -462,6 +482,7 @@ and the derived files           expkv-cs.pdf
 % \ekvcSplitAndForward\foo{\foo@aux{more args}}{keyA = A, keyB = B}
 % \end{lstlisting}
 % \end{function}
+% \noindent
 % In the first case |\foo@aux| should take at least two arguments (|keyA| and
 % |keyB|), in the second case at least three (|more args|, |keyA|, and |keyB|).
 %
@@ -483,12 +504,12 @@ and the derived files           expkv-cs.pdf
 %
 % The hash variants will provide the key values as a single argument in which
 % you can access specific values using a special macro. The implementation might
-% be more convenient and scale better, \emph{but} it is much slower (for a
-% primitive macro with a single key benchmarking was almost $1.7$ times slower,
-% the root of which being the key access with |\ekvcValue|, not the parsing, and
-% for a key access using |\ekvcValueFast| it was still about $1.2$ times
-% slower). So if your macro uses less than ten primary keys, you should consider
-% using the split approach.
+% be more convenient and scale better, \emph{but} it is slower (for a
+% rudimentary macro with a single key benchmarking was almost $1.7$ times
+% slower, the root of which being the key access with |\ekvcValue|, not the
+% parsing, and for a key access using |\ekvcValueFast| it was still about $1.2$
+% times slower). So if your macro uses less than ten primary keys, you should
+% consider using the split approach.
 %
 % \begin{function}{\ekvcHash}
 %   \begin{syntax}
@@ -501,7 +522,7 @@ and the derived files           expkv-cs.pdf
 %   \meta{definition}, in which you can access the \val\ of a \key\ by using
 %   \texttt{\cs[no-index]{ekvcValue}\{\key\}\{\#1\}}.
 % \end{function}
-% \example This defines an equivalent macro like the |\foo| defined with
+% \example This defines an equivalent macro to the |\foo| defined with
 % |\ekvcSplit| earlier:\\
 % \begin{minipage}{.75\linewidth}
 % \begin{lstlisting}
@@ -532,14 +553,21 @@ and the derived files           expkv-cs.pdf
 %   \texttt{\cs[no-index]{ekvcValue}\{\key\}\{\#1\}} (or whichever argument the
 %   hashed \kv\ list will be).
 % \end{function}
+% \example This defines a macro |\foo| processing two keys, and passing the
+% result to |\foobar|:
+% \begin{lstlisting}
+% \ekvcHashAndForward\foo\foobar{a=a,b=b}
+% \newcommand*\foobar[1]{a is \ekvcValue{a}{#1}.\par
+%                        b is \ekvcValue{b}{#1}.\par}
+% \end{lstlisting}
 %
 % \begin{function}{\ekvcHashAndUse}
 %   \begin{syntax}
 %     \cs{ekvcHashAndUse}\meta{cs}\marg{primary keys}
 %   \end{syntax}
 %   This will roughly do the same as |\ekvcHashAndForward|, but instead of
-%   specifying what will be used after hashing the keys, \meta{cs} will use what
-%   follows the \kv\ list. So its syntax will be
+%   specifying what will be used after hashing the keys at install time,
+%   \meta{cs} will use what follows the \kv\ list. So its syntax will be
 % \end{function}
 %   \begin{syntax}
 %     \meta{cs}\{\key=\val, \ldots\}\marg{after}
@@ -568,9 +596,9 @@ and the derived files           expkv-cs.pdf
 %   a result this is about $1.4$ times faster \emph{but} will throw low level
 %   \TeX\ errors eventually if the hash function isn't defined or the \key\
 %   isn't part of the \meta{key list} (\emph{e.g.}, because it was defined as a
-%   key for another macro -- all macros share the same hash function per \key).
-%   Use it if you know what you're doing. This macro needs exactly three steps
-%   of expansion in the no-errors case.
+%   key for another macro -- all macros share the same hash function per \key\
+%   name). Use it if you know what you're doing. This macro needs exactly three
+%   steps of expansion in the no-errors case.
 % \end{function}
 %
 % \begin{function}{\ekvcValueSplit}
@@ -706,8 +734,8 @@ and the derived files           expkv-cs.pdf
 %   If \key\ is a defined value taking key, you can define a |NoVal| version
 %   with this that will behave as if \key\ was given \meta{default} as its
 %   \val. Note that this doesn't change the initial values of primary keys set
-%   at definition time in |\ekvcSplit| and friends. \key\ can be a primary or
-%   secondary key.
+%   at definition time in |\ekvcSplit| and friends (see |\ekvcChange| in
+%   \autoref{sec:change} for this). \key\ can be a primary or secondary key.
 % \end{function}
 %
 % \begin{function}{flag-bool}
@@ -752,46 +780,51 @@ and the derived files           expkv-cs.pdf
 %   \begin{syntax}
 %     \cs{ekvcChange}\meta{cs}\{\kv,\ldots\}
 %   \end{syntax}
-%   This processes the \kv\ list (just like it would be processed by \meta{cs})
-%   to set new defaults for the macro \meta{cs} defined with \expkvc\ (meaning
-%   the values used if you don't provide anything at use time). Inside the \kv\
-%   list both primary and secondary keys can be used. If \meta{cs} was defined
-%   |\long| earlier it will still be |\long|, every other \TeX\ prefix will be
-%   stripped (but \expkvc\ doesn't support them anywhere else so that should be
-%   fine). The resulting new defaults will be stored inside the \meta{cs}
-%   locally (just as the original defaults were).
+%   This processes the \kv\ list for the macro \meta{cs} to set new defaults for
+%   it (meaning the values used if you don't provide anything at use time, not
+%   those specified with the |default| secondary key). \meta{cs} should be
+%   defined with \expkvc\ (so with any of the methods in \autoref{sec:define}).
+%   Inside the \kv\ list both primary and secondary keys can be used. If
+%   \meta{cs} was defined |\long| earlier it will still be |\long|, every other
+%   \TeX\ prefix will be stripped (but \expkvc\ doesn't support them anywhere
+%   else so that should be fine). The resulting new defaults will be stored
+%   inside the \meta{cs} locally (just as the original defaults were).
 % \end{function}
 %
 % Consider the following example:\\
 % \begin{minipage}[c]{.75\linewidth}
 % \begin{lstlisting}
 % \ekvcSplit\foo{a=a,b=b}{a is #1.\par b is #2.\par}
+% \begingroup
+%   \ekvcChange\foo{b=B}
+%   \foo{} % new defaults
+%   \ekvcSecondaryKeys\foo{meta c={a={#1},b={#1}}}
+%   \ekvcChange\foo{c=c}
+%   \foo{} % newer defaults
+% \endgroup
 % \foo{} % initial defaults
-% \ekvcChange\foo{b=B}
-% \foo{} % new defaults
-% \ekvcSecondaryKeys\foo{meta c={a={#1},b={#1}}}
-% \ekvcChange\foo{c=c}
-% \foo{} % newer defaults
 % \end{lstlisting}
 % \end{minipage}^^A
 % \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
 %   \ekvcSplit\foo{a=a,b=b}{a is #1.\par b is #2.\par}
-%   \foo{}
-%   \ekvcChange\foo{b=B}
-%   \foo{}
-%   \ekvcSecondaryKeys\foo{meta c={a={#1},b={#1}}}
-%   \ekvcChange\foo{c=c}
+%   \begingroup
+%     \ekvcChange\foo{b=B}
+%     \foo{}
+%     \ekvcSecondaryKeys\foo{meta c={a={#1},b={#1}}}
+%     \ekvcChange\foo{c=c}
+%     \foo{}
+%   \endgroup
 %   \foo{}
 % \end{exresult}
 %
 % As a result with this the typical setup macro could be implemented:
 % \begin{lstlisting}
 % \ekvcHashAndUse\foo{key=a,key=b}
-% \newcommand\foosetup{\ekvcChange\foo}
+% \newcommand*\foosetup{\ekvcChange\foo}
 % \end{lstlisting}
-% Of course the usage is limited to a single macro |\foo|, hence this might be
-% not as powerful as similar macros used with other \kv\ interfaces. But at
-% least a few similar macros could be grouped using the same key parsing macro
+% Of course the usage is limited to a single macro |\foo|, hence this might not
+% be as powerful as similar macros used with other \kv\ interfaces. But at least
+% a few similar macros could be grouped using the same key parsing macro
 % internally.
 %
 %
@@ -821,7 +854,7 @@ and the derived files           expkv-cs.pdf
 %   whether the macro \meta{flag} is currently undefined.  A \meta{flag} will
 %   expand to the flag's current height with a trailing space (so you can use it
 %   directly with |\ifnum| for example and it will terminate the number scanning
-%   itself).
+%   on its own).
 % \end{function}
 %
 %  All other macros dealing with flags take as a parameter a macro defined as a
@@ -906,14 +939,14 @@ and the derived files           expkv-cs.pdf
 % \end{function}
 %
 %
-% \subsection{Further Examples}
+% \subsection{Further Examples}\label{sec:examples}
 %
-% How could a documentation be a good documentation without some basic examples?
-% Say we want to define a small macro expanding to some character description
-% (who knows why this has to be expandable?). A character description will not
-% have too many items to it, so we use |\ekvcSplit| (the comments with the
-% parameter numbers are of course not necessary and just ease reading the
-% example).
+% How could a documentation be a good documentation without enough basic
+% examples?  Say we want to define a small macro expanding to some character
+% description (who knows why this has to be expandable?). A character
+% description will not have too many items to it, so we use |\ekvcSplit| (the
+% comments with the parameter numbers are of course not necessary and just ease
+% reading the example).
 % \begin{lstlisting}
 % \ekvcSplit\character
 %   {
@@ -1090,7 +1123,7 @@ and the derived files           expkv-cs.pdf
 % |\string|\meta{cs} is used. This can be exploited to define additional keys
 % with arbitrary code. Consider the following \emph{bad} example:
 % \begin{lstlisting}
-% \ekvcSplit\foo{a=A,b=B}{a is #1.\par b is #2}
+% \ekvcSplit\foo{a=A,b=B}{a is #1.\par b is #2\par}
 % \protected\ekvdef{\string\foo}{c}{\def\fooC{#1}}
 % \end{lstlisting}
 % This would define a key named |c| that will store its value inside a macro.
@@ -1145,13 +1178,13 @@ and the derived files           expkv-cs.pdf
 % use case. The key-parsing is still faster than with most other \kv\ packages
 % (see the ``Comparisons'' subsection in the \expkv\ documentation).
 %
-% The speed considerations in this subsection use the first example in this
-% documentation as the benchmark. So we have seven keys and a short sentence
-% which should be typeset. For comparisons I use the following equivalent
-% \expkvd\ definitions. Each result is the average between changing no keys from
-% their initial values and altering four. Furthermore I'll compare three
-% variants of \expkvc\ with the \expkvd\ definitions, namely the split example
-% from above, a hash variant using |\ekvcValue| and a hash variant using
+% The speed considerations in this subsection use the first example of
+% \autoref{sec:examples} as the benchmark. So we have seven keys and a short
+% sentence which should be typeset. For comparisons I use the following
+% equivalent \expkvd\ definitions. Each result is the average between changing
+% no keys from their initial values and altering four. Furthermore I'll compare
+% three variants of \expkvc\ with the \expkvd\ definitions, namely the split
+% example from above, a hash variant using |\ekvcValue| and a hash variant using
 % |\ekvcValueFast|.
 % \begin{lstlisting}
 % \usepackage{expkv-def}
@@ -1616,6 +1649,14 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[internal]{\ekvc@split@p@short}
+%   The |short| prefix does essentially nothing, it is only provided to allow
+%   key names starting with |long| that aren't |\long|.
+%    \begin{macrocode}
+\def\ekvc@split@p@short{\ekvc@SetupSplitKeys@c}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}[internal]{\ekvc@defarggobbler}
 %   This is needed to define a macro with 1-9 parameters programmatically.
 %   \LaTeX's \cs[no-index]{newcommand} does something similar for example.
@@ -1876,6 +1917,14 @@ and the derived files           expkv-cs.pdf
     \let\ekvc@any@long\long
     \ekvc@SetupHashKeys@c
   }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvc@hash@p@short}
+%   The |short| prefix does essentially nothing, it is only provided to allow
+%   key names starting with |long| that aren't |\long|.
+%    \begin{macrocode}
+\def\ekvc@hash@p@short{\ekvc@SetupHashKeys@c}
 %    \end{macrocode}
 % \end{macro}
 %

@@ -4,7 +4,7 @@ Don't change this file in any respect.
 TEST 1: change split
 ============================================================
 a=a,b=b
-a=A,b=B
+a=C,b=C
 a=a,b=b
 a=A,b=B
 a=a,b=b

@@ -1010,7 +1010,7 @@ and the derived files           expkv-cs.pdf
 %   {
 %     \ekvc@SetupSplitKeys, \ekvc@SetupSplitKeys@a, \ekvc@SetupSplitKeys@b,
 %     \ekvc@SetupSplitKeys@c,
-%     \ekvc@SetupSplitKeys@check@unknown
+%     \ekvc@SetupSplitKeys@check@unknown,\ekvc@SetupSplitKeys@unknown
 %   }
 %   These macros parse the list of keys and set up the key macros. First we need
 %   to initialise some macros and start |\ekvparse|.
@@ -1020,7 +1020,6 @@ and the derived files           expkv-cs.pdf
     \ekvc@keycount=0
     \def\ekvc@any@long{}%
     \def\ekvc@initials{}%
-    \let\ekvc@if@supports@unknown\@gobble
     \def\ekvc@unknown@handlers{}%
     \ekvparse\ekvc@SetupSplitKeys@check@unknown\ekvc@SetupSplitKeys@a
   }
@@ -1098,6 +1097,13 @@ and the derived files           expkv-cs.pdf
       {\expandafter\ekvc@setup@splitmacro\expandafter{\the\ekvc@keycount}}%
       {}%
   }
+%    \end{macrocode}
+% If no value was provided this could either be an error, or the unknown key
+% forwarding. We have to check this (comparing against |...| inside
+% |\ekvc@tripledots|) and if this is the unknown key list type, set it up
+% accordingly (advancing the key count and setting up the unknown handlers of
+% \expkv). Else we simply throw an error and ignore the incident.
+%    \begin{macrocode}
 \protected\long\def\ekvc@SetupSplitKeys@check@unknown#1%
   {%
     \begingroup
@@ -1105,11 +1111,32 @@ and the derived files           expkv-cs.pdf
       \expandafter
     \endgroup
     \ifx\ekvc@tripledots\ekvc@tmp
+      \advance\ekvc@keycount1
+%    \end{macrocode}
+% The |\begingroup\expandafter\endgroup| ensures that the split mark isn't
+% actually defined (even if it just were with meaning |\relax|).
+%    \begin{macrocode}
+      \begingroup\expandafter\endgroup
+      \expandafter\ekvc@SetupSplitKeys@unknown
+        \csname ekvc@splitmark@\the\ekvc@keycount\endcsname
       \let\ekvc@any@long\long
-      \let\ekvc@if@supports@unknown\@firstofone
     \else
       \ekvc@err@value@required{#1}%
     \fi
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\protected\long\def\ekvc@SetupSplitKeys@unknown#1%
+  {%
+    \long\expandafter\def\csname\ekv@name\ekvc@set{}u\endcsname##1##2##3#1##4%
+      {##3#1{##4,##2= {##1} }}%
+    \long\expandafter\def\csname\ekv@name\ekvc@set{}uN\endcsname##1##2#1##3%
+      {##2#1{##3,##1}}%
+    \edef\ekvc@initials{\unexpanded\expandafter{\ekvc@initials#1{}}}%
+    \ekvc@helpers@needed
+      {\expandafter\ekvc@setup@splitmacro\expandafter{\the\ekvc@keycount}}%
+      {}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1314,7 +1341,11 @@ and the derived files           expkv-cs.pdf
 % \end{macro}
 %
 % \begin{macro}[internal]
-%   {\ekvc@SetupHashKeys,\ekvc@SetupHashKeys@a,\ekvc@SetupHashKeys@b}
+%   {%
+%     \ekvc@SetupHashKeys,\ekvc@SetupHashKeys@a,\ekvc@SetupHashKeys@b,
+%     \ekvc@SetupHashKeys@c,
+%     \ekvc@SetupHashKeys@check@unknown,\ekvc@SetupHashKeys@unknown
+%   }
 %   This should look awfully familiar as well, since it's just the same as for
 %   the split keys with a few other names here and there.
 %    \begin{macrocode}
@@ -1322,7 +1353,7 @@ and the derived files           expkv-cs.pdf
   {%
     \def\ekvc@any@long{}%
     \def\ekvc@initials{}%
-    \ekvparse\ekvc@err@value@required\ekvc@SetupHashKeys@a{#1}%
+    \ekvparse\ekvc@SetupHashKeys@check@unknown\ekvc@SetupHashKeys@a{#1}%
   }
 \protected\def\ekvc@SetupHashKeys@a#1%
   {%
@@ -1375,6 +1406,38 @@ and the derived files           expkv-cs.pdf
     \ekvlet\ekvc@set{#1}\ekvc@tmp
     \ekvc@setup@hashmacro{#1}%
   }
+%    \end{macrocode}
+%    \begin{macrocode}
+\protected\long\def\ekvc@SetupHashKeys@check@unknown#1%
+  {%
+    \begingroup
+      \edef\ekvc@tmp{\detokenize{#1}}%
+      \expandafter
+    \endgroup
+    \ifx\ekvc@tripledots\ekvc@tmp
+      \ekvc@SetupHashKeys@unknown
+      \let\ekvc@any@long\long
+    \else
+      \ekvc@err@value@required{#1}%
+    \fi
+  }
+%    \end{macrocode}
+%    \begin{macrocode}
+\def\ekvc@SetupHashKeys@unknown#1%
+  {%
+    \protected\def\ekvc@SetupHashKeys@unknown
+      {%
+        \expandafter
+        \let\csname\ekvc@name\ekvc@set{}u\endcsname\ekvc@hash@unknown@kv
+        \expandafter
+        \let\csname\ekvc@name\ekvc@set{}uN\endcsname\ekvc@hash@unknown@k
+        \edef\ekvc@initials{\unexpanded\expandafter{\ekvc@initials#1{}}}%
+      }%
+    \long\def\ekvc@hash@unknown@kv##1##2##3#1##4{##3#1{##4,##2= {##1} }}%
+    \long\def\ekvc@hash@unknown@k##1##2#1##3{##2#1{##3,##1}}%
+  }
+\expandafter\ekvc@SetupHashKeys@unknown
+  \csname ekvc@hashmark@\ekvc@tripledots\endcsname
 %    \end{macrocode}
 % \end{macro}
 %

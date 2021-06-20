@@ -11,7 +11,7 @@
     ,depth=3
   }
   {%
-    \ekvcValueSplit{length}{#1}{\newtestB{}}%
+    \ekvcValueSplit{length}{#1}{\newtestB{}}{#1}%
   }
 \ekvcHash\macroB
   {
@@ -20,7 +20,7 @@
     ,depth=3
   }
   {%
-    \ekvcValueSplitFast{length}{#1}{\newtestB{}}%
+    \ekvcValueSplitFast{length}{#1}{\newtestB{}}{#1}%
   }
 \newcommand\newtestB[3]
   {%

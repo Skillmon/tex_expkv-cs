@@ -56,7 +56,7 @@
   }
 \OMIT
 \TIMO
-\TESTEXP{empty hashs}
+\TESTEXP{empty hashes}
   {%
     \ekvcValue{}{}\NEWLINE
     \ekvcValueFast{}{}\NEWLINE
@@ -70,19 +70,19 @@
     \ekvcValue{heigt}{}
   }
 \OMIT
-\newcommand\mygobbletwo[2]{}
+\newcommand\myfirst[1]{#1}
 \TIMO
-\TESTEXP{empty hashs splits}
+\TESTEXP{empty hashes splits}
   {%
-    \ekvcValueSplit{}{}\mygobbletwo\NEWLINE
-    \ekvcValueSplitFast{}{}\mygobbletwo\NEWLINE
+    \ekvcValueSplit{}{}\myfirst\NEWLINE
+    \ekvcValueSplitFast{}{}\myfirst\NEWLINE
   }
 \TESTEXP{missing hash splits}
   {%
-    \ekvcValueSplit{height}{}\mygobbletwo
+    \ekvcValueSplit{height}{}\myfirst
   }
 \TESTEXP{unknown hash splits}
   {%
-    \ekvcValueSplit{heigt}{}\mygobbletwo
+    \ekvcValueSplit{heigt}{}\myfirst
   }
 \END

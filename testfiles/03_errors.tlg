@@ -72,7 +72,7 @@ l. ...  }
 (That was another \errmessage.)
 ============================================================
 ============================================================
-TEST 5: empty hashs
+TEST 5: empty hashes
 ============================================================
 Runaway argument?
 ! expkv-cs Error: empty hash
@@ -144,7 +144,7 @@ control sequence to too much text. How can we recover?
 My plan is to forget the whole thing and hope for the best.
 ============================================================
 ============================================================
-TEST 8: empty hashs splits
+TEST 8: empty hashes splits
 ============================================================
 Runaway argument?
 ! expkv-cs Error: empty hash

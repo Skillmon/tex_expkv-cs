@@ -1,0 +1,17 @@
+\input regression-test
+
+\RequirePackage{expkv-cs}
+
+\START
+\OMIT
+\ekvcSplit\split{a=a,...,b=b}{#2}
+\ekvcHash \hash {a=a,b=b,...}{\ekvcValue{...}{#1}}
+\TIMO
+
+\TESTEXP{Forwarded keys}
+  {%
+    \split{c,a=b,d=d,b=a,e,f=f}\NEWLINE
+    \hash {c,a=b,d=d,b=a,e,f=f}%
+  }
+
+\END

@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% File: expkv-cs.dtx Copyright (C) 2020 Jonathan P. Spratte
+% File: expkv-cs.dtx Copyright (C) 2020-2021 Jonathan P. Spratte
 %
 % This work  may be  distributed and/or  modified under  the conditions  of the
 % LaTeX Project Public License (LPPL),  either version 1.3c  of this license or
@@ -27,7 +27,7 @@ Released under the LaTeX Project Public License v1.3c or later
 See http://www.latex-project.org/lppl.txt
 --------------------------------------------------------------
 
-Copyright (C) 2020 Jonathan P. Spratte
+Copyright (C) 2020-2021 Jonathan P. Spratte
 
 This  work may be  distributed and/or  modified under  the conditions  of the
 LaTeX Project Public License (LPPL),  either version 1.3c  of this license or
@@ -64,6 +64,19 @@ and the derived files           expkv-cs.pdf
 \RequirePackage[oldstylenums,nott]{kpfonts}
 \input{glyphtounicode}
 \pdfgentounicode=1
+\RequirePackage{tcolorbox}
+\newtcolorbox{exresult}[2][]
+  {colback=expkvgrey!10!white,colframe=expkvgrey,fontupper=\small,width={#2},#1}
+\newtcbox\exres[1][]
+  {
+     colback=expkvgrey!10!white
+    ,colframe=expkvgrey
+    ,size=small
+    ,nobeforeafter
+    ,tcbox raise base
+    ,fontupper=\small
+    ,#1
+  }
 \RequirePackage{listings}
 \RequirePackage{booktabs}
 \RequirePackage{array}
@@ -73,26 +86,129 @@ and the derived files           expkv-cs.pdf
 \RequirePackage{caption}
 \RequirePackage{microtype}
 \RequirePackage{accsupp}
+\lstdefinelanguage{expkvc}[primitive]{TeX}
+  {
+    ,moretexcs=[4]^^A e-TeX
+      {
+        expanded,
+        numexpr,
+        protected,
+      }
+    ,moretexcs=[5]^^A plain/LaTeX
+      {
+        approx,
+        begin,
+        empty,
+        item,
+        LaTeX,
+        makeatletter,makeatother,multicolumn,
+        newcommand,newdimen,
+        RequirePackage,
+        rule,
+        TeX,
+        textit,texttt,
+        usepackage,
+      }
+    ,moretexcs=[6]^^A used packages
+      {
+        ^^A xfp
+        fpeval,
+        ^^A keyval
+        setkeys,
+        ^^A yax
+        defactiveparameter,storevalue,setparameterlist
+      }
+    ,moretexcs=[2]^^A expkv-cs macros
+      {
+        ekvcSplit,ekvcSplitAndForward,ekvcSplitAndUse,
+        ekvcHash,ekvcHashAndForward,ekvcHashAndUse,
+        ekvcValue,ekvcValueFast,ekvcValueSplit,ekvcValueSplitFast,
+        ekvcSecondaryKeys,
+        ekvcChange,
+        ekvcFlagNew,
+        ekvcFlagHeight,
+        ekvcFlagRaise,
+        ekvcFlagSetTrue,ekvcFlagSetFalse,
+        ekvcFlagIf,ekvcFlagIfRaised,
+        ekvcFlagReset,
+        ekvcFlagGetHeight,ekvcFlagGetHeights,
+        ekvcPass
+      }
+    ,moretexcs=[3]^^A expkv-pkg macros
+      {
+        ^^A expkv
+        ekvdef,ekvdefNoVal,^^A
+        ekvlet,ekvletNoVal,ekvletkv,ekvletkvNoVal,^^A
+        ekvdefunknown,ekvdefunknownNoVal,^^A
+        ekvredirectunknown,ekvredirectunknownNoVal,^^A
+        ekvset,ekvsetSneaked,^^A
+        ekvsetdef,ekvsetSneakeddef,ekvsetdefSneaked,^^A
+        ekvparse,^^A
+        ekvVersion,ekvDate,^^A
+        ekvifdefined,ekvifdefinedNoVal,ekvifdefinedset,^^A
+        ekvbreak,ekvbreakPreSneak,ekvbreakPostSneak,^^A
+        ekvsneak,ekvsneakPre,^^A
+        ekvchangeset,^^A
+        ekvoptarg,ekvoptargTF,^^A
+        ekverr,
+        ^^A expkv-def
+        ekvdefinekeys
+      }
+  }
+\colorlet{codeparam}{cyan!65!black}
+\def\mylstwd{.55em}
 \lstset
   {
+    ,language=expkvc
     ,flexiblecolumns=false
-    ,basewidth=.53em
+    ,basewidth=\mylstwd
     ,gobble=2
     ,basicstyle=\fontfamily{jkp}\itshape
-    ,morekeywords=^^A
-      {^^A
-        \ekvcSplit,\ekvcSplitAndForward,\ekvcSplitAndUse
-        \ekvcHash,\ekvcHashAndForward,\ekvcHashAndUse
-        \ekvcValue,\ekvcValueFast,
-        \ekvcSecondaryKeys
-      }
-    ,morecomment=[l]\%
+    ,texcsstyle=*[1]{\bfseries\color{expkvgrey}} ^^A primitives
+    ,texcsstyle=*[2]{\bfseries\color{expkvred}}  ^^A expkv
+    ,texcsstyle=*[3]{\color{expkvred}}           ^^A expkv-pkg
+    ,texcsstyle=*[4]{\bfseries\color{expkvgrey}} ^^A e-TeX
+    ,texcsstyle=*[5]{\bfseries\color{expkvgrey}} ^^A plain/LaTeX macros
+    ,texcsstyle=*[6]{}                           ^^A macros of other packages
     ,commentstyle=\color[gray]{0.4}
-    ,literate={\{}{{\CodeSymbol\{}}{1}
-              {\}}{{\CodeSymbol\}}}{1}
+    ,literate=
+              {\{} {{\CodeUpBf\{}}{1}
+              {\}} {{\CodeUpBf\}}}{1}
+              {$}  {{\CodeUpBf\$}}{1}
+              {[}  {{\CodeUp[}}{1}
+              {]}  {{\CodeUp]}}{1}
+              {(}  {{\CodeUp(}}{1}
+              {)}  {{\CodeUp)}}{1}
+              {*}  {{$*$}}{1}
+              {1}  {{\CodeUp{1}}}{1}
+              {2}  {{\CodeUp{2}}}{1}
+              {3}  {{\CodeUp{3}}}{1}
+              {4}  {{\CodeUp{4}}}{1}
+              {5}  {{\CodeUp{5}}}{1}
+              {6}  {{\CodeUp{6}}}{1}
+              {7}  {{\CodeUp{7}}}{1}
+              {8}  {{\CodeUp{8}}}{1}
+              {9}  {{\CodeUp{9}}}{1}
+              {0}  {{\CodeUp{0}}}{1}
+              {##} {{\CodeColored{codeparam}{1}{\#}}}{1}
+              {##1}{{\CodeColored{codeparam}{2}{\#1}}}{2}
+              {##2}{{\CodeColored{codeparam}{2}{\#2}}}{2}
+              {##3}{{\CodeColored{codeparam}{2}{\#3}}}{2}
+              {##4}{{\CodeColored{codeparam}{2}{\#4}}}{2}
+              {##5}{{\CodeColored{codeparam}{2}{\#5}}}{2}
+              {##6}{{\CodeColored{codeparam}{2}{\#6}}}{2}
+              {##7}{{\CodeColored{codeparam}{2}{\#7}}}{2}
+              {##8}{{\CodeColored{codeparam}{2}{\#8}}}{2}
+              {##9}{{\CodeColored{codeparam}{2}{\#9}}}{2}
+              {<key>}{{$\langle$}key{$\rangle$}}{5}
+              {<set>}{{$\langle$}set{$\rangle$}}{5}
+              {<set1>}{{$\langle$}set1{$\rangle$}}{6}
+              {<set2>}{{$\langle$}set2{$\rangle$}}{6}
     ^^A,literate=*{<key>}{\key}{4}{<set>}{\set}{4}
   }
-\newcommand*\CodeSymbol[1]{\kern-1pt\textbf{#1}\kern1pt}
+\newcommand*\CodeColored[3]{\textcolor{#1}{\makebox[\dimexpr\mylstwd*#2]{#3}}}
+\newcommand*\CodeUpBf[1]{\makebox[\mylstwd]{\textup{\textbf{#1}}}}
+\newcommand*\CodeUp[1]{\makebox[\mylstwd]{\textup{#1}}}
 \RequirePackage{randtext}
 \let\metaORIG\meta
 \protected\def\meta #1{\texttt{\metaORIG{#1}}}
@@ -100,6 +216,7 @@ and the derived files           expkv-cs.pdf
 \definecolor{expkvred}{HTML}{9F393D}
 \colorlet{expkvgrey}{black!75}
 \makeatletter
+\newcommand*\example{\par\smallskip\noindent\textit{Example:} \ignorespaces}
 \newcommand*\expkv
   {^^A
     \texorpdfstring
@@ -168,15 +285,18 @@ and the derived files           expkv-cs.pdf
 \DoNotIndex{\protected,\ProvidesFile,\ProvidesPackage,\relax,\space,\advance}
 \DoNotIndex{\@,\unexpanded,\string,\expanded,\dimexpr,\global,\glueexpr,\hbox}
 \DoNotIndex{\numexpr,\RequirePackage,\setbox,\the,\unless,\xdef,\gdef,\newcount}
-\DoNotIndex{\romannumeral,\^,\@firstofone,\@firstoftwo,\@gobble}
+\DoNotIndex{\number,\detokenize,\meaning}
+\DoNotIndex{\^,\@firstofone,\@firstoftwo,\@gobble,\@secondoftwo}
 \DoNotIndex{\ifcsname}
 \DoNotIndex{\ifx}
+\DoNotIndex{\ifodd}
 \DoNotIndex{\ifnum}
 \DoNotIndex{\ifdefined}
 \DoNotIndex{\iffalse}
 \DoNotIndex{\iftrue}
 \DoNotIndex{\else}
 \DoNotIndex{\fi}
+\@gobble\fi ^^A ignoring \ifx, \ifcsname, etc., but only one \fi
 \@gobble\fi ^^A ignoring \ifx, \ifcsname, etc., but only one \fi
 \@gobble\fi ^^A ignoring \ifx, \ifcsname, etc., but only one \fi
 \@gobble\fi ^^A ignoring \ifx, \ifcsname, etc., but only one \fi
@@ -243,12 +363,14 @@ and the derived files           expkv-cs.pdf
 % has its own set of primary and secondary keys.
 %
 % A word of advice you should consider: If your macro doesn't have to be
-% expandable (and often it doesn't) don't use \expkvc. The interface has some
-% overhead (though it still can be considered fast -- check \autoref{sec:speed})
-% and the approach has its limits in versatility. If you don't need to be
+% expandable (and often it doesn't) consider not using \expkvc. The interface
+% has some overhead (though it still is fast -- check \autoref{sec:speed}) and
+% the approach has its limits in versatility. If you don't need to be
 % expandable, you should consider either defining your keys manually using
 % \expkv\ or using \expkvd\ for convenience. Or you resort to another \kv\
-% interface.
+% interface. Nevertheless setting up macros with \expkvc, especially with
+% |\ekvcSplit|, is very convenient in my opinion, so if you just want to define
+% a single macro with just a few keys this might be the way to go.
 %
 % \expkvc\ is usable as generic code and as a \LaTeX\ package. It'll
 % automatically load \expkv\ in the same mode as well. To use it, just use one
@@ -259,13 +381,14 @@ and the derived files           expkv-cs.pdf
 % \end{lstlisting}
 %
 %
-% \subsection{Define Macros and Primary Keys}
+% \subsection{Define Macros and Primary Keys}\label{sec:define}
 %
 % All macros defined with \expkvc\ have to be previously undefined or have the
-% |\meaning| of |\relax|. This is necessary as there is no way to undefine keys
-% once they are set up (neither \expkv\ nor \expkvc\ keep track of defined
-% keys) -- so to make sure there are no conflicts only new definitions are
-% allowed (that's not the case for individual keys, only for frontend macros).
+% |\meaning| of |\relax|. This is necessary as there is no way to automatically
+% undefine keys once they are set up (neither \expkv\ nor \expkvc\ keep track of
+% defined keys) -- so to make sure there are no conflicts only new definitions
+% are allowed (that's not the case for individual keys, only for frontend
+% macros).
 %
 %
 % \subsubsection{Primary Keys}\label{sec:primaries}
@@ -275,11 +398,31 @@ and the derived files           expkv-cs.pdf
 % primary key and \val\ the associated initial value. By default all keys are
 % defined short, but you can define long keys by prefixing \key\ with |long|
 % (\emph{e.g.}, \texttt{long name=Jonathan P. Spratte}). You only need |long| if
-% the key should be able to take a |\par| token. Note however that |long| keys
-% are a microscopic grain faster (due to some internals of \expkvc). Only if at
-% least one of the keys was |long| the \meta{cs} in the following defining
-% macros will be |\long|. For obvious reasons there is no possibility to define
-% a macro or key as |\protected|.
+% the key should be able to take an explicit |\par| token. Note however that
+% |long| keys are a microscopic grain faster (due to some internals of \expkvc).
+% Only if at least one of the keys was |long| the \meta{cs} in the following
+% defining macros will be |\long|. For obvious reasons there is no possibility
+% to define a macro or key as |\protected|.
+%
+% To allow keys not defined |long| which key names should start with |long|, you
+% can also use the prefix |short| (|short| and |long| are mutually exclusive,
+% which ever comes first defines the behaviour, the latter is considered part of
+% the key name). Note that this is the only reason for |short|'s existance,
+% essentially it does nothing.
+%
+% The consequence culminates in the following:
+% \begin{lstlisting}
+% \ekvcSplit\foo
+%   {
+%      long short = abc\par
+%     ,short long = def
+%   }
+%   {#1#2}
+% \end{lstlisting}
+% will define a macro |\foo| that knows two primary keys, the first one is
+% called |short|, and accepts explicit |\par| tokens inside its values, the
+% second one is called |long| and will not accept |\par| tokens (leading to a
+% low level \TeX\ error). A description of |\ekvcSplit| follows shortly.
 %
 % At the moment \expkvc\ doesn't require any internal keys, but I can't foresee
 % whether this will be the case in the future as well, as it might turn out that
@@ -306,6 +449,20 @@ and the derived files           expkv-cs.pdf
 %   key defined first). With |\ekvcSplit| you can define macros using at most
 %   nine primary keys.
 % \end{function}
+% \example The following defines a macro |\foo| that takes the keys |a| and |b|
+% and outputs their values in a textual form:\\
+% \begin{minipage}{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcSplit\foo{a=a,b=b}{a is #1.\par b is #2.\par}
+% \foo{}
+% \foo{b=e}
+% \end{lstlisting}
+% \end{minipage}^^A
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcSplit\foo{a=a,b=b}{a is #1.\par b is #2.\par}
+%   \foo{}
+%   \foo{b=e}
+% \end{exresult}
 %
 % \begin{function}{\ekvcSplitAndForward}
 %   \begin{syntax}
@@ -325,6 +482,9 @@ and the derived files           expkv-cs.pdf
 % \ekvcSplitAndForward\foo{\foo@aux{more args}}{keyA = A, keyB = B}
 % \end{lstlisting}
 % \end{function}
+% \noindent
+% In the first case |\foo@aux| should take at least two arguments (|keyA| and
+% |keyB|), in the second case at least three (|more args|, |keyA|, and |keyB|).
 %
 % \begin{function}{\ekvcSplitAndUse}
 %   \begin{syntax}
@@ -337,17 +497,19 @@ and the derived files           expkv-cs.pdf
 %   \begin{syntax}
 %     \meta{cs}\{\key=\val, \ldots\}\marg{after}
 %   \end{syntax}
+% and the code in |after| should expect at least as many arguments as the number
+% of keys defined for \meta{cs}.
 %
 % \subsubsection{Hash}
 %
 % The hash variants will provide the key values as a single argument in which
 % you can access specific values using a special macro. The implementation might
-% be more convenient and scale better, \emph{but} it is much slower (for a
-% primitive macro with a single key benchmarking was almost $1.7$ times slower,
-% the root of which being the key access with |\ekvcValue|, not the parsing, and
-% for a key access using |\ekvcValueFast| it was still about $1.2$ times
-% slower). So if your macro uses less than ten primary keys, you should most
-% likely use the split approach.
+% be more convenient and scale better, \emph{but} it is slower (for a
+% rudimentary macro with a single key benchmarking was almost $1.7$ times
+% slower, the root of which being the key access with |\ekvcValue|, not the
+% parsing, and for a key access using |\ekvcValueFast| it was still about $1.2$
+% times slower). So if your macro uses less than ten primary keys, you should
+% consider using the split approach.
 %
 % \begin{function}{\ekvcHash}
 %   \begin{syntax}
@@ -360,6 +522,22 @@ and the derived files           expkv-cs.pdf
 %   \meta{definition}, in which you can access the \val\ of a \key\ by using
 %   \texttt{\cs[no-index]{ekvcValue}\{\key\}\{\#1\}}.
 % \end{function}
+% \example This defines an equivalent macro to the |\foo| defined with
+% |\ekvcSplit| earlier:\\
+% \begin{minipage}{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcHash\foo{a=a,b=b}{a is \ekvcValue{a}{#1}.\par
+%                        b is \ekvcValue{b}{#1}.\par}
+% \foo{}
+% \foo{b=e}
+% \end{lstlisting}
+% \end{minipage}^^A
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcHash\foo{a=a,b=b}{a is \ekvcValue{a}{#1}.\par
+%                          b is \ekvcValue{b}{#1}.\par}
+%   \foo{}
+%   \foo{b=e}
+% \end{exresult}
 %
 % \begin{function}{\ekvcHashAndForward}
 %   \begin{syntax}
@@ -375,14 +553,21 @@ and the derived files           expkv-cs.pdf
 %   \texttt{\cs[no-index]{ekvcValue}\{\key\}\{\#1\}} (or whichever argument the
 %   hashed \kv\ list will be).
 % \end{function}
+% \example This defines a macro |\foo| processing two keys, and passing the
+% result to |\foobar|:
+% \begin{lstlisting}
+% \ekvcHashAndForward\foo\foobar{a=a,b=b}
+% \newcommand*\foobar[1]{a is \ekvcValue{a}{#1}.\par
+%                        b is \ekvcValue{b}{#1}.\par}
+% \end{lstlisting}
 %
 % \begin{function}{\ekvcHashAndUse}
 %   \begin{syntax}
 %     \cs{ekvcHashAndUse}\meta{cs}\marg{primary keys}
 %   \end{syntax}
 %   This will roughly do the same as |\ekvcHashAndForward|, but instead of
-%   specifying what will be used after hashing the keys, \meta{cs} will use what
-%   follows the \kv\ list. So its syntax will be
+%   specifying what will be used after hashing the keys at install time,
+%   \meta{cs} will use what follows the \kv\ list. So its syntax will be
 % \end{function}
 %   \begin{syntax}
 %     \meta{cs}\{\key=\val, \ldots\}\marg{after}
@@ -392,13 +577,15 @@ and the derived files           expkv-cs.pdf
 %   \begin{syntax}
 %     \cs{ekvcValue}\{\key\}\marg{key list}
 %   \end{syntax}
-%   This is a safe (but slow) way to access your keys in a hash variant. \key\
+%   This is a safe way to access your keys in a hash variant. \key\
 %   is the key which's \val\ you want to use out of the \meta{key list}.
 %   \meta{key list} should be the key list argument forwarded to your underlying
 %   macro by |\ekvcHash|, |\ekvcHashAndForward|, or |\ekvcHashAndUse|. It will
 %   be tested whether the hash function to access that \key\ exists, the \key\
 %   argument is not empty, and that the \meta{key list} really contains a \val\
-%   of that \key. This macro needs exactly two steps of expansion.
+%   of that \key. This macro needs exactly two steps of expansion and if used
+%   inside of an |\edef| or |\expanded| context will protect the \val\ from
+%   further expanding.
 % \end{function}
 %
 % \begin{function}{\ekvcValueFast}
@@ -409,9 +596,9 @@ and the derived files           expkv-cs.pdf
 %   a result this is about $1.4$ times faster \emph{but} will throw low level
 %   \TeX\ errors eventually if the hash function isn't defined or the \key\
 %   isn't part of the \meta{key list} (\emph{e.g.}, because it was defined as a
-%   key for another macro -- all macros share the same hash function per \key).
-%   Use it if you know what you're doing. This macro needs exactly three steps
-%   of expansion in the no-errors case.
+%   key for another macro -- all macros share the same hash function per \key\
+%   name). Use it if you know what you're doing. This macro needs exactly three
+%   steps of expansion in the no-errors case.
 % \end{function}
 %
 % \begin{function}{\ekvcValueSplit}
@@ -421,13 +608,35 @@ and the derived files           expkv-cs.pdf
 %   If you need a specific \key\ from a \meta{key list} more than once, it'll
 %   be a good idea to only extract it once and from then on keep it as a
 %   separate argument. Hence the macro \cs{ekvcValueSplit} will extract one
-%   specific \key's value from the list and forward the remainder of the list
-%   as the first and the \key's value as the second argument to \meta{next}, so
-%   the result of this will be \meta{next}\marg{key list'}\marg{value} with
-%   \meta{key list'} the remaining list. This is almost as fast as |\ekvcValue|
-%   and runs the same tests. Keep in mind that you can't fetch for the same
-%   \key\ again from \meta{key list'} as it got removed.
+%   specific \key's value from the list and forward it as the first and the
+%   remainder of the list as the second argument to \meta{next}, so the result
+%   of this will be \meta{next}\marg{value}\marg{key list'} with \meta{key
+%   list'} the remaining list. This is almost as fast as |\ekvcValue| and runs
+%   the same tests. Keep in mind that you can't fetch for the same \key\ again
+%   from \meta{key list'} as it got removed.
 % \end{function}
+% \example The following defines a macro |\foo| which will take three keys.
+% Since the next parsing step will need the value of one of the keys multiple
+% times we split that key off the list (in this example the next step doesn't
+% use the key multiple times for simplicity though):\\
+% \begin{minipage}{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcHash\foo{a=a,b=b,c=c}
+%   {\ekvcValueSplit{a}{#1}\foobar}
+% \newcommand*\foobar[2]{a is #1.\par
+%                        b is \ekvcValue{b}{#2}.\par
+%                        c is \ekvcValue{c}{#2}.\par}
+% \foo{}
+% \end{lstlisting}
+% \end{minipage}^^A
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcHash\foo{a=a,b=b,c=c}
+%     {\ekvcValueSplit{a}{#1}\foobar}
+%   \newcommand*\foobar[2]{a is #1.\par
+%                          b is \ekvcValue{b}{#2}.\par
+%                          c is \ekvcValue{c}{#2}.\par}
+%   \foo{}
+% \end{exresult}
 %
 % \begin{function}{\ekvcValueSplitFast}
 %   \begin{syntax}
@@ -439,7 +648,7 @@ and the derived files           expkv-cs.pdf
 % \end{function}
 %
 %
-% \subsection{Secondary Keys}
+% \subsection{Secondary Keys}\label{sec:secondaries}
 %
 % To remove some of the limitations with the approach that each primary key
 % matches an argument or hash entry, you can define secondary keys. Those have
@@ -525,31 +734,231 @@ and the derived files           expkv-cs.pdf
 %   If \key\ is a defined value taking key, you can define a |NoVal| version
 %   with this that will behave as if \key\ was given \meta{default} as its
 %   \val. Note that this doesn't change the initial values of primary keys set
-%   at definition time in |\ekvcSplit| and friends. \key\ can be a primary or
-%   secondary key.
+%   at definition time in |\ekvcSplit| and friends (see |\ekvcChange| in
+%   \autoref{sec:change} for this). \key\ can be a primary or secondary key.
+% \end{function}
+%
+% \begin{function}{flag-bool}
+%   \begin{syntax}
+%     flag-bool \key\ = \meta{cs} \prefixes3
+%   \end{syntax}
+%   This is a secondary key that doesn't directly involve any of the primary or
+%   secondary keys.
+%   This defines \key\ to take a value, which should be either |true| or
+%   |false|, and set the flag called \meta{cs} accordingly as a boolean.
+%   If \meta{cs} isn't defined yet it will be initialised as a flag.
+%   Please also read \autoref{sec:flags}.
+% \end{function}
+%
+% \begin{function}{flag-true,flag-false}
+%   \begin{syntax}
+%     flag-true \key\ = \meta{cs} \prefixes3
+%   \end{syntax}
+%   This is a secondary key that doesn't directly involve any of the primary or
+%   secondary keys.
+%   This defines \key\ to take no value and set the flag called \meta{cs} to
+%   |true| or |false|, respectively.
+%   If \meta{cs} isn't defined yet it will be initialised as a flag.
+%   Please also read \autoref{sec:flags}.
+% \end{function}
+%
+% \begin{function}{flag-raise}
+%   \begin{syntax}
+%     flag-raise \key\ = \meta{cs} \prefixes3
+%   \end{syntax}
+%   This is a secondary key that doesn't directly involve any of the primary or
+%   secondary keys.
+%   This defines \key\ to take no value and raise the flag called \meta{cs}.
+%   If \meta{cs} isn't defined yet it will be initialised as a flag.
+%   Please also read \autoref{sec:flags}.
 % \end{function}
 %
 %
-% \subsection{Example}
+% \subsection{Changing the Initial Values}\label{sec:change}
 %
-% How could a documentation be a good documentation without some basic examples?
-% Say we want to define a small macro expanding to some character description
-% (who knows why this has to be expandable?). A character description will not
-% have too many items to it, so we use |\ekvcSplit|.
+% \begin{function}{\ekvcChange}
+%   \begin{syntax}
+%     \cs{ekvcChange}\meta{cs}\{\kv,\ldots\}
+%   \end{syntax}
+%   This processes the \kv\ list for the macro \meta{cs} to set new defaults for
+%   it (meaning the values used if you don't provide anything at use time, not
+%   those specified with the |default| secondary key). \meta{cs} should be
+%   defined with \expkvc\ (so with any of the methods in \autoref{sec:define}).
+%   Inside the \kv\ list both primary and secondary keys can be used. If
+%   \meta{cs} was defined |\long| earlier it will still be |\long|, every other
+%   \TeX\ prefix will be stripped (but \expkvc\ doesn't support them anywhere
+%   else so that should be fine). The resulting new defaults will be stored
+%   inside the \meta{cs} locally (just as the original defaults were).
+% \end{function}
+%
+% Consider the following example:\\
+% \begin{minipage}[c]{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcSplit\foo{a=a,b=b}{a is #1.\par b is #2.\par}
+% \begingroup
+%   \ekvcChange\foo{b=B}
+%   \foo{} % new defaults
+%   \ekvcSecondaryKeys\foo{meta c={a={#1},b={#1}}}
+%   \ekvcChange\foo{c=c}
+%   \foo{} % newer defaults
+% \endgroup
+% \foo{} % initial defaults
+% \end{lstlisting}
+% \end{minipage}^^A
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcSplit\foo{a=a,b=b}{a is #1.\par b is #2.\par}
+%   \begingroup
+%     \ekvcChange\foo{b=B}
+%     \foo{}
+%     \ekvcSecondaryKeys\foo{meta c={a={#1},b={#1}}}
+%     \ekvcChange\foo{c=c}
+%     \foo{}
+%   \endgroup
+%   \foo{}
+% \end{exresult}
+%
+% As a result with this the typical setup macro could be implemented:
+% \begin{lstlisting}
+% \ekvcHashAndUse\foo{key=a,key=b}
+% \newcommand*\foosetup{\ekvcChange\foo}
+% \end{lstlisting}
+% Of course the usage is limited to a single macro |\foo|, hence this might not
+% be as powerful as similar macros used with other \kv\ interfaces. But at least
+% a few similar macros could be grouped using the same key parsing macro
+% internally.
+%
+%
+% \subsection{Flags}\label{sec:flags}
+%
+% The idea of flags is taken from \pkg{expl3}. They provide a way to store
+% numerical information expandably, however only incrementing and accessing
+% works expandably, decrementing is unexpandable. A flag has a height, which
+% is a numerical value, and which can be raised by $1$. Flags come at a high
+% computational cost (accessing them is slow and they require more memory than
+% normal \TeX\ data types like registers, both getting linearly worse with the
+% height), so don't use them if not necessary.
+%
+% The state of flags is always changed locally to the current group, but not to
+% the current macro, so if you're using one of the |t|-types involving flags
+% bear in mind that they can affect other macros using the same flags at the
+% current group level!
+%
+% \expkvc\ provides some macros to access, alter, and use flags. Flags of
+% \expkvc\ don't share a name space with the flags of \pkg{expl3}.
+%
+% \begin{function}{\ekvcFlagNew}
+%   \begin{syntax}
+%     \cs{ekvcFlagNew}\meta{flag}
+%   \end{syntax}
+%   This initialises the macro \meta{flag} as a new flag. It isn't checked
+%   whether the macro \meta{flag} is currently undefined.  A \meta{flag} will
+%   expand to the flag's current height with a trailing space (so you can use it
+%   directly with |\ifnum| for example and it will terminate the number scanning
+%   on its own).
+% \end{function}
+%
+%  All other macros dealing with flags take as a parameter a macro defined as a
+%  \meta{flag} with |\ekvcFlagNew|.
+%
+% \begin{function}{\ekvcFlagHeight}
+%   \begin{syntax}
+%     \cs{ekvcFlagHeight}\meta{flag}
+%   \end{syntax}
+%   This expands to the current height of \meta{flag} in a single step of
+%   expansion (without a trailing space).
+% \end{function}
+%
+% \begin{function}{\ekvcFlagRaise}
+%   \begin{syntax}
+%     \cs{ekvcFlagRaise}\meta{flag}
+%   \end{syntax}
+%   This expandably raises the height of \meta{flag} by $1$.
+% \end{function}
+%
+% \begin{function}{\ekvcFlagSetTrue,\ekvcFlagSetFalse}
+%   \begin{syntax}
+%     \cs{ekvcFlagSetTrue}\meta{flag}
+%   \end{syntax}
+%   By interpreting an even value as false and an odd value as true we can use a
+%   flag as a boolean. This expandably sets \meta{flag} to true or false,
+%   respectively, by raising it if necessary.
+% \end{function}
+%
+% \begin{function}{\ekvcFlagIf}
+%   \begin{syntax}
+%     \cs{ekvcFlagIf}\meta{flag}\marg{true}\marg{false}
+%   \end{syntax}
+%   This interprets a \meta{flag} as a boolean and expands to either \meta{true}
+%   or \meta{false}.
+% \end{function}
+%
+% \begin{function}{\ekvcFlagIfRaised}
+%   \begin{syntax}
+%     \cs{ekvcFlagIfRaised}\meta{flag}\marg{true}\marg{false}
+%   \end{syntax}
+%   This tests whether the \meta{flag} is raised, meaning it has a height
+%   greater than zero, and if so expands to \meta{true} else to \meta{false}.
+% \end{function}
+%
+% \begin{function}{\ekvcFlagReset}
+%   \begin{syntax}
+%     \cs{ekvcFlagReset}\meta{flag}
+%   \end{syntax}
+%   This resets a flag (so restores its height to $0$). This operation is
+%   \emph{not} expandable and done locally. If you really intend to use flags
+%   you can reset them every now and then to keep the performance hit low.
+% \end{function}
+%
+% \begin{function}{\ekvcFlagGetHeight}
+%   \begin{syntax}
+%     \cs{ekvcFlagGetHeight}\meta{flag}\marg{next}
+%   \end{syntax}
+%   This retrieves the current height of the \meta{flag} and provides it as a
+%   braced argument to \meta{next}, leaving \meta{next}\marg{height} in the
+%   input stream.
+% \end{function}
+%
+% \begin{function}{\ekvcFlagGetHeights}
+%   \begin{syntax}
+%     \cs{ekvcFlagGetHeights}\marg{flag-list}\marg{next}
+%   \end{syntax}
+%   This retrieves the current height of each \meta{flag} in the
+%   \meta{flag-list} and provides them as a single argument to \meta{next}.
+%   Inside that argument each height is enclosed in a set of braces
+%   individually. The \meta{flag-list} is just a single argument containing the
+%   \meta{flag}s.
+%   So a usage like
+%   \texttt
+%     {^^A
+%       \cs[no-index]{ekvcFlagGetHeights}\hskip0pt^^A
+%       \{\cs[no-index]{myflagA}\cs[no-index]{myflagB}\}\hskip0pt^^A
+%       \{\cs[no-index]{stuff}\}^^A
+%     }
+%   will expand to
+%   \texttt{\cs[no-index]{stuff}\{\marg{height-A}\marg{height-B}\}}.
+% \end{function}
+%
+%
+% \subsection{Further Examples}\label{sec:examples}
+%
+% How could a documentation be a good documentation without enough basic
+% examples?  Say we want to define a small macro expanding to some character
+% description (who knows why this has to be expandable?). A character
+% description will not have too many items to it, so we use |\ekvcSplit| (the
+% comments with the parameter numbers are of course not necessary and just ease
+% reading the example).
 % \begin{lstlisting}
 % \ekvcSplit\character
 %   {
-%     name=John Doe,
-%     age=any,
-%     nationality=the Universe,
-%     hobby=to exist,
-%     type=Mister,
-%     pronoun=He,
-%     possessive=his,
+%     name=John Doe,            % #1
+%     age=any,                  % #2
+%     nationality=the Universe, % #3
+%     hobby=to exist,           % #4
+%     type=Mister,              % #5
+%     pronoun=He,               % #6
+%     possessive=his,           % #7
 %   }
-%   {%
-%     #1 is a #5 from #3. #6 is of #2 age and #7 hobby is #4.\par
-%   }
+%   {#1 is a #5 from #3. #6 is of #2 age and #7 hobby is #4.\par}
 % \end{lstlisting}
 % Also we want to give some short cuts so that it's easier to describe several
 % persons.
@@ -560,7 +969,7 @@ and the derived files           expkv-cs.pdf
 %     alias pos = possessive,
 %     nmeta me =
 %       {
-%         name=Jonathan P. Spratte,
+%         name=Jonathan,
 %         age=a young,
 %         nationality=Germany,
 %         hobby=\TeX\ coding,
@@ -593,15 +1002,56 @@ and the derived files           expkv-cs.pdf
 % As one might see, the |lady| key could actually have been an |nmeta| key as
 % well, as all that is done with the argument is using it as a \kv\ list.
 %
-% Using \pkg{xparse} and forwarding arguments one can easily define \kv\ macros
-% with actual optional and mandatory arguments as well. A small nonsense example
-% (which should perhaps use |\ekvcSplitAndForward| instead of
-% |\ekvcHashAndForward| since it only uses four keys and one other argument --
-% and isn't expandable since it uses a \env{tabular} environment):
+% The result of only the first two usages would be:
+% \begin{exresult}{\linewidth}
+%   \ekvcSplit\character
+%     {
+%       name=John Doe,
+%       age=any,
+%       nationality=the Universe,
+%       hobby=to exist,
+%       type=Mister,
+%       pronoun=He,
+%       possessive=his,
+%     }
+%     {#1 is a #5 from #3. #6 is of #2 age and #7 hobby is #4.\par}
+%   \ekvcSecondaryKeys\character
+%     {
+%       alias pro = pronoun,
+%       alias pos = possessive,
+%       nmeta me =
+%         {
+%           name=Jonathan,
+%           age=a young,
+%           nationality=Germany,
+%           hobby=\TeX\ coding,
+%         },
+%       meta lady =
+%         {type=Lady, pronoun=She, possessive=her, name=Jane Doe, #1},
+%       nmeta paulo =
+%         {
+%           name=Paulo,
+%           type=duck,
+%           age=a young,
+%           nationality=Brazil,
+%           hobby=to quack,
+%         }
+%     }
+%   \character{}
+%   \character{me}
+% \end{exresult}
+%
+% Using \pkg{xparse} or \expkv's \cs{ekvoptarg} or \cs{ekvoptargTF} and
+% forwarding arguments one can easily define \kv\ macros with actual optional
+% and mandatory arguments as well. A small nonsense example (which should
+% perhaps use |\ekvcSplitAndForward| instead of |\ekvcHashAndForward| since it
+% only uses four keys and one other argument -- and isn't expandable since it
+% uses a \env{tabular} environment, so it would've been better to use a more
+% feature rich \kv\ interface most likely, \emph{e.g.}, the one provided by
+% \expkvd):
 % \begin{lstlisting}
-% \usepackage{xparse}
 % \makeatletter
-% \NewExpandableDocumentCommand\nonsense{O{} m}{\nonsense@a{#1}{#2}}
+% \newcommand*\nonsense{\ekvoptarg\nonsense@a{}}
 % \ekvcHashAndForward\nonsense@a\nonsense@b
 %   {
 %     keyA = A,
@@ -617,17 +1067,107 @@ and the derived files           expkv-cs.pdf
 %           & C & \ekvcValue{keyC}{#1} \\
 %           & D & \ekvcValue{keyD}{#1} \\
 %       \multicolumn{2}{l}{mandatory} & #2 \\
-%     \end{tabular}\par
+%     \end{tabular}%
 %   }
 % \makeatother
 % \end{lstlisting}
-% And then we would be able to do some nonsense:
+% And then we would be able to do some nonsense
 % \begin{lstlisting}
 % \nonsense{}
 % \nonsense[keyA=hihi]{haha}
 % \nonsense[keyA=hihi, keyB=A]{hehe}
 % \nonsense[keyC=huhu, keyA=hihi, keyB=A]{haha}
 % \end{lstlisting}
+% resulting in
+% \begin{exresult}{\linewidth}
+%   \makeatletter
+%   \newcommand*\nonsense{\ekvoptarg\nonsense@a{}}
+%   \ekvcHashAndForward\nonsense@a\nonsense@b
+%     {
+%       keyA = A,
+%       keyB = B,
+%       keyC = c,
+%       keyD = d,
+%     }
+%   \newcommand*\nonsense@b[2]
+%     {%
+%       \begin{tabular}{lll}
+%         key & A & \ekvcValue{keyA}{#1} \\
+%             & B & \ekvcValue{keyB}{#1} \\
+%             & C & \ekvcValue{keyC}{#1} \\
+%             & D & \ekvcValue{keyD}{#1} \\
+%         \multicolumn{2}{l}{mandatory} & #2 \\
+%       \end{tabular}%
+%     }
+%   \makeatother
+%   \nonsense{}
+%   \nonsense[keyA=hihi]{haha}
+%   \nonsense[keyA=hihi, keyB=A]{hehe}
+%   \nonsense[keyC=huhu, keyA=hihi, keyB=A]{haha}
+% \end{exresult}
+%
+%
+% \subsection{Freedom for Keys!}
+%
+% If this was the \TeX book this subsection would have a double bend sign. Not
+% because it is overly complicated, but because it shows things which could
+% break \expkvc's expandability and its alignment safety. This is for
+% experienced users wanting to get the most flexibility and knowing what they
+% are doing.
+%
+% In case you're wondering, it is possible to define other keys than the
+% primaries and the secondary types listed in \autoref{sec:secondaries} for a
+% macro defined with \expkvc\ by using the low-level interface of \expkv\ or
+% even the interface provided by \expkvd. The set name used for \expkvc's keys
+% is the macro name, including the leading backslash, or more precisely
+% |\string|\meta{cs} is used. This can be exploited to define additional keys
+% with arbitrary code. Consider the following \emph{bad} example:
+% \begin{lstlisting}
+% \ekvcSplit\foo{a=A,b=B}{a is #1.\par b is #2\par}
+% \protected\ekvdef{\string\foo}{c}{\def\fooC{#1}}
+% \end{lstlisting}
+% This would define a key named |c| that will store its value inside a macro.
+% The issue with this is that this can't be done expandably. As a result, the
+% macro |\foo| isn't always expandable any more (not that bad if this was never
+% required; killjoy if it was) and as soon as the key |c| is used, it is also no
+% longer alignment safe\footnote{This means that the \kv-list can't contain
+%   alignment markers that are not inside an additional set of braces if used
+%   inside a \TeX\ alignment.}
+% (might be bad depending on the usage).
+%
+% So why do I show you this? Because we could as well do something useful like
+% create a key that pre-parses the input and after that passes the parsed value
+% on. This parsing would have to be completely expandable though. For the
+% pass-on part we can use the following function:
+%
+% \begin{function}{\ekvcPass}
+%   \begin{syntax}
+%     \cs{ekvcPass}\meta{cs}\marg{key}\marg{value}
+%   \end{syntax}
+%   This passes \meta{value} on to \meta{key} for the \expkvc-macro \meta{cs}.
+%   It should be used inside the key parsing of a macro defined with \expkvc,
+%   else this most likely results in a low level \TeX\ error.
+% \end{function}
+%
+% With this we could for example split the value of a key at a hyphen and pass
+% the parts to different keys:\\
+% \begin{minipage}[c]{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcSplit\foo{a=A,b=B}{a is #1.\par b is #2.\par}
+% \ekvdef{\string\foo}{c}{\fooSplit#1\par}
+% \def\fooSplit#1-#2\par
+%   {\ekvcPass\foo{a}{#1}\ekvcPass\foo{b}{#2}}
+% \foo{}
+% \foo{c=1-2}
+% \end{lstlisting}
+% \end{minipage}
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcSplit\foo{a=A,b=B}{a is #1.\par b is #2.\par}
+%   \ekvdef{\string\foo}{c}{\fooSplit#1\par}
+%   \def\fooSplit#1-#2\par{\ekvcPass\foo{a}{#1}\ekvcPass\foo{b}{#2}}
+%   \foo{}
+%   \foo{c=1-2}
+% \end{exresult}
 %
 %
 % \subsection{Speed Considerations}\label{sec:speed}
@@ -638,13 +1178,13 @@ and the derived files           expkv-cs.pdf
 % use case. The key-parsing is still faster than with most other \kv\ packages
 % (see the ``Comparisons'' subsection in the \expkv\ documentation).
 %
-% The speed considerations in this subsection use the first example in this
-% documentation as the benchmark. So we have seven keys and a short sentence
-% which should be typeset. For comparisons I use the following equivalent
-% \expkvd\ definitions. Each result is the average between changing no keys from
-% their initial values and altering four. Furthermore I'll compare three
-% variants of \expkvc\ with the \expkvd\ definitions, namely the split example
-% from above, a hash variant using |\ekvcValue| and a hash variant using
+% The speed considerations in this subsection use the first example of
+% \autoref{sec:examples} as the benchmark. So we have seven keys and a short
+% sentence which should be typeset. For comparisons I use the following
+% equivalent \expkvd\ definitions. Each result is the average between changing
+% no keys from their initial values and altering four. Furthermore I'll compare
+% three variants of \expkvc\ with the \expkvd\ definitions, namely the split
+% example from above, a hash variant using |\ekvcValue| and a hash variant using
 % |\ekvcValueFast|.
 % \begin{lstlisting}
 % \usepackage{expkv-def}
@@ -692,7 +1232,7 @@ and the derived files           expkv-cs.pdf
 % Just in case you're wondering now, a simple macro taking seven arguments is
 % $30$ to $40$ times faster than any of those in the argument grabbing and \kv\
 % parsing part and only $1.5$ to $2.8$ times faster if the typesetting part is
-% factored in. So the real choke isn't the parsing. 
+% factored in. So the real choke isn't the parsing.
 %
 % So to summarize this, if you have a reasonable use case for expandable \kv\
 % parsing macros you should go on and define them using \expkvc. If you have a
@@ -800,8 +1340,8 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}{\ekvcVersion,\ekvcDate}
 % We're on our first input, so lets store the version and date in a macro.
 %    \begin{macrocode}
-\def\ekvcVersion{0.6}
-\def\ekvcDate{2020-10-18}
+\def\ekvcVersion{0.10}
+\def\ekvcDate{2021-06-03}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -820,21 +1360,6 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % |\ekvc@tmp| will be reused later, but we don't need it to ever store
 % information long-term after \expkvc\ was initialized.
-%
-% \begin{macro}[internal]{\ekvc@zero}
-%   There are different ways to define a |\romannumeral| expansion. If the
-%   control is never given to user input, the fastest way is to just execute
-%   your code and use a |\dimendef|ed zero to end it afterwards.  If the control
-%   is given to user input (so user input should be expanded) the fastest and
-%   best way is to use |\romannumeral`\^^@|, this will expand the user input
-%   until something unexpandable is found or a space (which would then be
-%   gobbled). However, we want to use the former approach since we don't want to
-%   expand any user input, just make sure own code is expanded in two steps.
-%   Since we want to use the |\dimendef| variant, we have to actually provide
-%   such a token. Since both plain \TeX\ and \LaTeX\ define |\z@| we can use
-%   that (but we use a private name for it). Luckily, \expkv\ already contains
-%   |\ekv@zero|, which we can use in \expkvc.
-% \end{macro}
 %
 % \begin{macro}[internal]{\ekvc@tripledots}
 %   This macro just serves as a marker for a comparison to allow the syntax
@@ -856,8 +1381,26 @@ and the derived files           expkv-cs.pdf
 %   Some macros will have to be defined long. These two will be let to |\long|
 %   when this should be the case.
 %    \begin{macrocode}
-\def\ekvc@long{}
-\def\ekvc@any@long{}
+\let\ekvc@long\ekv@empty
+\let\ekvc@any@long\ekv@empty
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvc@ifdefined}
+%   We want to test whether a macro is already defined. This test checks for a
+%   defined macro that isn't |\relax|.
+%    \begin{macrocode}
+\long\def\ekvc@ifdefined#1%
+  {%
+    \ifdefined#1%
+      \ifx\relax#1%
+        \ekv@fi@gobble
+      \fi
+      \@firstofone
+      \ekv@fi@firstoftwo
+    \fi
+    \@secondoftwo
+  }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -872,7 +1415,8 @@ and the derived files           expkv-cs.pdf
 %   a little magic trick to get the macro parameter |#1| for the macro
 %   definition this is used in, even though we're calling |\unexpanded|. We do
 %   that by splitting the expanded |\ekvset| at some marks and place |##1| in
-%   between.
+%   between. At this spot we also add |\ekv@alignsafe| and |\ekv@endalignsafe|
+%   to ensure that macros created with \expkvc\ are alignment safe.
 %    \begin{macrocode}
 \def\ekvc@ekvset@pre@expander#1%
   {%
@@ -884,7 +1428,9 @@ and the derived files           expkv-cs.pdf
   }
 \def\ekvc@ekvset@pre@expander@b#1\ekvc@stop#2\ekvc@stop
   {%
+    \unexpanded\expandafter{\ekv@alignsafe}%
     \unexpanded{#1}##1\unexpanded{#2}%
+    \unexpanded\expandafter{\ekv@endalignsafe}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -898,7 +1444,7 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcSplitAndUse#1#2%
   {%
     \let\ekvc@helpers@needed\@firstoftwo
-    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+    \ekvc@ifdefined#1%
       {\ekvc@err@already@defined#1}%
       {\ekvcSplitAndUse@#1{}{#2}}%
   }
@@ -946,7 +1492,7 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcSplitAndForward#1#2#3%
   {%
     \let\ekvc@helpers@needed\@firstoftwo
-    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+    \ekvc@ifdefined#1%
       {\ekvc@err@already@defined#1}%
       {\ekvcSplitAndUse@#1{{#2}}{#3}}%
   }
@@ -961,7 +1507,7 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcSplit#1#2#3%
   {%
     \let\ekvc@helpers@needed\@secondoftwo
-    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+    \ekvc@ifdefined#1%
       {\ekvc@err@already@defined#1}%
       {%
         \expandafter
@@ -1018,9 +1564,8 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvc@SetupSplitKeys
   {%
     \ekvc@keycount=0
-    \def\ekvc@any@long{}%
-    \def\ekvc@initials{}%
-    \def\ekvc@unknown@handlers{}%
+    \let\ekvc@any@long\ekv@empty
+    \let\ekvc@initials\ekv@empty
     \ekvparse\ekvc@SetupSplitKeys@check@unknown\ekvc@SetupSplitKeys@a
   }
 %    \end{macrocode}
@@ -1030,7 +1575,7 @@ and the derived files           expkv-cs.pdf
 \protected\def\ekvc@SetupSplitKeys@a#1%
   {%
     \advance\ekvc@keycount1
-    \def\ekvc@long{}%
+    \let\ekvc@long\ekv@empty
     \ekvc@ifspace{#1}%
       {\ekvc@SetupSplitKeys@b#1\ekvc@stop}%
       {\ekvc@SetupSplitKeys@c{#1}}%
@@ -1154,6 +1699,14 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[internal]{\ekvc@split@p@short}
+%   The |short| prefix does essentially nothing, it is only provided to allow
+%   key names starting with |long| that aren't |\long|.
+%    \begin{macrocode}
+\def\ekvc@split@p@short{\ekvc@SetupSplitKeys@c}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}[internal]{\ekvc@defarggobbler}
 %   This is needed to define a macro with 1-9 parameters programmatically.
 %   \LaTeX's \cs[no-index]{newcommand} does something similar for example.
@@ -1261,7 +1814,7 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcHashAndUse#1#2%
   {%
     \let\ekvc@helpers@needed\@firstoftwo
-    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+    \ekvc@ifdefined#1%
       {\ekvc@err@already@defined#1}%
       {\ekvcHashAndUse@#1{}{#2}}%
   }
@@ -1304,7 +1857,7 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcHashAndForward#1#2#3%
   {%
     \let\ekvc@helpers@needed\@firstoftwo
-    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+    \ekvc@ifdefined#1%
       {\ekvc@err@already@defined#1}%
       {\ekvcHashAndUse@#1{{#2}}{#3}}%
   }
@@ -1319,7 +1872,7 @@ and the derived files           expkv-cs.pdf
 \protected\long\def\ekvcHash#1#2#3%
   {%
     \let\ekvc@helpers@needed\@secondoftwo
-    \ekv@ifdefined{\expandafter\@gobble\string#1}%
+    \ekvc@ifdefined#1%
       {\ekvc@err@already@defined#1}%
       {%
         \expandafter
@@ -1351,13 +1904,13 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \protected\long\def\ekvc@SetupHashKeys#1%
   {%
-    \def\ekvc@any@long{}%
-    \def\ekvc@initials{}%
+    \let\ekvc@any@long\ekv@empty
+    \let\ekvc@initials\ekv@empty
     \ekvparse\ekvc@SetupHashKeys@check@unknown\ekvc@SetupHashKeys@a{#1}%
   }
 \protected\def\ekvc@SetupHashKeys@a#1%
   {%
-    \def\ekvc@long{}%
+    \let\ekvc@long\ekv@empty
     \ekvc@ifspace{#1}%
       {\ekvc@SetupHashKeys@b#1\ekvc@stop}%
       {\ekvc@SetupHashKeys@c{#1}}%
@@ -1453,9 +2006,17 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[internal]{\ekvc@hash@p@short}
+%   The |short| prefix does essentially nothing, it is only provided to allow
+%   key names starting with |long| that aren't |\long|.
+%    \begin{macrocode}
+\def\ekvc@hash@p@short{\ekvc@SetupHashKeys@c}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}[internal]{\ekvc@setup@hashmacro}
-%   The safe hash macros will be executed inside of a |\romannumeral| expansion
-%   context, so they have to insert a stop mark for that once they are done.
+%   The safe hash macros will be executed inside of an |\unexpanded| expansion
+%   context, so they have to insert braces for that once they are done.
 %   Most of the tests which have to be executed will already be done, but we
 %   have to play safe if the hash doesn't show up in the hash list. Therefore we
 %   use some |\ekvc@mark|s and |\ekvc@stop| to throw errors if the hash isn't
@@ -1464,7 +2025,7 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \protected\def\ekvc@setup@hashmacro#1%
   {%
-    \ekv@ifdefined{ekvc@hash@#1}{}%
+    \ekv@ifdefined{ekvc@fasthash@#1}{}%
       {%
         \begingroup
           \edef\ekvc@tmp
@@ -1480,10 +2041,10 @@ and the derived files           expkv-cs.pdf
                   ####1%
                 {%
                   \unexpanded\expandafter{\csname ekvc@@safehash@#1\endcsname}%
-                  ####1\unexpanded{\ekvc@mark\ekv@zero}%
+                  ####1\unexpanded{\ekvc@mark}{}%
                   \unexpanded\expandafter
                     {%
-                      \csname ekvc@hashmark@#1\endcsname\ekv@zero
+                      \csname ekvc@hashmark@#1\endcsname{}%
                       \ekvc@mark{\ekvc@err@missing@hash{#1}}\ekvc@stop
                     }%
                 }%
@@ -1494,7 +2055,7 @@ and the derived files           expkv-cs.pdf
                   ####2####3\unexpanded{\ekvc@mark}####4####5%
                   \unexpanded{\ekvc@stop}%
                 {%
-                  ####4####2%
+                  ####4{####2}%
                 }%
               \long\gdef\unexpanded\expandafter
                 {\csname ekvc@fastsplithash@#1\endcsname}%
@@ -1502,7 +2063,7 @@ and the derived files           expkv-cs.pdf
                   \unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname}%
                   ####2####3\unexpanded{\ekvc@stop}####4%
                 {%
-                  ####4{####1####3}{####2}%
+                  ####4{####2}{####1####3}%
                 }%
               \long\gdef\unexpanded\expandafter
                 {\csname ekvc@safesplithash@#1\endcsname}####1%
@@ -1541,10 +2102,10 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \long\def\ekvcValue#1%
   {%
-    \romannumeral
+    \unexpanded
     \ekv@ifdefined{ekvc@safehash@#1}%
       {\csname ekvc@safehash@#1\endcsname}%
-      {\ekvc@err@unknown@hash{#1}\@firstoftwo\ekv@zero}%
+      {\ekvc@err@unknown@hash{#1}\@firstoftwo{{}}}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1568,7 +2129,7 @@ and the derived files           expkv-cs.pdf
   }
 \long\def\ekvcValueSplit@recover#1#2%
   {%
-    #2{#1}{}%
+    #2{}{#1}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1577,11 +2138,11 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \long\def\ekvc@safe@found@hash#1#2\ekvc@stop#3%
   {%
-    #3{#2}{#1}%
+    #3{#1}{#2}%
   }
 \long\def\ekvc@safe@no@hash#1#2\ekvc@mark\ekvc@safe@found@hash\ekvc@stop#3%
   {%
-    #3{#2}{}%
+    #3{}{#2}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1608,12 +2169,12 @@ and the derived files           expkv-cs.pdf
 %   without affecting performance by just defining the macro that would be build
 %   in that case. There is of course a downside to this, the error will not be
 %   thrown by |\ekvcValueFast| in three expansion steps. The safe hash variant
-%   has to also stop the |\romannumeral| expansion.
+%   has to also stop the |\unexpanded| expansion.
 %    \begin{macrocode}
-\long\def\ekvc@safehash@#1{\ekvc@err@empty@hash\ekv@zero}
+\long\def\ekvc@safehash@#1{\ekvc@err@empty@hash{}}
 \long\def\ekvc@fasthash@#1\ekvc@stop{\ekvc@err@empty@hash}
-\long\def\ekvc@safesplithash@#1#2{\ekvc@err@empty@hash#2{#1}{}}
-\long\def\ekvc@fastsplithash@#1\ekvc@stop#2{\ekvc@err@empty@hash#2{#1}{}}
+\long\def\ekvc@safesplithash@#1#2{\ekvc@err@empty@hash#2{}{#1}}
+\long\def\ekvc@fastsplithash@#1\ekvc@stop#2{\ekvc@err@empty@hash#2{}{#1}}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1629,7 +2190,7 @@ and the derived files           expkv-cs.pdf
   }
 \protected\def\ekvcSecondaryKeys@a#1%
   {%
-    \def\ekvc@long{}%
+    \let\ekvc@long\ekv@empty
     \ekvc@ifspace{#1}%
       {\ekvcSecondaryKeys@b#1\ekvc@stop}%
       {\ekvc@err@missing@type{#1}\@gobble}%
@@ -1644,6 +2205,116 @@ and the derived files           expkv-cs.pdf
           {\ekvc@err@unknown@keytype{#1}\@firstoftwo\@gobble}%
       }%
       {#2}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcChange}
+%   This can be used to change the defaults of an \expkvc\ defined macro. It
+%   checks whether there is a set with the correct name and that the macro is
+%   defined. If both is true the real work is done by |\ekvc@change|.
+%    \begin{macrocode}
+\protected\long\def\ekvcChange#1%
+  {%
+    \ekvifdefinedset{\string#1}%
+      {%
+        \ekvc@ifdefined#1%
+          {\ekvc@change#1}%
+          {\ekvc@err@no@key@macro#1\@gobble}%
+      }%
+      {\ekvc@err@no@key@macro#1\@gobble}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]
+%   {\ekvc@change,\ekvc@change@a,\ekvc@change@b,\ekvc@change@c}
+%   First we need to see whether the macro is currently |\long|. For this we get
+%   the meaning and will parse it. |#1| is the macro name in which we want to
+%   change the defaults.
+%    \begin{macrocode}
+\protected\def\ekvc@change#1%
+  {\expandafter\ekvc@change@a\meaning#1\ekv@stop#1}
+%    \end{macrocode}
+%   A temporary definition to get the stringified |macro:|. |##1| will be the
+%   list of prefixes, we don't care for the exact contents of |##2| and |##3|.
+%    \begin{macrocode}
+\def\ekvc@change@a#1%
+  {%
+    \protected\def\ekvc@change@a##1#1##2->##3\ekv@stop
+      {%
+        \ekvc@change@iflong{##1}%
+          {\ekvc@change@b{}}%
+          {\ekvc@change@b{\long}}%
+      }%
+  }
+\expandafter\ekvc@change@a\expandafter{\detokenize{macro:}}
+%    \end{macrocode}
+%   Next we expand the macro once to get its contents (including the current
+%   default values with their markers). |#1| is either |\long| or empty, |#2| is
+%   the macro.
+%    \begin{macrocode}
+\protected\def\ekvc@change@b#1#2%
+  {\expandafter\ekvc@change@c\expandafter{#2{##1}}{#1}#2}
+%    \end{macrocode}
+%   Here we place an unbalanced closing brace after the expansion of the macro.
+%   Then we just parse the \kv-list with |\ekvset|, that will exchange the
+%   values behind the markers. Once those are changed we give control to
+%   |\ekvc@change@d|. The |\ekvset| step might horribly fail if the user defined
+%   some keys that don't behave nice. |#1| is the expansion of the macro, |#2|
+%   is either |\long| or empty, |#3| is the macro, and |#4| is the \kv-list
+%   containing the new defaults.
+%    \begin{macrocode}
+\ekv@exparg{\protected\long\def\ekvc@change@c#1#2#3#4}%
+  {%
+    \expandafter\iffalse\expandafter{\expandafter\fi
+      \ekvset{\string#3}{#4}%
+      \ekvc@change@d{#2}{#3}%
+      #1%
+    }%
+  }
+%    \end{macrocode}
+%   The final step needs to put an unbalanced opening brace after |\def|. We do
+%   that with the help of a temporary macro which stores everything necessary
+%   for |\def| and expand an |\iffalse}\fi| construct to leave a single
+%   opening brace. |#1| will be either empty or |\long| and |#2| is the macro.
+%   Each of the macros defined with \expkvc\ takes exactly one parameter, so we
+%   put that here as |####1|.
+%    \begin{macrocode}
+\protected\def\ekvc@change@d#1#2%
+  {%
+    \def\ekvc@tmp{#1\def#2####1}%
+    \expandafter\ekvc@tmp\expandafter{\iffalse}\fi
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvc@change@iflong,\ekvc@change@iflong@}
+%   Checking whether a string contains the string representation of |\long| can
+%   be done by gobbling everything up to the first |\long| and checking whether
+%   the result is completely empty. We need a temporary macro to get the result
+%   of |\string\long| inside the definitions.
+%    \begin{macrocode}
+\def\ekvc@change@iflong#1%
+  {%
+    \protected\def\ekvc@change@iflong##1%
+      {\expandafter\ekv@ifempty\expandafter{\ekvc@change@iflong@##1#1}}%
+    \def\ekvc@change@iflong@##1#1{}
+  }
+\expandafter\ekvc@change@iflong\expandafter{\string\long}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcPass}
+%   This macro can be used to pass a value to a key of some macro (this way
+%   more complicated key codes are possible that in the end pass processed
+%   values on to some macro). The implemantation is pretty straight forward.
+%    \begin{macrocode}
+\long\def\ekvcPass#1#2%
+  {%
+    \ekvifdefined{\string#1}{#2}%
+      {\csname\ekv@name{\string#1}{#2}\endcsname}%
+      {\ekvc@err@unknown@key@or@macro{#1}{#2}\@gobble}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1754,6 +2425,258 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[internal]{\ekvc@t@flag-bool}
+%    \begin{macrocode}
+\protected\expandafter\def\csname ekvc@t@flag-bool\endcsname#1#2%
+  {%
+    \ekvc@assert@not@long{flag-bool #1}%
+    \unless\ifdefined#2\ekvcFlagNew#2\fi
+    \ekvdef\ekvc@set{#1}%
+      {%
+        \ekv@ifdefined{ekvc@flag@set@##1}%
+          {%
+            \csname ekvc@flag@set@##1\expandafter\endcsname
+              \ekvcFlagHeight#2\ekv@stop#2%
+          }%
+          {\ekvc@err@invalid@bool{##1}}%
+      }%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]
+%   {\ekvc@t@flag-true,\ekvc@t@flag-false,\ekvc@t@flag-raise,\ekvc@type@flag}
+%    \begin{macrocode}
+\protected\def\ekvc@type@flag#1#2#3#4%
+  {%
+    \ekvc@assert@not@long{flag-#1 #3}%
+    \unless\ifdefined#4\ekvcFlagNew#4\fi
+    \ekv@exparg{\ekvdefNoVal\ekvc@set{#3}}{#2#4}%
+  }
+\protected\expandafter\def\csname ekvc@t@flag-true\endcsname
+  {\ekvc@type@flag{true}\ekvcFlagSetTrue}
+\protected\expandafter\def\csname ekvc@t@flag-false\endcsname
+  {\ekvc@type@flag{false}\ekvcFlagSetFalse}
+\protected\expandafter\def\csname ekvc@t@flag-raise\endcsname
+  {\ekvc@type@flag{raise}\ekvcFlagRaise}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsubsection{Flags}
+%
+% The basic idea of flags is to store information by the fact that \TeX\
+% expandably assigns the meaning |\relax| to undefined control sequences which
+% were built with |\csname|. This mechanism is borrowed from \pkg{expl3}.
+%
+% \begin{macro}[internal]{\ekvc@flag@name,\ekvc@flag@namescheme}
+%   Flags follow a simple naming scheme which we define here. |\ekvc@flag@name|
+%   will store the name of an internal function that is used to build names of
+%   the second naming scheme defined by |\ekvc@flag@namescheme|.
+%    \begin{macrocode}
+\def\ekvc@flag@name{ekvcf\string}
+\def\ekvc@flag@namescheme#1#2{ekvch#2#1}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagHeight}
+%   For semantic reasons we use |\number| with another name.
+%    \begin{macrocode}
+\let\ekvcFlagHeight\number
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagNew}
+%   This macro defines a new flag. It stores the function build with the
+%   |\ekvc@flag@name| naming scheme after the internal function
+%   |\ekvc@flag@height| that'll determine the current flag height. It'll also
+%   define the macro named via |\ekvc@flag@name| to build names according to
+%   |\ekvc@flag@namescheme|.
+%    \begin{macrocode}
+\protected\def\ekvcFlagNew#1%
+  {%
+    \edef#1%
+      {%
+        \unexpanded{\ekvc@flag@height}%
+          \unexpanded\expandafter{\csname\ekvc@flag@name#1\endcsname}%
+      }%
+    \ekv@expargtwice
+      {\expandafter\def\csname\ekvc@flag@name#1\endcsname##1}%
+      {\expandafter\ekvc@flag@namescheme\expandafter{\string#1}{##1}}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvc@flag@height,\ekvc@flag@height@}
+%   This macro gets the height of a flag by a simple loop. The first loop
+%   iteration differs a bit from the following in that it doesn't have to get
+%   the current iteration count. The space at the end of |\ekvc@flag@height|
+%   ends the |\number| evaluation.
+%    \begin{macrocode}
+\def\ekvc@flag@height#1%
+  {%
+    \ifcsname#10\endcsname
+      \ekvc@flag@height@1\ekv@stop#1%
+    \fi
+    \@firstofone{0} % leave this space
+  }
+\def\ekvc@flag@height@#1\ekv@stop#2\fi\@firstofone#3%
+  {%
+    \fi
+    \ifcsname#2{#1}\endcsname
+      \expandafter\ekvc@flag@height@\the\numexpr#1+1\relax\ekv@stop#2%
+    \fi
+    \@firstofone{#1}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagRaise}
+%   Raising a flag simply means letting the |\ekvc@flag@namescheme| macro for
+%   the current height to relax. The result of raising a flag is that its height
+%   is bigger by $1$.
+%    \begin{macrocode}
+\ekv@exparg{\def\ekvcFlagRaise#1}%
+  {%
+    \expandafter\expandafter\expandafter\@gobble\expandafter
+      \csname\ekvc@flag@namescheme{\string#1}{\ekvcFlagHeight#1}\endcsname
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagSetTrue,\ekvcFlagSetFalse}
+% \begin{macro}[internal]{\ekvc@flag@set@true,\ekvc@flag@set@false}
+%   A flag is considered true if its current height is odd, and as false if it
+%   is even. Therefore |\ekvcFlagSetTrue| and |\ekvcFlagSetFalse| only need to
+%   raise the flag if the opposing boolean value is the current one.
+%    \begin{macrocode}
+\def\ekvcFlagSetTrue#1%
+  {\expandafter\ekvc@flag@set@true\ekvcFlagHeight#1\ekv@stop#1}
+\def\ekvcFlagSetFalse#1%
+  {\expandafter\ekvc@flag@set@false\ekvcFlagHeight#1\ekv@stop#1}
+%    \end{macrocode}
+%   We can expand |\ekvc@flag@namescheme| at definition time here, which is why
+%   we're using a temporary definition to set up |\ekvc@flag@set@true| and
+%   |\ekvc@flag@set@false|.
+%    \begin{macrocode}
+\def\ekvc@flag@set@true#1%
+  {%
+    \def\ekvc@flag@set@true##1\ekv@stop##2%
+      {%
+        \ifodd##1
+          \ekv@fi@gobble
+        \fi
+        \@firstofone{\expandafter\@gobble\csname#1\endcsname}%
+      }%
+    \def\ekvc@flag@set@false##1\ekv@stop##2%
+      {%
+        \ifodd##1
+          \ekv@fi@firstofone
+        \fi
+        \@gobble{\expandafter\@gobble\csname#1\endcsname}%
+      }%
+  }
+\expandafter\ekvc@flag@set@true\expandafter
+  {\ekvc@flag@namescheme{\string#2}{#1}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagIf}
+%   As already explained, truthiness is defined as a flag's height is odd, so we
+%   just branch accordingly here.
+%    \begin{macrocode}
+\def\ekvcFlagIf#1%
+  {%
+    \ifodd#1%
+      \ekv@fi@firstoftwo
+    \fi
+    \@secondoftwo
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagIfRaised}
+%   This macro uses flags as a switch, if a flag's current height is bigger than
+%   $0$ this test yields true.
+%    \begin{macrocode}
+\ekv@exparg{\def\ekvcFlagIfRaised#1}%
+  {%
+    \expandafter\ifcsname\ekvc@flag@namescheme{\string#1}0\endcsname
+      \ekv@fi@firstoftwo
+    \fi
+    \@secondoftwo
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagReset}
+% \begin{macro}[internal]{\ekvc@flag@reset,\ekvc@flag@reset@}
+%   Resetting works by locally letting all the defined internal macros named
+%   after |\ekvc@flag@namescheme| to undefined.
+%    \begin{macrocode}
+\protected\def\ekvcFlagReset#1%
+  {\expandafter\ekvc@flag@reset\csname\ekvc@flag@name#1\endcsname}
+\protected\def\ekvc@flag@reset#1%
+  {%
+    \ifcsname#10\endcsname
+      \expandafter\let\csname#10\endcsname\ekvc@undefined
+      \ekvc@flag@reset@1\ekv@stop#1%
+    \fi
+  }
+\protected\def\ekvc@flag@reset@#1\ekv@stop#2\fi
+  {%
+    \fi
+    \ifcsname#2{#1}\endcsname
+      \expandafter\let\csname#2{#1}\endcsname\ekvc@undefined
+      \expandafter\ekvc@flag@reset@\the\numexpr#1+1\relax\ekv@stop#2%
+    \fi
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagGetHeight}
+% \begin{macro}[internal]{\ekvc@flag@get@height@single}
+%   These are just small helpers, first getting the height of the flag and then
+%   passing it on to the user supplied code.
+%    \begin{macrocode}
+\def\ekvcFlagGetHeight#1%
+  {\expandafter\ekvc@flag@get@height@single\ekvcFlagHeight#1\ekv@stop}
+\long\def\ekvc@flag@get@height@single#1\ekv@stop#2{#2{#1}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\ekvcFlagGetHeights}
+% \begin{macro}[internal]
+%   {\ekvc@flag@get@heights,\ekvc@flag@get@heights@,\ekvc@flag@get@heights@done}
+%   This works by a simple loop that stops at |\ekv@stop|. As long as that
+%   marker isn't hit, get the next flags height and put it into a list after
+%   |\ekv@stop|. |\ekvc@flag@get@heights@| uses the same marker name for the
+%   end of the height, which shouldn't clash in any case. Once we're done we
+%   remove the remainder of the current iteration and leave the user supplied
+%   code in the input stream with all the flags' heights as a single argument.
+%    \begin{macrocode}
+\def\ekvcFlagGetHeights#1%
+  {%
+    \ekvc@flag@get@heights#1\ekv@stop{}%
+  }
+\def\ekvc@flag@get@heights#1%
+  {%
+    \ekv@gobbleto@stop#1\ekvc@flag@get@heights@done\ekv@stop
+    \expandafter\ekvc@flag@get@heights@\ekvcFlagHeight#1\ekv@stop
+  }
+\def\ekvc@flag@get@heights@#1\ekv@stop#2\ekv@stop#3%
+  {\ekvc@flag@get@heights#2\ekv@stop{#3{#1}}}
+\long\def\ekvc@flag@get@heights@done
+    \ekv@stop
+    \expandafter\ekvc@flag@get@heights@\ekvcFlagHeight\ekv@stop\ekv@stop#1#2%
+  {#2{#1}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 %
 % \subsubsection{Helper Macros}
 %
@@ -1789,7 +2712,7 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}[internal]
 %   {
 %     \ekvc@err@toomany,\ekvc@err@value@required,\ekvc@err@missing@type,
-%     \ekvc@err@already@defined
+%     \ekvc@err@already@defined,\ekvc@err@no@key@macro
 %   }
 %   Boring unexpandable error messages.
 %    \begin{macrocode}
@@ -1824,28 +2747,31 @@ and the derived files           expkv-cs.pdf
     \errmessage
       {expkv-cs Error: Unknown key `\unexpanded{#1}' for macro `\ekvc@set'}%
   }
+\long\def\ekvc@err@no@key@macro#1%
+  {\errmessage{expkv-cs Error: \string#1 is no key=val macro}}
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[internal]{\ekvc@err,\ekvc@err@}
+% \begin{macro}[internal]{\ekvc@err}
 %   We need a way to throw error messages expandably in some contexts.
 %    \begin{macrocode}
-\def\ekvc@err#1%
-  {%
-    \long\def\ekvc@err##1{\expandafter\ekv@err@\@firstofone{#1##1.}\ekv@stop}%
-  }
-\begingroup\expandafter\endgroup
-\expandafter\ekvc@err\csname ! expkv-cs Error:\endcsname
+\ekv@exparg{\long\def\ekvc@err#1}{\ekverr{expkv-cs}{#1}}
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}[internal]
-%   {\ekvc@err@unknown@hash,\ekvc@err@empty@hash,\ekvc@err@missing@hash}
+%   {
+%     \ekvc@err@unknown@hash,\ekvc@err@empty@hash,\ekvc@err@missing@hash,
+%     \ekvc@err@invalid@bool
+%   }
 %   And here are the expandable error messages.
 %    \begin{macrocode}
 \long\def\ekvc@err@unknown@hash#1{\ekvc@err{unknown hash `#1'}}
 \long\def\ekvc@err@missing@hash#1{\ekvc@err{hash `#1' not found}}
 \long\def\ekvc@err@empty@hash{\ekvc@err{empty hash}}
+\def\ekvc@err@invalid@bool#1{\ekvc@err{invalid boolean value `#1'}}
+\long\def\ekvc@err@unknown@key@or@macro#1#2%
+  {\ekvc@err{unknown key `#2' for macro #1}}
 %    \end{macrocode}
 % \end{macro}
 %

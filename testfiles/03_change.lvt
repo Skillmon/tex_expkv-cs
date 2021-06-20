@@ -1,0 +1,52 @@
+\input regression-test
+
+\RequirePackage{expkv-cs}
+
+\START
+\OMIT
+\newcommand\splitout[2]{\TYPE{a=#1,b=#2}}
+\ekvcSplit\split{a=a,b=b}{\TYPE{a=#1,b=#2}}
+\ekvcSecondaryKeys\split{meta c={a=#1,b=#1}}
+\ekvcSplitAndForward\splitf\splitout{a=a,b=b}
+\ekvcSplitAndUse\splitu{a=a,b=b}
+\newcommand\hashout[1]{\TYPE{a=\ekvcValue{a}{#1},b=\ekvcValue{b}{#1}}}
+\ekvcHash\hash{a=a,b=b}{\TYPE{a=\ekvcValue{a}{#1},b=\ekvcValue{b}{#1}}}
+\ekvcHashAndForward\hashf\hashout{a=a,b=b}
+\ekvcHashAndUse\hashu{a=a,b=b}
+\newcommand\testchange[1]
+  {%
+    \ekvifdefined{\string#1}{c}%
+      {\ekvcChange#1{c=C}}%
+      {\ekvcChange#1{a=A,b=B}}%
+    #1{}%
+  }
+\TIMO
+
+\begingroup
+\TEST{change split}
+  {
+    \split{}
+    \testchange\split
+    \splitf{}
+    \testchange\splitf
+    \splitu{}\splitout
+    \testchange\splitu\splitout
+  }
+
+\TEST{change hash}
+  {
+    \hash{}
+    \testchange\hash
+    \hashf{}
+    \testchange\hashf
+    \hashu{}\hashout
+    \testchange\hashu\hashout
+  }
+\endgroup
+
+% this test just checks that the changes above were local.
+\TEST{change local}
+  {
+    \split{}
+  }
+\END

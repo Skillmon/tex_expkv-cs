@@ -424,6 +424,11 @@ and the derived files           expkv-cs.pdf
 % second one is called |long| and will not accept |\par| tokens (leading to a
 % low level \TeX\ error). A description of |\ekvcSplit| follows shortly.
 %
+% There is one exception to these syntax rules of \meta{primary keys}: One can
+% include a key named |...| without a value. If this is found the \meta{cs} will
+% be defined |\long|. Any unknown keys found at use time will end up in a list
+% at this spot. See some examples in \autoref{sec:unknown}.
+%
 % At the moment \expkvc\ doesn't require any internal keys, but I can't foresee
 % whether this will be the case in the future as well, as it might turn out that
 % some features I deem useful can't be implemented without such internal keys.
@@ -788,7 +793,9 @@ and the derived files           expkv-cs.pdf
 %   \meta{cs} was defined |\long| earlier it will still be |\long|, every other
 %   \TeX\ prefix will be stripped (but \expkvc\ doesn't support them anywhere
 %   else so that should be fine). The resulting new defaults will be stored
-%   inside the \meta{cs} locally (just as the original defaults were).
+%   inside the \meta{cs} locally (just as the original defaults were). If there
+%   was an unknown key forwarding added to \meta{cs} (see \autoref{sec:unknown})
+%   any unknown key will be stored inside the list of unknown keys as well.
 % \end{function}
 %
 % Consider the following example:\\
@@ -826,6 +833,110 @@ and the derived files           expkv-cs.pdf
 % be as powerful as similar macros used with other \kv\ interfaces. But at least
 % a few similar macros could be grouped using the same key parsing macro
 % internally.
+%
+%
+% \subsection{Handling Unknown Keys}\label{sec:unknown}
+%
+% If your macro should handle unknown keys without directly throwing an error
+% you can use the special |...| marker in the \meta{primary keys} list. Since
+% those keys will be processed once by \expkv\ they will be forwarded
+% normalised: The key name will be the result of one |\detokenize|, the value
+% will be forwarded as \verb*| {|\meta{value}\verb*|} |, so with spaces around
+% one set of braces (this way, most other \kv\ implementations should parse the
+% correct input).
+%
+% The exact behaviour differs slightly between the two variants (as all keys
+% do). The behaviour inside the split variants will be similar to normal primary
+% keys, the $n$-th argument (corresponding to the position of |...| inside the
+% primary keys list) will contain any unknown key encountered while parsing the
+% argument. And inside the split variant you can use a primary key named |...|
+% at the same time.
+%
+% \example The following will forward any unknown key to |\includegraphics| to
+% control the appearance while processing its own keys:\\
+% \begin{minipage}{.6\linewidth}
+% \begin{lstlisting}
+% \newcommand*\foo{\ekvoptarg\fooKV{}}
+% \ekvcSplitAndForward\fooKV\fooOUT
+%   {
+%      a=a
+%     ,...
+%     ,b=b
+%     ,...={}
+%   }
+% \newcommand\fooOUT[5]
+%   {%
+%     a is #1 and b is #3.\par
+%     \includegraphics[{#2}]{#5}\par
+%     \texttt{...} is #4.\par
+%   }
+% \foo[width=.5\linewidth, b=c,
+%      ...={a stupid key name, but works}]
+%     {example-image-duck}
+% \end{lstlisting}
+% \end{minipage}^^A
+% \begin{exresult}[nobeforeafter,box align=center]{.4\linewidth}
+%   \newcommand*\foo{\ekvoptarg\fooKV{}}
+%   \ekvcSplitAndForward\fooKV\fooOUT
+%     {
+%        a=a
+%       ,...
+%       ,b=b
+%       ,...={}
+%     }
+%   \newcommand\fooOUT[5]
+%     {%
+%       a is #1 and b is #3.\par
+%       \includegraphics[{#2}]{#5}\par
+%       \texttt{...} is #4.\par
+%     }
+%   \foo[width=.5\linewidth, b=c,
+%        ...={a stupid key name, but works}]
+%       {example-image-duck}
+% \end{exresult}
+%
+% Inside the hash variants the unknown keys list will be put inside the hash
+% named |...| (we have to use some name, so why not this). As a consequence a
+% primary key named |...| would clash with the unknown key handler. If you still
+% used such a key it would remove any unknown key stored there until that point
+% and replace the list with its value.
+%
+% \example The following is more or less equivalent to the example above, but
+% with the hash variant, and it will not contain the primary |...| key. We have
+% to make sure that |\includegraphics| sees the \kv\ list, so need to expand
+% |\ekvcValue{...}{#1}| before |\includegraphics| parses it.\\
+% \begin{minipage}{.76\linewidth}
+% \begin{lstlisting}
+% \newcommand*\foo{\ekvoptarg\fooKV{}}
+% \ekvcHashAndForward\fooKV\fooOUT
+%   {a=a, b=b, ...}
+% \newcommand\fooOUT[2]
+%   {%
+%     a is \ekvcValue{a}{#1} and
+%     b is \ekvcValue{b}{#1}.\par
+%     \expanded{\noexpand\includegraphics
+%                          [{\ekvcValue{...}{#1}}]}
+%                          {#2}\par
+%   }
+% \foo[width=\linewidth, b=c]
+%     {example-image-duck-portrait}
+% \end{lstlisting}
+% \end{minipage}^^A
+% \begin{exresult}[nobeforeafter,box align=center]{.24\linewidth}
+%   \newcommand*\foo{\ekvoptarg\fooKV{}}
+%   \ekvcHashAndForward\fooKV\fooOUT
+%     {a=a, b=b, ...}
+%   \newcommand\fooOUT[2]
+%     {%
+%       a is \ekvcValue{a}{#1} and
+%       b is \ekvcValue{b}{#1}.\par
+%       \expanded{\noexpand\includegraphics
+%                            [{\ekvcValue{...}{#1}}]}
+%                            {#2}\par
+%     }
+%   \foo[width=\linewidth, b=c]
+%       {example-image-duck-portrait}
+% \end{exresult}
 %
 %
 % \subsection{Flags}\label{sec:flags}
@@ -1146,7 +1257,8 @@ and the derived files           expkv-cs.pdf
 %   \end{syntax}
 %   This passes \meta{value} on to \meta{key} for the \expkvc-macro \meta{cs}.
 %   It should be used inside the key parsing of a macro defined with \expkvc,
-%   else this most likely results in a low level \TeX\ error.
+%   else this most likely results in a low level \TeX\ error. You can't forward
+%   anything to the special unknown key handler |...| as that is no defined key.
 % \end{function}
 %
 % With this we could for example split the value of a key at a hyphen and pass

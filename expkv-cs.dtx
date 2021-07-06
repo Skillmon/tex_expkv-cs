@@ -658,9 +658,10 @@ and the derived files           expkv-cs.pdf
 %
 % To remove some of the limitations with the approach that each primary key
 % matches an argument or hash entry, you can define secondary keys. Those have
-% to be defined for each macro but it doesn't matter whether that macro was a
-% split or a hash variant. If a secondary key references another key it doesn't
-% matter whether that other key is primary or secondary.
+% to be defined for each macro individually but it doesn't matter whether that
+% macro was a split or a hash variant. If a secondary key references another key
+% it doesn't matter whether that other key is primary or secondary unless
+% otherwise specified.
 %
 % Secondary keys can have a prefix (like |long|) which are called |p|-type
 % prefix and must have a type (like |meta|) which are called |t|-type prefix.
@@ -743,6 +744,52 @@ and the derived files           expkv-cs.pdf
 %   at definition time in |\ekvcSplit| and friends (see |\ekvcChange| in
 %   \autoref{sec:change} for this). \key\ can be a primary or secondary key.
 % \end{function}
+%
+% \begin{function}{aggregate}
+%   \begin{syntax}
+%     aggregate \key\ = \marg{primary}\marg{definition} \prefixes3
+%   \end{syntax}
+%   While all other key types replace the current value of the associated
+%   \meta{primary} key, with |aggregate| you can create keys that append or
+%   prepend (or whatever you like) the new value to the current one. The
+%   definition must be exactly two \TeX\ arguments, where \meta{primary} should
+%   be the name of a \meta{primary} key, and \meta{definition} the way you want
+%   to store the current and the new value. Inside \meta{definition} you
+%   can use |#1| for the current, and |#2| for the new value. The
+%   \meta{definition} will not expand any further during the entire parsing (so
+%   this doesn't allow general processing of current and new values). The
+%   resulting \key\ will inherit being either |short| or |long| from the
+%   \meta{primary} key.
+% \end{function}
+% \example The following defines an internal key (|k-internal|), which is used
+% to build a comma separated list from each call of the user facing key (|k|):\\
+% \begin{minipage}[c]{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcSplit\foo
+%   {k-internal=0,color=red}
+%   {\textcolor{#2}{#1}}
+% \ekvcSecondaryKeys\foo
+%   {aggregate k = {k-internal}{#1,#2}}
+% \foo{}\par
+% \foo{k=1,k=2,k=3,k=4}
+% \end{lstlisting}
+% \end{minipage}^^A
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcSplit\foo
+%     {k-internal=0,color=red}
+%     {\textcolor{#2}{#1}}
+%   \ekvcSecondaryKeys\foo
+%     {aggregate k = {k-internal}{#1,#2}}
+%   \foo{}\par
+%   \foo{k=1,k=2,k=3,k=4}
+% \end{exresult}
+%
+% But also more strange stuff could end there, like macros or doubling:
+% \begin{lstlisting}
+% \ekvcSecondaryKeys\foo
+%   {aggregate k = {k-internal}{\old{#1}\new{#2\old{#1}}}}
+% \end{lstlisting}
+%
 %
 % \begin{function}{flag-bool}
 %   \begin{syntax}
@@ -1282,6 +1329,20 @@ and the derived files           expkv-cs.pdf
 %   \foo{}
 %   \foo{c=1-2}
 % \end{exresult}
+%
+% Additionally, there is a more general version of the |aggregate| secondary key
+% type (described in \autoref{sec:secondaries}), namely the |process| key type:
+%
+% \begin{function}{process}
+%   \begin{syntax}
+%     process \key\ = \marg{primary}\marg{definition} \prefixes3
+%   \end{syntax}
+%   This will grab the current value of a \meta{primary} key as |#1| (without
+%   altering it in any way) and the new value as |#2| and leave all the
+%   processing to \meta{definition}. You should use |\ekvcPass| to forward the
+%   values afterwards. Keep in mind that you could easily break things here if
+%   your code does not work by expansion.
+% \end{function}
 %
 %
 % \subsection{Speed Considerations}\label{sec:speed}
@@ -2535,6 +2596,163 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[internal]{\ekvc@t@aggregate}
+%   Aggregating isn't easy to define. We'll have to extract the correct mark for
+%   the specified key, branch correctly for short and long keys, and use a small
+%   hack to have the correct arguments on the user interface (|#1| as the
+%   current contents, |#2| as the new value). This is split into a few steps
+%   here.
+%
+%   First, assert that the user input is well-behaved.
+%    \begin{macrocode}
+\protected\def\ekvc@t@aggregate
+  {%
+    \ekvc@type@aggregate
+      \ekvc@type@aggregate@long@\ekvc@type@aggregate@short@
+      {process}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]
+%   {\ekvc@type@aggregate,\ekvc@type@aggregate@a,\ekvc@type@aggregate@b}
+%   The next step stores the user defined processing in a temporary macro that's
+%   used to do the parameter number swapping later. It also builds the names of
+%   the key macro and the helper which would be used for processing a short key.
+%    \begin{macrocode}
+\protected\long\def\ekvc@type@aggregate#1#2#3#4#5%
+  {%
+    \ekvc@assert@not@long{#3 #4}%
+    \ekvc@assert@twoargs{#5}{#3 #4}{\ekvc@type@aggregate@a#1#2{#4}#5}%
+  }
+\protected\long\def\ekvc@type@aggregate@a#1#2#3#4#5%
+  {
+    \ekvifdefined\ekvc@set{#4}%
+      {%
+        \def\ekvc@type@aggregate@tmp##1##2{#5}%
+        \begingroup\expandafter\endgroup
+        \expandafter\ekvc@type@aggregate@b
+          \csname\ekv@name\ekvc@set{#4}\expandafter\endcsname
+          \csname ekvc@\ekvc@set(#4)\endcsname
+          #1#2%
+          {#3}%
+      }
+      {\ekvc@err@unknown@key{#4}}%
+  }
+\protected\long\def\ekvc@type@aggregate@b#1#2#3#4%
+  {%
+    \ekvc@type@aggregate@check@long#1#2%
+      {\ekvc@type@aggregate@long#3#1}%
+      {\ekvc@type@aggregate@short#4#2}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]
+%   {
+%     \ekvc@type@aggregate@check@long,
+%     \ekvc@type@aggregate@check@long@a,\ekvc@type@aggregate@check@long@b
+%   }
+%   To check whether the primary key is long we see whether its |\meaning|
+%   contains the helper which would only be there for short keys. For this we
+%   have to get the stringified name of the internal (using |\detokenize|),
+%   and afterwards get the |\meaning| of the macro. A temporary helper does the
+%   real test by gobbling and forwarding the result to |\ekv@ifempty|.
+%    \begin{macrocode}
+\protected\long\def\ekvc@type@aggregate@check@long#1#2%
+  {\expandafter\ekvc@type@aggregate@check@long@a\detokenize{#2}\ekv@stop#1}
+\protected\long\def\ekvc@type@aggregate@check@long@a#1\ekv@stop#2%
+  {%
+    \def\ekvc@type@aggregate@check@long@@##1#1{}%
+    \expandafter\ekvc@type@aggregate@check@long@b\meaning#2\ekv@stop{#1}%
+  }
+\protected\def\ekvc@type@aggregate@check@long@b#1\ekv@stop#2%
+  {\expandafter\ekv@ifempty\expandafter{\ekvc@type@aggregate@check@long@@#1#2}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvc@type@aggregate@long,\ekvc@type@aggregate@long@}
+%   The long variant just builds the split mark we extract, uses the hack to
+%   swap argument order, and then does the definition via |\ekvlet| and a
+%   temporary macro.
+%    \begin{macrocode}
+\protected\long\def\ekvc@type@aggregate@long#1#2%
+  {%
+    \begingroup\expandafter\endgroup\expandafter
+    #1%
+      \csname\ekvc@extract@mark#2\expandafter\endcsname
+      \expandafter{\ekvc@type@aggregate@tmp{##3}{##1}}%
+  }
+\protected\long\def\ekvc@type@aggregate@long@#1#2#3%
+  {%
+    \long\def\ekvc@type@aggregate@tmp##1##2#1##3{##2#1{#2}}
+    \ekvlet\ekvc@set{#3}\ekvc@type@aggregate@tmp
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]
+%   {\ekvc@type@aggregate@short,\ekvc@type@aggregate@short@}
+%   The short variant will have to build the marker and the name of the helper
+%   function, and swap the user argument order. Hence here are a few more
+%   |\expandafter|s involved. But afterwards we can do the definition of the key
+%   and the helper macro directly.
+%    \begin{macrocode}
+\protected\long\def\ekvc@type@aggregate@short#1#2#3%
+  {%
+    \begingroup\expandafter\endgroup\expandafter
+    #1%
+      \csname\ekvc@extract@mark#2\expandafter\endcsname
+      \csname ekvc@\ekvc@set(#3)\expandafter\endcsname
+      \expandafter{\ekvc@type@aggregate@tmp{##3}{##1}}%
+      {#3}%
+  }
+\protected\long\def\ekvc@type@aggregate@short@#1#2#3#4%
+  {%
+    \ekvdef\ekvc@set{#4}{#2{##1}}%
+    \long\def#2##1##2#1##3{##2#1{#3}}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvc@t@process}
+%   The |process| type can reuse much of |aggregate|, just the last step of
+%   definition differ.
+%    \begin{macrocode}
+\protected\def\ekvc@t@process
+  {%
+    \ekvc@type@aggregate
+      \ekvc@type@process@long@\ekvc@type@process@short@
+      {process}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvc@type@process@long@}
+%   This defines a temporary macro to grab the current value (found after the
+%   marker |#1|), executes the user code and puts everything back to where it
+%   belongs. Then |\ekvlet| is used to assign that meaning to the key macro.
+%    \begin{macrocode}
+\protected\long\def\ekvc@type@process@long@#1#2#3%
+  {%
+    \long\def\ekvc@type@aggregate@tmp##1##2#1##3{#2##2#1{##3}}%
+    \ekvlet\ekvc@set{#3}\ekvc@type@aggregate@tmp
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvc@type@process@short@}
+%   We define the key macro directly to just grab the argument once and forward
+%   it to the auxiliary. That one does essentially the same as the long variant.
+%    \begin{macrocode}
+\protected\long\def\ekvc@type@process@short@#1#2#3#4%
+  {%
+    \ekvdef\ekvc@set{#4}{#2{##1}}%
+    \long\def#2##1##2#1##3{#3##2#1{##3}}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}[internal]{\ekvc@t@flag-bool}
 %    \begin{macrocode}
 \protected\expandafter\def\csname ekvc@t@flag-bool\endcsname#1#2%
@@ -2806,6 +3024,33 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[internal]{\ekvc@ifnottwoargs,\ekvc@ifempty@gtwo}
+%   Used to test whether a token list contains exactly two \TeX\ arguments.
+%    \begin{macrocode}
+\long\def\ekvc@ifnottwoargs#1%
+  {%
+    \ekvc@ifempty@gtwo#1\ekv@ifempty@B
+      \ekv@ifempty@false\ekv@ifempty@A\ekv@ifempty@B\@firstoftwo
+  }
+\long\def\ekvc@ifempty@gtwo#1#2{\ekv@ifempty@\ekv@ifempty@A}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[internal]{\ekvc@extract@mark,\ekvc@extract@mark@}
+%   This is used to extract the mark of a split or hash key from its definition.
+%   This is kind of fragile, it assumes |#1| is always a macro used for hashing
+%   or splitting. Also it assumes that the escape character is a backslash.
+%    \begin{macrocode}
+\def\ekvc@extract@mark#1{\expandafter\ekvc@extract@mark@\meaning#1\ekv@stop}
+\begingroup
+\lccode`;=`\#
+\lccode`/=`\\
+\lowercase{\endgroup
+\def\ekvc@extract@mark@#1:#2/#3 ;#4\ekv@stop{#3}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
 %
 % \subsubsection{Assertions}
 % \begin{macro}[internal]{\ekvc@assert@not@long}
@@ -2816,13 +3061,23 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[internal]{\ekvc@assert@twoargs}
+%   Some keys need exactly two arguments as their definition, so we have to
+%   somehow assert this.
+%    \begin{macrocode}
+\protected\long\def\ekvc@assert@twoargs#1#2%
+  {\ekvc@ifnottwoargs{#1}{\ekvc@err@not@two{#2}}}
+%    \end{macrocode}
+% \end{macro}
+%
 %
 % \subsubsection{Messages}
 %
 % \begin{macro}[internal]
 %   {
 %     \ekvc@err@toomany,\ekvc@err@value@required,\ekvc@err@missing@type,
-%     \ekvc@err@already@defined,\ekvc@err@no@key@macro
+%     \ekvc@err@already@defined,\ekvc@err@no@key@macro,
+%     \ekvc@err@not@two
 %   }
 %   Boring unexpandable error messages.
 %    \begin{macrocode}
@@ -2859,6 +3114,14 @@ and the derived files           expkv-cs.pdf
   }
 \long\def\ekvc@err@no@key@macro#1%
   {\errmessage{expkv-cs Error: \string#1 is no key=val macro}}
+\protected\long\def\ekvc@err@not@two#1%
+  {%
+    \errmessage
+      {%
+        expkv-cs Error: Definition of `\unexpanded{#1}' doesn't contain exactly
+        two arguments%
+      }%
+  }
 %    \end{macrocode}
 % \end{macro}
 %

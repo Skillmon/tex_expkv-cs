@@ -49,4 +49,17 @@
   {
     \split{}
   }
+
+\OMIT
+% define a new set for which the macro will be undefined
+\ekvdef{\string\undefinedmacro}{a}{}
+% define a new macro for which the set will be undefined
+\def\undefinedset{}
+\TIMO
+
+\TEST{errors}
+  {
+    \ekvcChange\undefinedmacro{}
+    \ekvcChange\undefinedset{}
+  }
 \END

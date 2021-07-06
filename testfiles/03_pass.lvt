@@ -16,4 +16,10 @@
     \hash{c}%
   }
 
+\TESTEXP{Error}
+  {%
+    \ekvcPass\undefinedmacro{key}{}
+    \ekvcPass\split{undefined key}{}
+  }
+
 \END

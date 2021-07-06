@@ -6,3 +6,37 @@ TEST 1: Pass
 a=c,b=c
 a=c,b=c
 ============================================================
+============================================================
+TEST 2: Error
+============================================================
+Runaway argument?
+! expkv-cs Error: unknown key `key' for macro \undefinedmacro 
+! Paragraph ended before \<an-expandable-macro>
+completed due to above exception.  If the error
+summary is  not comprehensible  see the package
+documentation.
+I will try to recover now.  If you're in inter-
+active mode hit <return>  at the ? prompt and I
+continue hoping recovery was complete.
+<to be read again> 
+                   \par 
+l. ...  }
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
+Runaway argument?
+! expkv-cs Error: unknown key `undefined key' for macro \split 
+! Paragraph ended before \<an-expandable-macro>
+completed due to above exception.  If the error
+summary is  not comprehensible  see the package
+documentation.
+I will try to recover now.  If you're in inter-
+active mode hit <return>  at the ? prompt and I
+continue hoping recovery was complete.
+<to be read again> 
+                   \par 
+l. ...  }
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
+============================================================

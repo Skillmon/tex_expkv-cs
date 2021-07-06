@@ -52,6 +52,10 @@
         ,crababble key=d
         ,long crababble key=d
         ,key
+        ,aggregate key={abe}
+        ,aggregate key={undefined key is undefined}{}
+        ,process key={abe}
+        ,process key={undefined key is undefined}{}
       }
   }
 \OMIT

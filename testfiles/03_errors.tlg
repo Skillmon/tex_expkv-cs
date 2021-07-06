@@ -70,6 +70,22 @@ l. ...  }
 \ekvc@err@value@required ...ey `\unexpanded {#1}'}
 l. ...  }
 (That was another \errmessage.)
+! expkv-cs Error: Definition of `process key' doesn't contain exactly two arguments.
+\ekvc@err@not@two ...ontain exactly two arguments}
+l. ...  }
+(That was another \errmessage.)
+! expkv-cs Error: Unknown key `undefined key is undefined' for macro `\macroA'.
+\ekvc@err@unknown@key ...' for macro `\ekvc@set '}
+l. ...  }
+(That was another \errmessage.)
+! expkv-cs Error: Definition of `process key' doesn't contain exactly two arguments.
+\ekvc@err@not@two ...ontain exactly two arguments}
+l. ...  }
+(That was another \errmessage.)
+! expkv-cs Error: Unknown key `undefined key is undefined' for macro `\macroA'.
+\ekvc@err@unknown@key ...' for macro `\ekvc@set '}
+l. ...  }
+(That was another \errmessage.)
 ============================================================
 ============================================================
 TEST 5: empty hashes

@@ -64,4 +64,72 @@
     \macroB{square}{arg}\NEWLINE
     \macroB{dot}{arg}\NEWLINE
   }
+\OMIT
+\ekvcSplit\macroC{a=a,long b=1}{#1 and #2}
+\ekvcHash\macroD{a=a,long b=1}{\ekvcValue{a}{#1} and \ekvcValue{b}{#1}}
+\TIMO
+\TEST{defining aggregate}
+  {%
+    \ekvcSecondaryKeys\macroC
+      {%
+         aggregate aa = {a}{#1,#2}
+        ,aggregate bb = {b}{\new{#2}\old{#1}}
+      }
+    \ekvcSecondaryKeys\macroD
+      {%
+         aggregate aa = {a}{#1,#2}
+        ,aggregate bb = {b}{\new{#2}\old{#1}}
+      }
+  }
+\OMIT
+\ekvcSecondaryKeys\macroC
+  {%
+     aggregate aa = {a}{#1,#2}
+    ,aggregate bb = {b}{{#2}{#1}}
+  }
+\ekvcSecondaryKeys\macroD
+  {%
+     aggregate aa = {a}{#1,#2}
+    ,aggregate bb = {b}{\new{#2}\old{#1}}
+  }
+\TIMO
+\TESTEXP{using aggregate}
+  {%
+    \macroC{aa=b,aa=c,bb=2,aa=d,bb=3,bb=4}\NEWLINE
+    \macroD{aa=b,aa=c,bb=2,aa=d,bb=3,bb=4}
+  }
+\OMIT
+\ekvcSplit\macroE{a=a,long b=1}{}
+\ekvcHash\macroF{a=a,long b=1}{}
+\TIMO
+\TEST{defining process}
+  {%
+    \ekvcSecondaryKeys\macroE
+      {%
+         process A = {a}{\TYPE{old: {#1}. new: {#2}.}}
+        ,process B = {b}{\TYPE{old: {#1}. new: {#2}.}}
+      }
+    \ekvcSecondaryKeys\macroF
+      {%
+         process A = {a}{\TYPE{old: {#1}. new: {#2}.}}
+        ,process B = {b}{\TYPE{old: {#1}. new: {#2}.}}
+      }
+  }
+\OMIT
+\ekvcSecondaryKeys\macroE
+  {%
+     process A = {a}{\TYPE{old: {#1}. new: {#2}.}\NEWLINE}
+    ,process B = {b}{\TYPE{old: {#1}. new: {#2}.}\NEWLINE}
+  }
+\ekvcSecondaryKeys\macroF
+  {%
+     process A = {a}{\TYPE{old: {#1}. new: {#2}.}\NEWLINE}
+    ,process B = {b}{\TYPE{old: {#1}. new: {#2}.}\NEWLINE}
+  }
+\TIMO
+\TEST{using process}
+  {%
+    \setbox0\hbox{\macroE{A=b,A=c,B=2,A=d,B=3,B=4}}
+    \setbox0\hbox{\macroF{A=b,A=c,B=2,A=d,B=3,B=4}}
+  }
 \END

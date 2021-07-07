@@ -78,6 +78,10 @@ l. ...  }
 \ekvc@err@unknown@key ...' for macro `\ekvc@set '}
 l. ...  }
 (That was another \errmessage.)
+! expkv-cs Error: prefix `long' not accepted for `aggregate key'.
+\ekvc@err@no@long ...epted for `\unexpanded {#1}'}
+l. ...  }
+(That was another \errmessage.)
 ! expkv-cs Error: Definition of `process key' doesn't contain exactly two arguments.
 \ekvc@err@not@two ...ontain exactly two arguments}
 l. ...  }

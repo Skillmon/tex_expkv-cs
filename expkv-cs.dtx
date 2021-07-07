@@ -752,7 +752,7 @@ and the derived files           expkv-cs.pdf
 %   While all other key types replace the current value of the associated
 %   \meta{primary} key, with |aggregate| you can create keys that append or
 %   prepend (or whatever you like) the new value to the current one. The
-%   definition must be exactly two \TeX\ arguments, where \meta{primary} should
+%   value must be exactly two \TeX\ arguments, where \meta{primary} should
 %   be the name of a \meta{primary} key, and \meta{definition} the way you want
 %   to store the current and the new value. Inside \meta{definition} you
 %   can use |#1| for the current, and |#2| for the new value. The
@@ -784,7 +784,8 @@ and the derived files           expkv-cs.pdf
 %   \foo{k=1,k=2,k=3,k=4}
 % \end{exresult}
 %
-% But also more strange stuff could end there, like macros or doubling:
+% But also more strange stuff could end there, like macros or using the same
+% value multiple times:
 % \begin{lstlisting}
 % \ekvcSecondaryKeys\foo
 %   {aggregate k = {k-internal}{\old{#1}\new{#2\old{#1}}}}
@@ -1335,13 +1336,15 @@ and the derived files           expkv-cs.pdf
 %
 % \begin{function}{process}
 %   \begin{syntax}
-%     process \key\ = \marg{primary}\marg{definition} \prefixes3
+%     process \key\ = \marg{primary}\marg{definition} \prefixes2
 %   \end{syntax}
 %   This will grab the current value of a \meta{primary} key as |#1| (without
-%   altering it in any way) and the new value as |#2| and leave all the
+%   changing the current value) and the new value as |#2| and leave all the
 %   processing to \meta{definition}. You should use |\ekvcPass| to forward the
-%   values afterwards. Keep in mind that you could easily break things here if
-%   your code does not work by expansion.
+%   values afterwards. Unlike |aggregate| you can specify whether the \key\
+%   should be long or not, this isn't inherited from the \meta{primary} key.
+%   Keep in mind that you could easily break things here if your code does not
+%   work by expansion.
 % \end{function}
 %
 %
@@ -2605,11 +2608,13 @@ and the derived files           expkv-cs.pdf
 %
 %   First, assert that the user input is well-behaved.
 %    \begin{macrocode}
-\protected\def\ekvc@t@aggregate
+\protected\def\ekvc@t@aggregate#1%
   {%
+    \ekvc@assert@not@long{aggregate #1}%
     \ekvc@type@aggregate
-      \ekvc@type@aggregate@long@\ekvc@type@aggregate@short@
+      \ekvc@type@aggregate@long\ekvc@type@aggregate@short
       {process}%
+      {#1}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -2622,11 +2627,10 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \protected\long\def\ekvc@type@aggregate#1#2#3#4#5%
   {%
-    \ekvc@assert@not@long{#3 #4}%
     \ekvc@assert@twoargs{#5}{#3 #4}{\ekvc@type@aggregate@a#1#2{#4}#5}%
   }
 \protected\long\def\ekvc@type@aggregate@a#1#2#3#4#5%
-  {
+  {%
     \ekvifdefined\ekvc@set{#4}%
       {%
         \def\ekvc@type@aggregate@tmp##1##2{#5}%
@@ -2636,14 +2640,14 @@ and the derived files           expkv-cs.pdf
           \csname ekvc@\ekvc@set(#4)\endcsname
           #1#2%
           {#3}%
-      }
+      }%
       {\ekvc@err@unknown@key{#4}}%
   }
 \protected\long\def\ekvc@type@aggregate@b#1#2#3#4%
   {%
     \ekvc@type@aggregate@check@long#1#2%
-      {\ekvc@type@aggregate@long#3#1}%
-      {\ekvc@type@aggregate@short#4#2}%
+      {#3#1}%
+      {#4#2}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -2676,11 +2680,11 @@ and the derived files           expkv-cs.pdf
 %   swap argument order, and then does the definition via |\ekvlet| and a
 %   temporary macro.
 %    \begin{macrocode}
-\protected\long\def\ekvc@type@aggregate@long#1#2%
+\protected\long\def\ekvc@type@aggregate@long#1%
   {%
     \begingroup\expandafter\endgroup\expandafter
-    #1%
-      \csname\ekvc@extract@mark#2\expandafter\endcsname
+    \ekvc@type@aggregate@long@
+      \csname\ekvc@extract@mark#1\expandafter\endcsname
       \expandafter{\ekvc@type@aggregate@tmp{##3}{##1}}%
   }
 \protected\long\def\ekvc@type@aggregate@long@#1#2#3%
@@ -2698,14 +2702,14 @@ and the derived files           expkv-cs.pdf
 %   |\expandafter|s involved. But afterwards we can do the definition of the key
 %   and the helper macro directly.
 %    \begin{macrocode}
-\protected\long\def\ekvc@type@aggregate@short#1#2#3%
+\protected\long\def\ekvc@type@aggregate@short#1#2%
   {%
     \begingroup\expandafter\endgroup\expandafter
-    #1%
-      \csname\ekvc@extract@mark#2\expandafter\endcsname
-      \csname ekvc@\ekvc@set(#3)\expandafter\endcsname
+    \ekvc@type@aggregate@short@
+      \csname\ekvc@extract@mark#1\expandafter\endcsname
+      \csname ekvc@\ekvc@set(#2)\expandafter\endcsname
       \expandafter{\ekvc@type@aggregate@tmp{##3}{##1}}%
-      {#3}%
+      {#2}%
   }
 \protected\long\def\ekvc@type@aggregate@short@#1#2#3#4%
   {%
@@ -2721,18 +2725,35 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \protected\def\ekvc@t@process
   {%
-    \ekvc@type@aggregate
-      \ekvc@type@process@long@\ekvc@type@process@short@
+    \ifx\ekvc@long\long
+      \ekv@fi@firstoftwo
+    \fi
+    \@secondoftwo
+      {%
+        \ekvc@type@aggregate
+          \ekvc@type@process@long\ekvc@type@process@long
+      }%
+      {%
+        \ekvc@type@aggregate
+          \ekvc@type@process@short\ekvc@type@process@short
+      }%
       {process}%
   }
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[internal]{\ekvc@type@process@long@}
+% \begin{macro}[internal]{\ekvc@type@process@long,\ekvc@type@process@long@}
 %   This defines a temporary macro to grab the current value (found after the
 %   marker |#1|), executes the user code and puts everything back to where it
 %   belongs. Then |\ekvlet| is used to assign that meaning to the key macro.
 %    \begin{macrocode}
+\protected\long\def\ekvc@type@process@long#1%
+  {%
+    \begingroup\expandafter\endgroup\expandafter
+    \ekvc@type@process@long@
+      \csname\ekvc@extract@mark#1\expandafter\endcsname
+      \expandafter{\ekvc@type@aggregate@tmp{##3}{##1}}%
+  }
 \protected\long\def\ekvc@type@process@long@#1#2#3%
   {%
     \long\def\ekvc@type@aggregate@tmp##1##2#1##3{#2##2#1{##3}}%
@@ -2741,10 +2762,19 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[internal]{\ekvc@type@process@short@}
+% \begin{macro}[internal]{\ekvc@type@process@short,\ekvc@type@process@short@}
 %   We define the key macro directly to just grab the argument once and forward
 %   it to the auxiliary. That one does essentially the same as the long variant.
 %    \begin{macrocode}
+\protected\long\def\ekvc@type@process@short#1#2%
+  {%
+    \begingroup\expandafter\endgroup\expandafter
+    \ekvc@type@process@short@
+      \csname\ekvc@extract@mark#1\expandafter\endcsname
+      \csname ekvc@\ekvc@set(#2)\expandafter\endcsname
+      \expandafter{\ekvc@type@aggregate@tmp{##3}{##1}}%
+      {#2}%
+  }
 \protected\long\def\ekvc@type@process@short@#1#2#3#4%
   {%
     \ekvdef\ekvc@set{#4}{#2{##1}}%

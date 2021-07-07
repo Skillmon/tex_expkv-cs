@@ -54,6 +54,7 @@
         ,key
         ,aggregate key={abe}
         ,aggregate key={undefined key is undefined}{}
+        ,long aggregate key={height}{#1,#2}
         ,process key={abe}
         ,process key={undefined key is undefined}{}
       }

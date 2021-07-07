@@ -95,8 +95,8 @@
 \TIMO
 \TESTEXP{using aggregate}
   {%
-    \macroC{aa=b,aa=c,bb=2,aa=d,bb=3,bb=4}\NEWLINE
-    \macroD{aa=b,aa=c,bb=2,aa=d,bb=3,bb=4}
+    \macroC{aa=b,aa=c,bb=2,aa=d,bb=3,bb=\par}\NEWLINE
+    \macroD{aa=b,aa=c,bb=2,aa=d,bb=3,bb=\par}
   }
 \OMIT
 \ekvcSplit\macroE{a=a,long b=1}{}
@@ -107,29 +107,29 @@
     \ekvcSecondaryKeys\macroE
       {%
          process A = {a}{\TYPE{old: {#1}. new: {#2}.}}
-        ,process B = {b}{\TYPE{old: {#1}. new: {#2}.}}
+        ,long process B = {b}{\TYPE{old: {#1}. new: {#2}.}}
       }
     \ekvcSecondaryKeys\macroF
       {%
          process A = {a}{\TYPE{old: {#1}. new: {#2}.}}
-        ,process B = {b}{\TYPE{old: {#1}. new: {#2}.}}
+        ,long process B = {b}{\TYPE{old: {#1}. new: {#2}.}}
       }
   }
 \OMIT
 \ekvcSecondaryKeys\macroE
   {%
      process A = {a}{\TYPE{old: {#1}. new: {#2}.}\NEWLINE}
-    ,process B = {b}{\TYPE{old: {#1}. new: {#2}.}\NEWLINE}
+    ,long process B = {b}{\TYPE{old: {#1}. new: {#2}.}\NEWLINE}
   }
 \ekvcSecondaryKeys\macroF
   {%
      process A = {a}{\TYPE{old: {#1}. new: {#2}.}\NEWLINE}
-    ,process B = {b}{\TYPE{old: {#1}. new: {#2}.}\NEWLINE}
+    ,long process B = {b}{\TYPE{old: {#1}. new: {#2}.}\NEWLINE}
   }
 \TIMO
 \TEST{using process}
   {%
-    \setbox0\hbox{\macroE{A=b,A=c,B=2,A=d,B=3,B=4}}
-    \setbox0\hbox{\macroF{A=b,A=c,B=2,A=d,B=3,B=4}}
+    \macroE{A=b,A=c,B=2,A=d,B=3,B=\par}
+    \macroF{A=b,A=c,B=2,A=d,B=3,B=\par}
   }
 \END

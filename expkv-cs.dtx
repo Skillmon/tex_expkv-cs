@@ -285,8 +285,8 @@ and the derived files           expkv-cs.pdf
 \DoNotIndex{\protected,\ProvidesFile,\ProvidesPackage,\relax,\space,\advance}
 \DoNotIndex{\@,\unexpanded,\string,\expanded,\dimexpr,\global,\glueexpr,\hbox}
 \DoNotIndex{\numexpr,\RequirePackage,\setbox,\the,\unless,\xdef,\gdef,\newcount}
-\DoNotIndex{\number,\detokenize,\meaning}
-\DoNotIndex{\^,\@firstofone,\@firstoftwo,\@gobble,\@secondoftwo}
+\DoNotIndex{\number,\detokenize,\meaning,\lccode,\lowercase}
+\DoNotIndex{\^,\\,\@firstofone,\@firstoftwo,\@gobble,\@secondoftwo}
 \DoNotIndex{\ifcsname}
 \DoNotIndex{\ifx}
 \DoNotIndex{\ifodd}
@@ -2102,7 +2102,7 @@ and the derived files           expkv-cs.pdf
 % \end{macro}
 %
 % \begin{macro}[internal]
-%   {%
+%   {
 %     \ekvc@SetupHashKeys,\ekvc@SetupHashKeys@a,\ekvc@SetupHashKeys@b,
 %     \ekvc@SetupHashKeys@c,
 %     \ekvc@SetupHashKeys@check@unknown,\ekvc@SetupHashKeys@unknown
@@ -3100,7 +3100,7 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \def\ekvc@extract@mark#1{\expandafter\ekvc@extract@mark@\meaning#1\ekv@stop}
 \begingroup
-\lccode`;=`\#
+\lccode`;=`#
 \lccode`/=`\\
 \lowercase{\endgroup
 \def\ekvc@extract@mark@#1:#2/#3 ;#4\ekv@stop{#3}%

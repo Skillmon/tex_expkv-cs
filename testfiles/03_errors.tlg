@@ -23,7 +23,7 @@ l. ...  }
 TEST 3: value required
 ============================================================
 ! expkv-cs Error: Missing value for key `key'.
-\ekvc@err@value@required ...ey `\unexpanded {#1}'}
+\ekvc@err@value@required ...\ekv@unexpanded {#1}'}
 l. ...  }
 (That was another \errmessage.)
 ============================================================
@@ -39,35 +39,35 @@ l. ...  }
 l. ...  }
 (That was another \errmessage.)
 ! expkv-cs Error: prefix `long' not accepted for `default height'.
-\ekvc@err@no@long ...epted for `\unexpanded {#1}'}
+\ekvc@err@no@long ...d for `\ekv@unexpanded {#1}'}
 l. ...  }
 (That was another \errmessage.)
 ! expkv-cs Error: prefix `long' not accepted for `alias ht'.
-\ekvc@err@no@long ...epted for `\unexpanded {#1}'}
+\ekvc@err@no@long ...d for `\ekv@unexpanded {#1}'}
 l. ...  }
 (That was another \errmessage.)
 ! expkv-cs Error: prefix `long' not accepted for `nmeta dot'.
-\ekvc@err@no@long ...epted for `\unexpanded {#1}'}
+\ekvc@err@no@long ...d for `\ekv@unexpanded {#1}'}
 l. ...  }
 (That was another \errmessage.)
 ! expkv-cs Error: Missing type for secondary key `key'.
-\ekvc@err@missing@type ... key `\unexpanded {#1}'}
+\ekvc@err@missing@type ... `\ekv@unexpanded {#1}'}
 l. ...  }
 (That was another \errmessage.)
 ! expkv-cs Error: Missing type for secondary key `long key'.
-\ekvc@err@missing@type ... key `\unexpanded {#1}'}
+\ekvc@err@missing@type ... `\ekv@unexpanded {#1}'}
 l. ...  }
 (That was another \errmessage.)
 ! expkv-cs Error: Unknown key type `crababble'.
-\ekvc@err@unknown@keytype ...e `\unexpanded {#1}'}
+\ekvc@err@unknown@keytype ...ekv@unexpanded {#1}'}
 l. ...  }
 (That was another \errmessage.)
 ! expkv-cs Error: Unknown key type `crababble'.
-\ekvc@err@unknown@keytype ...e `\unexpanded {#1}'}
+\ekvc@err@unknown@keytype ...ekv@unexpanded {#1}'}
 l. ...  }
 (That was another \errmessage.)
 ! expkv-cs Error: Missing value for key `key'.
-\ekvc@err@value@required ...ey `\unexpanded {#1}'}
+\ekvc@err@value@required ...\ekv@unexpanded {#1}'}
 l. ...  }
 (That was another \errmessage.)
 ! expkv-cs Error: Definition of `process key' doesn't contain exactly two arguments.
@@ -79,7 +79,7 @@ l. ...  }
 l. ...  }
 (That was another \errmessage.)
 ! expkv-cs Error: prefix `long' not accepted for `aggregate key'.
-\ekvc@err@no@long ...epted for `\unexpanded {#1}'}
+\ekvc@err@no@long ...d for `\ekv@unexpanded {#1}'}
 l. ...  }
 (That was another \errmessage.)
 ! expkv-cs Error: Definition of `process key' doesn't contain exactly two arguments.

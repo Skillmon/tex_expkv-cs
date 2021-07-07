@@ -1,6 +1,6 @@
 -- Build script for expkv-cs
 module     = "expkv-cs"
-pkgversion = "1.1"
+pkgversion = "1.1a"
 pkgdate    = "2021-07-07"
 
 -- update package date and version
@@ -15,6 +15,12 @@ function update_tag(file, content, tagname, tagdate)
       "%d%d%d%d%-%d%d%-%d%d v%d%.%d+%w?",
       tagdate .. " v" .. tagname)
   elseif file == "expkv-cs.dtx" then
+    content = string.gsub(content,
+      "date=%d%d%d%d%-%d%d%-%d%d",
+      "date=" .. tagdate)
+    content = string.gsub(content,
+      "version=%d.%d%w?",
+      "version=" .. tagname)
     content = string.gsub(content,
       "\\def\\ekvcDate{%d%d%d%d%-%d%d%-%d%d}",
       "\\def\\ekvcDate{" .. tagdate .. "}")
@@ -34,7 +40,7 @@ sourcefiles = {"expkv-cs.dtx"}
 unpackfiles = sourcefiles
 
 -- which files to put in the tds
-installfiles = {"expkv-cs.sty", "expkv-cs.tex"}
+installfiles = {"expkv-cs.sty", "expkv-cs.tex", "t-expkv-cs.tex"}
 textfiles    = {"README.md", "CTAN.md"}
 docfiles     = {"expkv-cs.pdf"}
 
@@ -46,6 +52,7 @@ typesetruns  = 4
 packtdszip   = true
 tdslocations = {
   "tex/generic/expkv-cs/expkv-cs.tex",
+  "tex/context/third/expkv-cs/t-expkv-cs.tex",
 }
 
 -- CTAN upload

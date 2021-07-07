@@ -1346,6 +1346,33 @@ and the derived files           expkv-cs.pdf
 %   Keep in mind that you could easily break things here if your code does not
 %   work by expansion.
 % \end{function}
+% \example We could define a key that only accepts values greater than the
+% current value with this:\\
+% \begin{minipage}[c]{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcSplit\foo{internal=5}{a is #1.\par}
+% \ekvcSecondaryKeys\foo
+%   {
+%     process a={internal}
+%       {%
+%         \ifnum#1<#2
+%           \ekvcPass\foo{internal}{#2}%
+%         \fi
+%       }
+%   }
+% \foo{a=1}
+% \foo{a=5}
+% \foo{a=9}
+% \end{lstlisting}
+% \end{minipage}^^A
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcSplit\foo{internal=5}{a is #1.\par}
+%   \ekvcSecondaryKeys\foo
+%     {process a={internal}{\ifnum#1<#2 \ekvcPass\foo{internal}{#2}\fi}}
+%   \foo{a=1}
+%   \foo{a=5}
+%   \foo{a=9}
+% \end{exresult}
 %
 %
 % \subsection{Speed Considerations}\label{sec:speed}

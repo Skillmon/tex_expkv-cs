@@ -1780,7 +1780,7 @@ and the derived files           expkv-cs.pdf
 %   Then we need to step the key counter for each key. Also we have to check
 %   whether this key has a |long| prefix so we initialise |\ekvc@long|.
 %    \begin{macrocode}
-\protected\def\ekvc@SetupSplitKeys@a#1%
+\protected\long\def\ekvc@SetupSplitKeys@a#1%
   {%
     \advance\ekvc@keycount1
     \let\ekvc@long\ekv@empty
@@ -1793,7 +1793,7 @@ and the derived files           expkv-cs.pdf
 %   else call the next step |\ekvc@SetupSplitKeys@c| which will define the key
 %   macro and add the key's value to the initials list.
 %    \begin{macrocode}
-\protected\def\ekvc@SetupSplitKeys@b#1 #2\ekvc@stop
+\protected\long\def\ekvc@SetupSplitKeys@b#1 #2\ekvc@stop
   {%
     \ekv@ifdefined{ekvc@split@p@#1}%
       {\csname ekvc@split@p@#1\endcsname{#2}}%

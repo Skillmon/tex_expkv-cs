@@ -43,6 +43,7 @@ This work consists of the file  expkv-cs.dtx
 and the derived files           expkv-cs.pdf
                                 expkv-cs.sty
                                 expkv-cs.tex
+                                t-expkv-cs.tex
 
 \endpreamble
 % stop docstrip adding \endinput
@@ -50,6 +51,7 @@ and the derived files           expkv-cs.pdf
 \endpostamble
 \generate{\file{expkv-cs.sty}{\from{expkv-cs.dtx}{pkg}}}
 \generate{\file{expkv-cs.tex}{\from{expkv-cs.dtx}{tex}}}
+\generate{\file{t-expkv-cs.tex}{\from{expkv-cs.dtx}{ctx}}}
 \ifx\fmtname\nameofplainTeX
   \expandafter\endbatchfile
 \else
@@ -108,6 +110,7 @@ and the derived files           expkv-cs.pdf
         TeX,
         textit,texttt,
         usepackage,
+        usemodule,
       }
     ,moretexcs=[6]^^A used packages
       {
@@ -372,12 +375,13 @@ and the derived files           expkv-cs.pdf
 % |\ekvcSplit|, is very convenient in my opinion, so if you just want to define
 % a single macro with just a few keys this might be the way to go.
 %
-% \expkvc\ is usable as generic code and as a \LaTeX\ package. It'll
-% automatically load \expkv\ in the same mode as well. To use it, just use one
-% of
+% \expkvc\ is usable as generic code, as a \LaTeX\ package, and as a \ConTeXt\
+% module. It'll automatically load \expkv\ in the same mode as well. To use it,
+% just use one of
 % \begin{lstlisting}
-% \usepackage{expkv-cs} % LaTeX
 % \input expkv-cs       % plainTeX
+% \usepackage{expkv-cs} % LaTeX
+% \usemodule[expkv-cs]  % ConTeXt
 % \end{lstlisting}
 %
 %
@@ -1523,6 +1527,22 @@ and the derived files           expkv-cs.pdf
 % \gobbledocstriptag
 %</pkg>
 %^^A=<<
+%^^A the ConTeXt module >>=
+% \subsection{The \ConTeXt\ module}
+% \gobbledocstriptag
+%<*ctx>
+%    \begin{macrocode}
+\writestatus{loading}{ConTeXt User Module / expkv-cs}
+\usemodule[expkv]
+\unprotect
+\input expkv-cs.tex
+\writestatus{loading}
+  {ConTeXt User Module / expkv-cs / Version \ekvcVersion\space loaded}
+\protect\endinput
+%    \end{macrocode}
+% \gobbledocstriptag
+%</ctx>
+%^^A=<<
 %^^A main file >>=
 % \subsection{The Generic Code}
 % The rest of this implementation will be the generic code.
@@ -1636,9 +1656,9 @@ and the derived files           expkv-cs.pdf
   }
 \def\ekvc@ekvset@pre@expander@b#1\ekvc@stop#2\ekvc@stop
   {%
-    \unexpanded\expandafter{\ekv@alignsafe}%
-    \unexpanded{#1}##1\unexpanded{#2}%
-    \unexpanded\expandafter{\ekv@endalignsafe}%
+    \ekv@unexpanded\expandafter{\ekv@alignsafe}%
+    \ekv@unexpanded{#1}##1\ekv@unexpanded{#2}%
+    \ekv@unexpanded\expandafter{\ekv@endalignsafe}%
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1675,17 +1695,17 @@ and the derived files           expkv-cs.pdf
         \ekvc@any@long\edef#1##1%
           {%
             \expandafter\ekvc@ekvset@pre@expander\expandafter{\ekvc@set}%
-            \unexpanded\expandafter
+            \ekv@unexpanded\expandafter
               {\csname ekvc@split@\the\ekvc@keycount\endcsname}%
-            \unexpanded\expandafter{\ekvc@initials{}#2}%
+            \ekv@unexpanded\expandafter{\ekvc@initials{}#2}%
           }%
       }%
       {%
         \ekvc@any@long\edef#1##1%
           {%
             \expandafter\ekvc@ekvset@pre@expander\expandafter{\ekvc@set}%
-            \unexpanded{#2}%
-            \unexpanded\expandafter{\ekvc@initials}%
+            \ekv@unexpanded{#2}%
+            \ekv@unexpanded\expandafter{\ekvc@initials}%
           }%
       }%
   }
@@ -1743,7 +1763,7 @@ and the derived files           expkv-cs.pdf
   {%
     \begingroup
       \edef\ekvc@tmp
-        {\endgroup\def\unexpanded{\ekvc@tmp}{\ekvcSplit@build@argspec@{1}}}%
+        {\endgroup\def\ekv@unexpanded{\ekvc@tmp}{\ekvcSplit@build@argspec@{1}}}%
     \ekvc@tmp
   }
 \def\ekvcSplit@build@argspec@#1%
@@ -1753,7 +1773,7 @@ and the derived files           expkv-cs.pdf
     \fi
     \@firstofone
       {%
-        \unexpanded\expandafter{\csname ekvc@splitmark@#1\endcsname####}#1%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@#1\endcsname####}#1%
         \expandafter\ekvcSplit@build@argspec@\expandafter{\the\numexpr#1+1}%
       }%
   }
@@ -1813,12 +1833,12 @@ and the derived files           expkv-cs.pdf
     \edef\ekvc@tmp
       {%
         \endgroup
-        \long\def\unexpanded{\ekvc@tmp}####1####2%
-            \unexpanded\expandafter
+        \long\def\ekv@unexpanded{\ekvc@tmp}####1####2%
+            \ekv@unexpanded\expandafter
             {\csname ekvc@splitmark@\the\ekvc@keycount\endcsname}####3%
           {%
             ####2%
-            \unexpanded\expandafter
+            \ekv@unexpanded\expandafter
               {\csname ekvc@splitmark@\the\ekvc@keycount\endcsname}{####1}%
           }%
 %    \end{macrocode}
@@ -1829,19 +1849,19 @@ and the derived files           expkv-cs.pdf
 %   reordering.
 %    \begin{macrocode}
         \unless\ifx\ekvc@long\long
-          \let\unexpanded\expandafter
+          \let\ekv@unexpanded\expandafter
             {\csname ekvc@\ekvc@set(\detokenize{#1})\endcsname\ekvc@tmp}%
-          \def\unexpanded{\ekvc@tmp}####1%
+          \def\ekv@unexpanded{\ekvc@tmp}####1%
             {%
-              \unexpanded\expandafter
+              \ekv@unexpanded\expandafter
                 {\csname ekvc@\ekvc@set(\detokenize{#1})\endcsname}%
                 {####1}%
             }%
         \fi
-        \def\unexpanded{\ekvc@initials}%
+        \def\ekv@unexpanded{\ekvc@initials}%
           {%
-            \unexpanded\expandafter{\ekvc@initials}%
-            \unexpanded\expandafter
+            \ekv@unexpanded\expandafter{\ekvc@initials}%
+            \ekv@unexpanded\expandafter
               {\csname ekvc@splitmark@\the\ekvc@keycount\endcsname{#2}}%
           }%
       }%
@@ -1887,7 +1907,7 @@ and the derived files           expkv-cs.pdf
       {##3#1{##4,##2= {##1} }}%
     \long\expandafter\def\csname\ekv@name\ekvc@set{}uN\endcsname##1##2#1##3%
       {##2#1{##3,##1}}%
-    \edef\ekvc@initials{\unexpanded\expandafter{\ekvc@initials#1{}}}%
+    \edef\ekvc@initials{\ekv@unexpanded\expandafter{\ekvc@initials#1{}}}%
     \ekvc@helpers@needed
       {\expandafter\ekvc@setup@splitmacro\expandafter{\the\ekvc@keycount}}%
       {}%
@@ -1940,53 +1960,53 @@ and the derived files           expkv-cs.pdf
 \begingroup
 \edef\ekvc@tmp
   {%
-    \long\gdef\unexpanded\expandafter{\csname ekvc@split@1\endcsname}%
-        \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}%
+    \long\gdef\ekv@unexpanded\expandafter{\csname ekvc@split@1\endcsname}%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}%
         ##1##2##3%
       {##3{##1}##2}%
-    \long\gdef\unexpanded\expandafter{\csname ekvc@split@2\endcsname}%
-        \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
-        \unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
+    \long\gdef\ekv@unexpanded\expandafter{\csname ekvc@split@2\endcsname}%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
         ##3##4%
       {##4{##1}{##2}##3}%
-    \long\gdef\unexpanded\expandafter{\csname ekvc@split@3\endcsname}%
-        \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
-        \unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
-        \unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
+    \long\gdef\ekv@unexpanded\expandafter{\csname ekvc@split@3\endcsname}%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
         ##4##5%
       {##5{##1}{##2}{##3}##4}%
-    \long\gdef\unexpanded\expandafter{\csname ekvc@split@4\endcsname}%
-        \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
-        \unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
-        \unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
-        \unexpanded\expandafter{\csname ekvc@splitmark@4\endcsname}##4%
+    \long\gdef\ekv@unexpanded\expandafter{\csname ekvc@split@4\endcsname}%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@4\endcsname}##4%
         ##5##6%
       {##6{##1}{##2}{##3}{##4}##5}%
-    \long\gdef\unexpanded\expandafter{\csname ekvc@split@5\endcsname}%
-        \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
-        \unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
-        \unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
-        \unexpanded\expandafter{\csname ekvc@splitmark@4\endcsname}##4%
-        \unexpanded\expandafter{\csname ekvc@splitmark@5\endcsname}##5%
+    \long\gdef\ekv@unexpanded\expandafter{\csname ekvc@split@5\endcsname}%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@4\endcsname}##4%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@5\endcsname}##5%
         ##6##7%
       {##7{##1}{##2}{##3}{##4}{##5}##6}%
-    \long\gdef\unexpanded\expandafter{\csname ekvc@split@6\endcsname}%
-        \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
-        \unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
-        \unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
-        \unexpanded\expandafter{\csname ekvc@splitmark@4\endcsname}##4%
-        \unexpanded\expandafter{\csname ekvc@splitmark@5\endcsname}##5%
-        \unexpanded\expandafter{\csname ekvc@splitmark@6\endcsname}##6%
+    \long\gdef\ekv@unexpanded\expandafter{\csname ekvc@split@6\endcsname}%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@4\endcsname}##4%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@5\endcsname}##5%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@6\endcsname}##6%
         ##7##8%
       {##8{##1}{##2}{##3}{##4}{##5}{##6}##7}%
-    \long\gdef\unexpanded\expandafter{\csname ekvc@split@7\endcsname}%
-        \unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
-        \unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
-        \unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
-        \unexpanded\expandafter{\csname ekvc@splitmark@4\endcsname}##4%
-        \unexpanded\expandafter{\csname ekvc@splitmark@5\endcsname}##5%
-        \unexpanded\expandafter{\csname ekvc@splitmark@6\endcsname}##6%
-        \unexpanded\expandafter{\csname ekvc@splitmark@7\endcsname}##7%
+    \long\gdef\ekv@unexpanded\expandafter{\csname ekvc@split@7\endcsname}%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@1\endcsname}##1%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@2\endcsname}##2%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@3\endcsname}##3%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@4\endcsname}##4%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@5\endcsname}##5%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@6\endcsname}##6%
+        \ekv@unexpanded\expandafter{\csname ekvc@splitmark@7\endcsname}##7%
         ##8##9%
       {##9{##1}{##2}{##3}{##4}{##5}{##6}{##7}##8}%
   }
@@ -2000,12 +2020,13 @@ and the derived files           expkv-cs.pdf
           \edef\ekvc@tmp
             {%
               \long\gdef
-                  \unexpanded\expandafter{\csname ekvc@split@#1\endcsname}%
+                  \ekv@unexpanded\expandafter{\csname ekvc@split@#1\endcsname}%
                   ####1%
-                  \unexpanded\expandafter{\csname ekvc@splitmark@#1\endcsname}%
+                  \ekv@unexpanded\expandafter
+                    {\csname ekvc@splitmark@#1\endcsname}%
                   ####2####3%
                 {%
-                  \unexpanded\expandafter
+                  \ekv@unexpanded\expandafter
                     {\csname ekvc@split@\the\numexpr#1-1\relax\endcsname}%
                   ####1{{####2}####3}%
                 }%
@@ -2044,16 +2065,16 @@ and the derived files           expkv-cs.pdf
         \ekvc@any@long\edef#1##1%
           {%
             \expandafter\ekvc@ekvset@pre@expander\expandafter{\ekvc@set}%
-            \unexpanded{\ekvc@hash@pack@argument}%
-            \unexpanded\expandafter{\ekvc@initials\ekvc@stop#2}%
+            \ekv@unexpanded{\ekvc@hash@pack@argument}%
+            \ekv@unexpanded\expandafter{\ekvc@initials\ekvc@stop#2}%
           }%
       }%
       {%
         \ekvc@any@long\edef#1##1%
           {%
             \expandafter\ekvc@ekvset@pre@expander\expandafter{\ekvc@set}%
-            \unexpanded{#2}%
-            \unexpanded\expandafter{\ekvc@initials\ekvc@stop}%
+            \ekv@unexpanded{#2}%
+            \ekv@unexpanded\expandafter{\ekvc@initials\ekvc@stop}%
           }%
       }%
   }
@@ -2143,25 +2164,27 @@ and the derived files           expkv-cs.pdf
     \edef\ekvc@tmp
       {%
         \endgroup
-        \long\def\unexpanded{\ekvc@tmp}####1####2%
-            \unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname}####3%
+        \long\def\ekv@unexpanded{\ekvc@tmp}####1####2%
+            \ekv@unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname}%
+            ####3%
           {%
             ####2%
-            \unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname}{####1}%
+            \ekv@unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname}%
+            {####1}%
           }%
         \unless\ifx\ekvc@long\long
-          \let\unexpanded\expandafter
+          \let\ekv@unexpanded\expandafter
             {\csname ekvc@\ekvc@set(#1)\endcsname\ekvc@tmp}%
-          \def\unexpanded{\ekvc@tmp}####1%
+          \def\ekv@unexpanded{\ekvc@tmp}####1%
             {%
-              \unexpanded\expandafter{\csname ekvc@\ekvc@set(#1)\endcsname}%
+              \ekv@unexpanded\expandafter{\csname ekvc@\ekvc@set(#1)\endcsname}%
                 {####1}%
             }%
         \fi
-        \def\unexpanded{\ekvc@initials}%
+        \def\ekv@unexpanded{\ekvc@initials}%
           {%
-            \unexpanded\expandafter{\ekvc@initials}%
-            \unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname{#2}}%
+            \ekv@unexpanded\expandafter{\ekvc@initials}%
+            \ekv@unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname{#2}}%
           }%
       }%
     \ekvc@tmp
@@ -2193,7 +2216,7 @@ and the derived files           expkv-cs.pdf
         \let\csname\ekv@name\ekvc@set{}u\endcsname\ekvc@hash@unknown@kv
         \expandafter
         \let\csname\ekv@name\ekvc@set{}uN\endcsname\ekvc@hash@unknown@k
-        \edef\ekvc@initials{\unexpanded\expandafter{\ekvc@initials#1{}}}%
+        \edef\ekvc@initials{\ekv@unexpanded\expandafter{\ekvc@initials#1{}}}%
         \ekvc@setup@hashmacro{...}%
       }%
     \long\def\ekvc@hash@unknown@kv##1##2##3#1##4{##3#1{##4,##2= {##1} }}%
@@ -2241,47 +2264,52 @@ and the derived files           expkv-cs.pdf
           \edef\ekvc@tmp
             {%
               \long\gdef
-                \unexpanded\expandafter{\csname ekvc@fasthash@#1\endcsname}%
+                \ekv@unexpanded\expandafter{\csname ekvc@fasthash@#1\endcsname}%
                   ####1%
-                  \unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname}%
-                  ####2####3\unexpanded{\ekvc@stop}%
+                  \ekv@unexpanded\expandafter
+                    {\csname ekvc@hashmark@#1\endcsname}%
+                  ####2####3\ekv@unexpanded{\ekvc@stop}%
                 {####2}%
               \long\gdef
-                \unexpanded\expandafter{\csname ekvc@safehash@#1\endcsname}%
+                \ekv@unexpanded\expandafter{\csname ekvc@safehash@#1\endcsname}%
                   ####1%
                 {%
-                  \unexpanded\expandafter{\csname ekvc@@safehash@#1\endcsname}%
-                  ####1\unexpanded{\ekvc@mark}{}%
-                  \unexpanded\expandafter
+                  \ekv@unexpanded\expandafter
+                    {\csname ekvc@@safehash@#1\endcsname}%
+                  ####1\ekv@unexpanded{\ekvc@mark}{}%
+                  \ekv@unexpanded\expandafter
                     {%
                       \csname ekvc@hashmark@#1\endcsname{}%
                       \ekvc@mark{\ekvc@err@missing@hash{#1}}\ekvc@stop
                     }%
                 }%
               \long\gdef
-                \unexpanded\expandafter{\csname ekvc@@safehash@#1\endcsname}%
+                \ekv@unexpanded\expandafter
+                  {\csname ekvc@@safehash@#1\endcsname}%
                   ####1%
-                  \unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname}%
-                  ####2####3\unexpanded{\ekvc@mark}####4####5%
-                  \unexpanded{\ekvc@stop}%
+                  \ekv@unexpanded\expandafter
+                    {\csname ekvc@hashmark@#1\endcsname}%
+                  ####2####3\ekv@unexpanded{\ekvc@mark}####4####5%
+                  \ekv@unexpanded{\ekvc@stop}%
                 {%
                   ####4{####2}%
                 }%
-              \long\gdef\unexpanded\expandafter
+              \long\gdef\ekv@unexpanded\expandafter
                 {\csname ekvc@fastsplithash@#1\endcsname}%
                   ####1%
-                  \unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname}%
-                  ####2####3\unexpanded{\ekvc@stop}####4%
+                  \ekv@unexpanded\expandafter
+                    {\csname ekvc@hashmark@#1\endcsname}%
+                  ####2####3\ekv@unexpanded{\ekvc@stop}####4%
                 {%
                   ####4{####2}%
                 }%
-              \long\gdef\unexpanded\expandafter
+              \long\gdef\ekv@unexpanded\expandafter
                 {\csname ekvc@safesplithash@#1\endcsname}####1%
                 {%
-                  \unexpanded\expandafter
+                  \ekv@unexpanded\expandafter
                     {\csname ekvc@@safesplithash@#1\endcsname}%
-                  ####1\unexpanded{\ekvc@mark\ekvc@safe@after@hash}%
-                  \unexpanded\expandafter
+                  ####1\ekv@unexpanded{\ekvc@mark\ekvc@safe@after@hash}%
+                  \ekv@unexpanded\expandafter
                     {%
                       \csname ekvc@hashmark@#1\endcsname{}%
                       \ekvc@mark
@@ -2289,12 +2317,13 @@ and the derived files           expkv-cs.pdf
                       \ekvc@stop
                     }%
                 }%
-              \long\gdef\unexpanded\expandafter
+              \long\gdef\ekv@unexpanded\expandafter
                 {\csname ekvc@@safesplithash@#1\endcsname}%
                   ####1%
-                  \unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname}%
-                  ####2####3\unexpanded{\ekvc@mark}####4####5%
-                  \unexpanded{\ekvc@stop}%
+                  \ekv@unexpanded\expandafter
+                    {\csname ekvc@hashmark@#1\endcsname}%
+                  ####2####3\ekv@unexpanded{\ekvc@mark}####4####5%
+                  \ekv@unexpanded{\ekvc@stop}%
                 {%
                   ####4{####2}%
                 }%
@@ -2313,7 +2342,7 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \long\def\ekvcValue#1%
   {%
-    \unexpanded
+    \ekv@unexpanded
     \ekv@ifdefined{ekvc@safehash@#1}%
       {\csname ekvc@safehash@#1\endcsname}%
       {\ekvc@err@unknown@hash{#1}\@firstoftwo{{}}}%
@@ -2617,7 +2646,7 @@ and the derived files           expkv-cs.pdf
         \ekvc@assert@not@long{default #1}%
         \edef\ekvc@tmp
           {%
-            \unexpanded\expandafter
+            \ekv@unexpanded\expandafter
               {\csname\ekv@name\ekvc@set{#1}\endcsname{#2}}%
           }%
         \ekvletNoVal\ekvc@set{#1}\ekvc@tmp
@@ -2883,8 +2912,8 @@ and the derived files           expkv-cs.pdf
   {%
     \edef#1%
       {%
-        \unexpanded{\ekvc@flag@height}%
-          \unexpanded\expandafter{\csname\ekvc@flag@name#1\endcsname}%
+        \ekv@unexpanded{\ekvc@flag@height}%
+          \ekv@unexpanded\expandafter{\csname\ekvc@flag@name#1\endcsname}%
       }%
     \ekv@expargtwice
       {\expandafter\def\csname\ekvc@flag@name#1\endcsname##1}%
@@ -3145,17 +3174,17 @@ and the derived files           expkv-cs.pdf
   }
 \protected\def\ekvc@err@value@required#1%
   {%
-    \errmessage{expkv-cs Error: Missing value for key `\unexpanded{#1}'}%
+    \errmessage{expkv-cs Error: Missing value for key `\ekv@unexpanded{#1}'}%
   }
 \protected\def\ekvc@err@missing@type#1%
   {%
     \errmessage
-      {expkv-cs Error: Missing type for secondary key `\unexpanded{#1}'}%
+      {expkv-cs Error: Missing type for secondary key `\ekv@unexpanded{#1}'}%
   }
 \protected\def\ekvc@err@no@long#1%
   {%
     \errmessage
-      {expkv-cs Error: prefix `long' not accepted for `\unexpanded{#1}'}%
+      {expkv-cs Error: prefix `long' not accepted for `\ekv@unexpanded{#1}'}%
   }
 \protected\def\ekvc@err@already@defined#1%
   {%
@@ -3163,12 +3192,12 @@ and the derived files           expkv-cs.pdf
   }
 \protected\def\ekvc@err@unknown@keytype#1%
   {%
-    \errmessage{expkv-cs Error: Unknown key type `\unexpanded{#1}'}%
+    \errmessage{expkv-cs Error: Unknown key type `\ekv@unexpanded{#1}'}%
   }
 \protected\def\ekvc@err@unknown@key#1%
   {%
     \errmessage
-      {expkv-cs Error: Unknown key `\unexpanded{#1}' for macro `\ekvc@set'}%
+      {expkv-cs Error: Unknown key `\ekv@unexpanded{#1}' for macro `\ekvc@set'}%
   }
 \long\def\ekvc@err@no@key@macro#1%
   {\errmessage{expkv-cs Error: \string#1 is no key=val macro}}
@@ -3176,8 +3205,8 @@ and the derived files           expkv-cs.pdf
   {%
     \errmessage
       {%
-        expkv-cs Error: Definition of `\unexpanded{#1}' doesn't contain exactly
-        two arguments%
+        expkv-cs Error: Definition of `\ekv@unexpanded{#1}' doesn't contain
+        exactly two arguments%
       }%
   }
 %    \end{macrocode}

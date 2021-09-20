@@ -34,7 +34,7 @@ sourcefiles = {"expkv-cs.dtx"}
 unpackfiles = sourcefiles
 
 -- which files to put in the tds
-installfiles = {"expkv-cs.sty", "expkv-cs.tex"}
+installfiles = {"expkv-cs.sty", "expkv-cs.tex", "t-expkv-cs.tex"}
 textfiles    = {"README.md", "CTAN.md"}
 docfiles     = {"expkv-cs.pdf"}
 
@@ -46,6 +46,7 @@ typesetruns  = 4
 packtdszip   = true
 tdslocations = {
   "tex/generic/expkv-cs/expkv-cs.tex",
+  "tex/context/third/expkv-cs/t-expkv-cs.tex",
 }
 
 -- CTAN upload

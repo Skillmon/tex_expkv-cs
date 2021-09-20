@@ -1830,10 +1830,11 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
         \unless\ifx\ekvc@long\long
           \let\unexpanded\expandafter
-            {\csname ekvc@\ekvc@set(#1)\endcsname\ekvc@tmp}%
+            {\csname ekvc@\ekvc@set(\detokenize{#1})\endcsname\ekvc@tmp}%
           \def\unexpanded{\ekvc@tmp}####1%
             {%
-              \unexpanded\expandafter{\csname ekvc@\ekvc@set(#1)\endcsname}%
+              \unexpanded\expandafter
+                {\csname ekvc@\ekvc@set(\detokenize{#1})\endcsname}%
                 {####1}%
             }%
         \fi

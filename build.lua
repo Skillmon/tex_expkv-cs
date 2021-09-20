@@ -16,12 +16,6 @@ function update_tag(file, content, tagname, tagdate)
       tagdate .. " v" .. tagname)
   elseif file == "expkv-cs.dtx" then
     content = string.gsub(content,
-      "date=%d%d%d%d%-%d%d%-%d%d",
-      "date=" .. tagdate)
-    content = string.gsub(content,
-      "version=%d.%d%w?",
-      "version=" .. tagname)
-    content = string.gsub(content,
       "\\def\\ekvcDate{%d%d%d%d%-%d%d%-%d%d}",
       "\\def\\ekvcDate{" .. tagdate .. "}")
     return string.gsub(content,

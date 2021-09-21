@@ -1,0 +1,42 @@
+\input regression-test
+
+\RequirePackage{expkv-cs}
+
+\START
+
+\OMIT
+\newcommand\use[1]{#1}
+\TIMO
+
+\TEST{par in hash}
+  {
+    \ekvcHash\foo{\par=.}{\ekvcValue{\par}{#1}}%
+    \ekvcHash\FOO{long \par=!}{\ekvcValueFast{\par}{#1}}%
+    \ekvcHash\baz{\par=.}{\ekvcValueSplit{\par}{#1}\use}
+    \ekvcHash\BAZ{long \par=!}{\ekvcValueSplit{\par}{#1}\use}
+    \TYPE{\foo{}\FOO{\par=.}\baz{}\BAZ{\par=.}}%
+  }
+
+\TEST{par in split}
+  {
+    \ekvcSplit\foo{\par=.}{#1}%
+    \ekvcSplit\FOO{long \par=!}{#1}%
+    \TYPE{\foo{}\FOO{\par=.}}%
+  }
+
+\OMIT
+\ekvcSplit\foo{long a=!}{#1}
+\TIMO
+
+\TEST{par in secondaries}
+  {
+    \ekvcSecondaryKeys\foo
+      {
+         nmeta \par = a = .
+        ,meta \par = a = {#1}
+        ,uie \par = {}
+      }%
+    \TYPE{\foo{\par}\foo{\par=.}}%
+  }
+
+\END

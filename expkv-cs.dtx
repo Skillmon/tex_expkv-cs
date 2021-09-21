@@ -1783,7 +1783,7 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}[internal]
 %   {
 %     \ekvc@SetupSplitKeys, \ekvc@SetupSplitKeys@a, \ekvc@SetupSplitKeys@b,
-%     \ekvc@SetupSplitKeys@c,
+%     \ekvc@SetupSplitKeys@c, \ekvc@SetupSplitKeys@d
 %     \ekvc@SetupSplitKeys@check@unknown,\ekvc@SetupSplitKeys@unknown
 %   }
 %   These macros parse the list of keys and set up the key macros. First we need
@@ -1801,23 +1801,25 @@ and the derived files           expkv-cs.pdf
 %   whether this key has a |long| prefix so we initialise |\ekvc@long|.
 %    \begin{macrocode}
 \protected\long\def\ekvc@SetupSplitKeys@a#1%
+  {\expandafter\ekvc@SetupSplitKeys@b\detokenize{#1}\ekvc@stop}
+\protected\def\ekvc@SetupSplitKeys@b#1\ekvc@stop
   {%
     \advance\ekvc@keycount1
     \let\ekvc@long\ekv@empty
     \ekvc@ifspace{#1}%
-      {\ekvc@SetupSplitKeys@b#1\ekvc@stop}%
-      {\ekvc@SetupSplitKeys@c{#1}}%
+      {\ekvc@SetupSplitKeys@c#1\ekvc@stop}%
+      {\ekvc@SetupSplitKeys@d{#1}}%
   }
 %    \end{macrocode}
 %   If there was a space, there might be a prefix. If so call the prefix macro,
-%   else call the next step |\ekvc@SetupSplitKeys@c| which will define the key
+%   else call the next step |\ekvc@SetupSplitKeys@d| which will define the key
 %   macro and add the key's value to the initials list.
 %    \begin{macrocode}
-\protected\long\def\ekvc@SetupSplitKeys@b#1 #2\ekvc@stop
+\protected\long\def\ekvc@SetupSplitKeys@c#1 #2\ekvc@stop
   {%
     \ekv@ifdefined{ekvc@split@p@#1}%
       {\csname ekvc@split@p@#1\endcsname{#2}}%
-      {\ekvc@SetupSplitKeys@c{#1 #2}}%
+      {\ekvc@SetupSplitKeys@d{#1 #2}}%
   }
 %    \end{macrocode}
 %   The inner definition is grouped, because we don't want to actually define
@@ -1827,7 +1829,7 @@ and the derived files           expkv-cs.pdf
 %   the value given to the key. Additionally we'll need a sorting macro for each
 %   key count in use so we set it up with |\ekvc@setup@splitmacro|.
 %    \begin{macrocode}
-\protected\long\def\ekvc@SetupSplitKeys@c#1#2%
+\protected\long\def\ekvc@SetupSplitKeys@d#1#2%
   {%
     \begingroup
     \edef\ekvc@tmp
@@ -1923,7 +1925,7 @@ and the derived files           expkv-cs.pdf
   {%
     \let\ekvc@long\long
     \let\ekvc@any@long\long
-    \ekvc@SetupSplitKeys@c
+    \ekvc@SetupSplitKeys@d
   }
 %    \end{macrocode}
 % \end{macro}
@@ -1932,7 +1934,7 @@ and the derived files           expkv-cs.pdf
 %   The |short| prefix does essentially nothing, it is only provided to allow
 %   key names starting with |long| that aren't |\long|.
 %    \begin{macrocode}
-\def\ekvc@split@p@short{\ekvc@SetupSplitKeys@c}
+\def\ekvc@split@p@short{\ekvc@SetupSplitKeys@d}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -2126,7 +2128,7 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}[internal]
 %   {
 %     \ekvc@SetupHashKeys,\ekvc@SetupHashKeys@a,\ekvc@SetupHashKeys@b,
-%     \ekvc@SetupHashKeys@c,
+%     \ekvc@SetupHashKeys@c,\ekvc@SetupHashKeys@d
 %     \ekvc@SetupHashKeys@check@unknown,\ekvc@SetupHashKeys@unknown
 %   }
 %   This should look awfully familiar as well, since it's just the same as for
@@ -2138,18 +2140,20 @@ and the derived files           expkv-cs.pdf
     \let\ekvc@initials\ekv@empty
     \ekvparse\ekvc@SetupHashKeys@check@unknown\ekvc@SetupHashKeys@a{#1}%
   }
-\protected\def\ekvc@SetupHashKeys@a#1%
+\protected\long\def\ekvc@SetupHashKeys@a#1%
+  {\expandafter\ekvc@SetupHashKeys@b\detokenize{#1}\ekvc@stop}
+\protected\def\ekvc@SetupHashKeys@b#1\ekvc@stop
   {%
     \let\ekvc@long\ekv@empty
     \ekvc@ifspace{#1}%
-      {\ekvc@SetupHashKeys@b#1\ekvc@stop}%
-      {\ekvc@SetupHashKeys@c{#1}}%
+      {\ekvc@SetupHashKeys@c#1\ekvc@stop}%
+      {\ekvc@SetupHashKeys@d{#1}}%
   }
-\protected\def\ekvc@SetupHashKeys@b#1 #2\ekvc@stop
+\protected\def\ekvc@SetupHashKeys@c#1 #2\ekvc@stop
   {%
     \ekv@ifdefined{ekvc@hash@p@#1}%
       {\csname ekvc@hash@p@#1\endcsname{#2}}%
-      {\ekvc@SetupHashKeys@c{#1 #2}}%
+      {\ekvc@SetupHashKeys@d{#1 #2}}%
   }
 %    \end{macrocode}
 %   Yes, even the defining macro looks awfully familiar. Instead of numbered we
@@ -2158,7 +2162,7 @@ and the derived files           expkv-cs.pdf
 %   short keys. And instead of the |\ekvc@setup@splitmacro| we use
 %   |\ekvc@setup@hashmacro|.
 %    \begin{macrocode}
-\protected\long\def\ekvc@SetupHashKeys@c#1#2%
+\protected\long\def\ekvc@SetupHashKeys@d#1#2%
   {%
     \begingroup
     \edef\ekvc@tmp
@@ -2234,7 +2238,7 @@ and the derived files           expkv-cs.pdf
   {%
     \let\ekvc@long\long
     \let\ekvc@any@long\long
-    \ekvc@SetupHashKeys@c
+    \ekvc@SetupHashKeys@d
   }
 %    \end{macrocode}
 % \end{macro}
@@ -2243,7 +2247,7 @@ and the derived files           expkv-cs.pdf
 %   The |short| prefix does essentially nothing, it is only provided to allow
 %   key names starting with |long| that aren't |\long|.
 %    \begin{macrocode}
-\def\ekvc@hash@p@short{\ekvc@SetupHashKeys@c}
+\def\ekvc@hash@p@short{\ekvc@SetupHashKeys@d}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -2336,6 +2340,7 @@ and the derived files           expkv-cs.pdf
 % \end{macro}
 %
 % \begin{macro}{\ekvcValue}
+% \begin{macro}[internal]{\ekvcValue@}
 %   All this does is a few consistency checks on the first argument (not empty,
 %   hash macro exists) and then call that hash-grabbing macro that will also
 %   test whether the hash is inside of |#2| or not.
@@ -2343,25 +2348,34 @@ and the derived files           expkv-cs.pdf
 \long\def\ekvcValue#1%
   {%
     \ekv@unexpanded
+    \expandafter\ekvcValue@\detokenize{#1}\ekvc@stop
+  }
+\def\ekvcValue@#1\ekvc@stop
+  {%
     \ekv@ifdefined{ekvc@safehash@#1}%
       {\csname ekvc@safehash@#1\endcsname}%
       {\ekvc@err@unknown@hash{#1}\@firstoftwo{{}}}%
   }
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\ekvcValueFast}
 %   To be as fast as possible, this doesn't test for anything, assuming the user
 %   knows best.
 %    \begin{macrocode}
-\long\def\ekvcValueFast#1#2{\csname ekvc@fasthash@#1\endcsname#2\ekvc@stop}
+\long\def\ekvcValueFast#1#2%
+  {\csname ekvc@fasthash@\detokenize{#1}\endcsname#2\ekvc@stop}
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\ekvcValueSplit,\ekvcValueSplit@recover}
+% \begin{macro}{\ekvcValueSplit}
+% \begin{macro}[internal]{\ekvcValueSplit@,\ekvcValueSplit@recover}
 %   This splits off a single value.
 %    \begin{macrocode}
 \long\def\ekvcValueSplit#1%
+  {\expandafter\ekvcValueSplit@\detokenize{#1}\ekvc@stop}
+\def\ekvcValueSplit@#1\ekvc@stop
   {%
     \ekv@ifdefined{ekvc@safesplithash@#1}%
       {\csname ekvc@safesplithash@#1\endcsname}%
@@ -2369,6 +2383,7 @@ and the derived files           expkv-cs.pdf
   }
 \long\def\ekvcValueSplit@recover#1#2{#2{}}
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}[internal]{\ekvc@safe@after@hash}
@@ -2387,7 +2402,7 @@ and the derived files           expkv-cs.pdf
 %   sequence.
 %    \begin{macrocode}
 \long\def\ekvcValueSplitFast#1#2%
-  {\csname ekvc@fastsplithash@#1\endcsname#2\ekvc@stop}
+  {\csname ekvc@fastsplithash@\detokenize{#1}\endcsname#2\ekvc@stop}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -2410,6 +2425,8 @@ and the derived files           expkv-cs.pdf
 % \end{macro}
 %
 % \begin{macro}{\ekvcSecondaryKeys}
+% \begin{macro}[internal]
+%   {\ekvcSecondaryKeys@a,\ekvcSecondaryKeys@b,\ekvcSecondaryKeys@c}
 %   The secondary keys are defined pretty similar to the way the originals are,
 %   but here we also introduce some key types (those have a |@t@| in their name)
 %   additionally to the prefixes.
@@ -2419,14 +2436,16 @@ and the derived files           expkv-cs.pdf
     \edef\ekvc@set{\string#1}%
     \ekvparse\ekvc@err@value@required\ekvcSecondaryKeys@a{#2}%
   }
-\protected\def\ekvcSecondaryKeys@a#1%
+\protected\long\def\ekvcSecondaryKeys@a#1%
+  {\expandafter\ekvcSecondaryKeys@b\detokenize{#1}\ekvc@stop}
+\protected\def\ekvcSecondaryKeys@b#1\ekvc@stop
   {%
     \let\ekvc@long\ekv@empty
     \ekvc@ifspace{#1}%
-      {\ekvcSecondaryKeys@b#1\ekvc@stop}%
+      {\ekvcSecondaryKeys@c#1\ekvc@stop}%
       {\ekvc@err@missing@type{#1}\@gobble}%
   }
-\protected\def\ekvcSecondaryKeys@b#1 #2\ekvc@stop
+\protected\def\ekvcSecondaryKeys@c#1 #2\ekvc@stop
   {%
     \ekv@ifdefined{ekvc@p@#1}%
       {\csname ekvc@p@#1\endcsname}%
@@ -3172,34 +3191,34 @@ and the derived files           expkv-cs.pdf
   {%
     \errmessage{expkv-cs Error: Too many keys for macro `\string#1'}%
   }
-\protected\def\ekvc@err@value@required#1%
+\protected\long\def\ekvc@err@value@required#1%
   {%
     \errmessage{expkv-cs Error: Missing value for key `\ekv@unexpanded{#1}'}%
   }
-\protected\def\ekvc@err@missing@type#1%
+\protected\long\def\ekvc@err@missing@type#1%
   {%
     \errmessage
       {expkv-cs Error: Missing type for secondary key `\ekv@unexpanded{#1}'}%
   }
-\protected\def\ekvc@err@no@long#1%
+\protected\long\def\ekvc@err@no@long#1%
   {%
     \errmessage
       {expkv-cs Error: prefix `long' not accepted for `\ekv@unexpanded{#1}'}%
   }
-\protected\def\ekvc@err@already@defined#1%
+\protected\long\def\ekvc@err@already@defined#1%
   {%
     \errmessage{expkv-cs Error: Macro `\string#1' already defined}%
   }
-\protected\def\ekvc@err@unknown@keytype#1%
+\protected\long\def\ekvc@err@unknown@keytype#1%
   {%
     \errmessage{expkv-cs Error: Unknown key type `\ekv@unexpanded{#1}'}%
   }
-\protected\def\ekvc@err@unknown@key#1%
+\protected\long\def\ekvc@err@unknown@key#1%
   {%
     \errmessage
       {expkv-cs Error: Unknown key `\ekv@unexpanded{#1}' for macro `\ekvc@set'}%
   }
-\long\def\ekvc@err@no@key@macro#1%
+\protected\long\def\ekvc@err@no@key@macro#1%
   {\errmessage{expkv-cs Error: \string#1 is no key=val macro}}
 \protected\long\def\ekvc@err@not@two#1%
   {%

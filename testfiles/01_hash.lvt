@@ -73,4 +73,10 @@
     \macroA{length=\empty}\NEWLINE
     \macroB{length=\empty}{arg}\NEWLINE
   }
+\TEST{macro parameter in defaults}
+  {%
+    \ekvcHash\macroD{1=#,2=#2}{\typeout{\unexpanded{#1}}}
+    \macroD{}
+    \macroD{1=2,2=#1}
+  }
 \END

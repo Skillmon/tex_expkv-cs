@@ -31,3 +31,15 @@ height: 3; length: b; mandatory: arg
 height: a; length: b; mandatory: arg
 height: a; length: par\par ; mandatory: arg
 ============================================================
+============================================================
+TEST 5: macro parameter in defaults
+============================================================
+> \testtmp=macro:
+#1#2->#1#2.
+\ekvc@\macroD ...ttmp ##1##2{#11#2}\show \testtmp 
+l. ...  }
+> \testtmp=macro:
+#1#2->21#1.
+\ekvc@\macroD ...ttmp ##1##2{#11#2}\show \testtmp 
+l. ...  }
+============================================================

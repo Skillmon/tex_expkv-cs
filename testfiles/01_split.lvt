@@ -42,4 +42,10 @@
     \macroC{height=a,length=b}\helper{arg}\NEWLINE
     \macroC{height=a,length=par\par}\helper{arg}\NEWLINE
   }
+\TEST{macro parameter in defaults}
+  {%
+    \ekvcSplit\macroD{1=#,2=#2}{\def\testtmp##1##2{#11#2}\show\testtmp}
+    \macroD{}
+    \macroD{1=2,2=#1}
+  }
 \END

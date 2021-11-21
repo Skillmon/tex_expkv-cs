@@ -37,3 +37,9 @@ TEST 5: three steps for fast hash
 height: 1; length: \empty 
 height: 3; length: \empty ; mandatory: arg
 ============================================================
+============================================================
+TEST 6: macro parameter in defaults
+============================================================
+\ekvc@hashmark@1 {##}\ekvc@hashmark@2 {##2}
+\ekvc@hashmark@1 {2}\ekvc@hashmark@2 {##1}
+============================================================

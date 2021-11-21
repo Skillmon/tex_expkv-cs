@@ -1860,11 +1860,14 @@ and the derived files           expkv-cs.pdf
                 {####1}%
             }%
         \fi
-        \def\ekv@unexpanded{\ekvc@initials}%
+        \edef\ekv@unexpanded{\ekvc@initials}%
           {%
-            \ekv@unexpanded\expandafter{\ekvc@initials}%
-            \ekv@unexpanded\expandafter
-              {\csname ekvc@splitmark@\the\ekvc@keycount\endcsname{#2}}%
+            \ekv@unexpanded{\ekv@unexpanded}%
+              {%
+                \ekv@unexpanded\expandafter{\ekvc@initials}%
+                \ekv@unexpanded\expandafter
+                  {\csname ekvc@splitmark@\the\ekvc@keycount\endcsname{#2}}%
+              }%
           }%
       }%
     \ekvc@tmp
@@ -2185,10 +2188,14 @@ and the derived files           expkv-cs.pdf
                 {####1}%
             }%
         \fi
-        \def\ekv@unexpanded{\ekvc@initials}%
+        \edef\ekv@unexpanded{\ekvc@initials}%
           {%
-            \ekv@unexpanded\expandafter{\ekvc@initials}%
-            \ekv@unexpanded\expandafter{\csname ekvc@hashmark@#1\endcsname{#2}}%
+            \ekv@unexpanded{\ekv@unexpanded}%
+              {%
+                \ekv@unexpanded\expandafter{\ekvc@initials}%
+                \ekv@unexpanded\expandafter
+                  {\csname ekvc@hashmark@#1\endcsname{#2}}%
+              }%
           }%
       }%
     \ekvc@tmp

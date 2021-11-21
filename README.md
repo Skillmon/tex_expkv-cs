@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 # expkv-cs -- define expandable key=val macros using expkv
 
-Version 2021-09-20 v1.1a
+Version 2021-11-21 v1.1b
 
 Released under the LaTeX Project Public License v1.3c or later
 See http://www.latex-project.org/lppl.txt

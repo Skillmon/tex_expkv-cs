@@ -2456,7 +2456,10 @@ and the derived files           expkv-cs.pdf
 % \end{macro}
 %
 % \begin{macro}[internal]
-%   {\ekvc@change,\ekvc@change@a,\ekvc@change@b,\ekvc@change@c}
+%   {
+%     \ekvc@change  ,\ekvc@change@a,\ekvc@change@b,
+%     \ekvc@change@c,\ekvc@change@d,\ekvc@change@e
+%   }
 %   First we need to see whether the macro is currently |\long|. For this we get
 %   the meaning and will parse it. |#1| is the macro name in which we want to
 %   change the defaults.
@@ -2479,11 +2482,12 @@ and the derived files           expkv-cs.pdf
 \expandafter\ekvc@change@a\expandafter{\detokenize{macro:}}
 %    \end{macrocode}
 %   Next we expand the macro once to get its contents (including the current
-%   default values with their markers). |#1| is either |\long| or empty, |#2| is
-%   the macro.
+%   default values with their markers) and place |\ekvc@stop| instead of an
+%   argument as a marker for the last step. |#1| is either |\long| or empty,
+%   |#2| is the macro.
 %    \begin{macrocode}
 \protected\def\ekvc@change@b#1#2%
-  {\expandafter\ekvc@change@c\expandafter{#2{##1}}{#1}#2}
+  {\expandafter\ekvc@change@c\expandafter{#2\ekvc@stop}{#1}#2}
 %    \end{macrocode}
 %   Here we place an unbalanced closing brace after the expansion of the macro.
 %   Then we just parse the \kv-list with |\ekvset|, that will exchange the
@@ -2495,25 +2499,24 @@ and the derived files           expkv-cs.pdf
 %    \begin{macrocode}
 \ekv@exparg{\protected\long\def\ekvc@change@c#1#2#3#4}%
   {%
-    \expandafter\iffalse\expandafter{\expandafter\fi
+    \expandafter\iffalse\expandafter{\expandafter{\expandafter\fi
       \ekvset{\string#3}{#4}%
       \ekvc@change@d{#2}{#3}%
       #1%
-    }%
+    }}%
   }
 %    \end{macrocode}
-%   The final step needs to put an unbalanced opening brace after |\def|. We do
-%   that with the help of a temporary macro which stores everything necessary
-%   for |\def| and expand an |\iffalse}\fi| construct to leave a single
-%   opening brace. |#1| will be either empty or |\long| and |#2| is the macro.
-%   Each of the macros defined with \expkvc\ takes exactly one parameter, so we
-%   put that here as |####1|.
+%   The final step needs to put an unbalanced opening brace after |\edef|. Also
+%   we have to protect everything from further expanding with the exception of
+%   the redefined macro's argument, which is why we placed the |\ekvc@stop|
+%   earlier. Then we need to also protect the rest of the contents from further
+%   expanding using |\unexpanded| with another unbalanced opening brace.
+%   |#1| will be either empty or |\long| and |#2| is the macro.
 %    \begin{macrocode}
 \protected\def\ekvc@change@d#1#2%
-  {%
-    \def\ekvc@tmp{#1\def#2####1}%
-    \expandafter\ekvc@tmp\expandafter{\iffalse}\fi
-  }
+  {#1\edef#2##1{\expandafter\ekvc@change@e\iffalse}\fi}
+\long\def\ekvc@change@e#1\ekvc@stop
+  {\ekv@unexpanded{#1}##1\ekv@unexpanded\expandafter{\iffalse}\fi}
 %    \end{macrocode}
 % \end{macro}
 %

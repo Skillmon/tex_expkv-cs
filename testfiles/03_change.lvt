@@ -62,4 +62,22 @@
     \ekvcChange\undefinedmacro{}
     \ekvcChange\undefinedset{}
   }
+
+\OMIT
+\renewcommand\testchange[1]
+  {%
+    \ekvcChange#1{a=##}%
+    #1{}%
+  }
+\TIMO
+
+\TEST{change with macro parameter}
+  {
+    \testchange\split
+    \testchange\splitf
+    \testchange\splitu\splitout
+    \testchange\hash
+    \testchange\hashf
+    \testchange\hashu\hashout
+  }
 \END

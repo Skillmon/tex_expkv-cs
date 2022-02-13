@@ -132,4 +132,39 @@
     \macroE{A=b,A=c,B=2,A=d,B=3,B=\par}
     \macroF{A=b,A=c,B=2,A=d,B=3,B=\par}
   }
+
+\OMIT
+\ekvcSplit\macroG{long kk=-1}{#1}
+\ekvcHash\macroH{long kk=-1}{\ekvcValue{kk}{#1}}
+\TIMO
+\TEST{defining enum}
+  {%
+    \ekvcSecondaryKeys\macroG
+      {%
+         enum k = {kk}{a,b,c,d}
+        ,long enum K= {kk}{a\par,b\par,c\par}
+      }
+    \ekvcSecondaryKeys\macroH
+      {%
+         enum k = {kk}{a,b,c,d}
+        ,long enum K= {kk}{a\par,b\par,c\par}
+      }
+  }
+\OMIT
+\ekvcSecondaryKeys\macroG
+  {%
+     enum k = {kk}{a,b,c,d}
+    ,long enum K= {kk}{a\par,b\par,c\par}
+  }
+\ekvcSecondaryKeys\macroH
+  {%
+     enum k = {kk}{a,b,c,d}
+    ,long enum K= {kk}{a\par,b\par,c\par}
+  }
+\TIMO
+\TESTEXP{using enum}
+  {%
+    \macroG{k=a}\macroG{K=c\par}\macroG{k=d}\macroG{K=b\par}\NEWLINE
+    \macroH{k=a}\macroH{K=c\par}\macroH{k=d}\macroH{K=b\par}%
+  }
 \END

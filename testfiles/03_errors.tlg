@@ -235,3 +235,35 @@ I suspect you've forgotten a `}', causing me to apply this
 control sequence to too much text. How can we recover?
 My plan is to forget the whole thing and hope for the best.
 ============================================================
+============================================================
+TEST 11: wrong enum definitions
+============================================================
+! expkv-cs Error: Unknown key `undefined' for macro `\enumsplit'.
+\ekvc@err@unknown@key ...' for macro `\ekvc@set '}
+l. ...  }
+(That was another \errmessage.)
+! expkv-cs Error: Definition of `enum K' doesn't contain exactly two arguments.
+\ekvc@err@not@two ...ontain exactly two arguments}
+l. ...  }
+(That was another \errmessage.)
+============================================================
+============================================================
+TEST 12: undefined enum value
+============================================================
+Runaway argument?
+! expkv-cs Error: unknown value `c' for enum `a' in macro \enumsplit
+! Paragraph ended before \<an-expandable-macro>
+completed due to above exception.  If the error
+summary is  not comprehensible  see the package
+documentation.
+I will try to recover now.  If you're in inter-
+active mode hit <return>  at the ? prompt and I
+continue hoping recovery was complete.
+<to be read again> 
+                   \par 
+l. ...  }
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
+-1
+============================================================

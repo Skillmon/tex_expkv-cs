@@ -729,7 +729,7 @@ and the derived files           expkv-cs.pdf
 %
 % \begin{function}{alias}
 %   \begin{syntax}
-%     alias \key\ = \meta{key_2} \prefixes3
+%     alias \key\ = \marg{key_2} \prefixes3
 %   \end{syntax}
 %   This assigns the definition of \meta{key_2} to \key. As a result \key\ is an
 %   alias for \meta{key_2} behaving just the same. Both the value taking and the
@@ -748,6 +748,74 @@ and the derived files           expkv-cs.pdf
 %   at definition time in |\ekvcSplit| and friends (see |\ekvcChange| in
 %   \autoref{sec:change} for this). \key\ can be a primary or secondary key.
 % \end{function}
+%
+% \begin{function}{enum}
+%   \begin{syntax}
+%     enum \key\ = \marg{key_2}\{\val, \ldots\} \prefixes2
+%   \end{syntax}
+%   This defines \key\ to only accept the values given in the list of the second
+%   argument of its definition. It forwards the position of \val\ in that list
+%   to \meta{key_2} (zero-based). The \meta{key_2} has to already be defined
+%   by the time an |enum| key is set up. Each \val\ in the list (and at use
+%   time) is treated as a string, so no expansion takes place here.
+%
+%   If you use |enum| twice on the same \key\ the new values will again start at
+%   zero (so it is possible to define multiple values with the same outcome),
+%   however since you can't skip values you'll have to use the same as in the
+%   first call for values with just a single variant. There is no interface to
+%   delete existing values.
+% \end{function}
+% \example First a small example that might give you an idea of what the
+% description above could mean:\\
+% \begin{minipage}[c]{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcSplit\foo{k-internal=-1}{#1}
+% \ekvcSecondaryKeys\foo
+%   {enum k = {k-internal}{a,b,c}}
+% \foo{}\foo{k=a}\foo{k=b}\foo{k=c}
+% \end{lstlisting}
+% \end{minipage}^^A
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcSplit\foo{k-internal=-1}{#1}
+%   \ekvcSecondaryKeys\foo
+%     {enum k = {k-internal}{a,b,c}}
+%   \foo{}\foo{k=a}\foo{k=b}\foo{k=c}
+% \end{exresult}
+% \example We can define a choice setup that might do different things based on
+% the choice encountered, and the numeric value is easy to parse using
+% |\ifcase|:\\
+% \begin{minipage}[c]{.75\linewidth}
+% \begin{lstlisting}
+% \ekvcSplit\foo{k-internal=-1}
+%   {%
+%     \ifcase#1
+%       is\or
+%       This\or
+%       easy%
+%     \else
+%       .%
+%     \fi
+%   }
+% \ekvcSecondaryKeys\foo
+%   {enum k = {k-internal}{a,b,c}}
+% \foo{k=b} \foo{k=a} \foo{k=c}\foo{}
+% \end{lstlisting}
+% \end{minipage}^^A
+% \begin{exresult}[nobeforeafter,box align=center]{.25\linewidth}
+%   \ekvcSplit\foo{k-internal=-1}
+%     {^^A
+%       \ifcase#1
+%         is\or
+%         This\or
+%         easy^^A
+%       \else
+%         .^^A
+%       \fi
+%     }
+%   \ekvcSecondaryKeys\foo
+%     {enum k = {k-internal}{a,b,c}}
+%   \foo{k=b} \foo{k=a} \foo{k=c}\foo{}
+% \end{exresult}
 %
 % \begin{function}{aggregate}
 %   \begin{syntax}
@@ -2656,6 +2724,110 @@ and the derived files           expkv-cs.pdf
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[internal]{\ekvc@t@enum}
+% \begin{macro}[internal]
+%   {\ekvc@type@enum,\ekvc@h@enum,\ekvc@h@enum@,\ekvc@enum@name}
+%   Enums don't need to apply special trickery to make the parts of the names
+%   retrievable, so unlike in \expkvd\ we don't need catcode juggling.
+%   The setup of an |enum| requires unpacking the value in two different
+%   arguments so we need an auxiliary here.
+%    \begin{macrocode}
+\def\ekvc@enum@name#1#2#3{ekvc#1(#2)#3}
+\protected\long\def\ekvc@t@enum#1#2%
+  {\ekvc@assert@twoargs{#2}{enum #1}{\ekvc@type@enum{#1}#2}}
+\protected\long\def\ekvc@type@enum#1#2%
+  {%
+    \ekvifdefined\ekvc@set{#2}%
+      {%
+%    \end{macrocode}
+%   At run time we need another helper and we need to expand the current
+%   |\ekvc@set| now. The helper will build a control sequence from each given
+%   value, those will be set up in the |\ekvcsvloop|.
+%    \begin{macrocode}
+        \ekvc@long\edef\ekvc@tmp##1%
+          {%
+            \ekv@unexpanded{\expandafter\ekvc@h@enum\detokenize}{##1}%
+            \ekv@unexpanded{\ekvc@stop}%
+            {\ekvc@set}{#1}%
+          }%
+        \ekvlet\ekvc@set{#1}\ekvc@tmp
+        \def\ekvc@tmp{0}%
+        \expandafter\ekvcsvloop\expandafter
+          {%
+            \expandafter\ekvc@type@enum@
+              \csname\ekv@name\ekvc@set{#2}\endcsname
+              {#1}%
+          }%
+      }%
+      {%
+        \ekvc@err@unknown@key{#2}%
+        \@gobble
+      }%
+  }
+%    \end{macrocode}
+%   Here |#1| will be the key-macro of the underlying primary or secondary key,
+%   |#2| is the |enum| key's name, and |#3| will be the choice. The rest is
+%   pretty obvious.
+%    \begin{macrocode}
+\ekv@exparg{\protected\long\def\ekvc@type@enum@#1#2#3}%
+  {%
+    \expandafter\expandafter\expandafter\edef\expandafter
+        \csname\ekvc@enum@name\ekvc@set{#2}{\detokenize{#3}}\endcsname
+      {\ekv@unexpanded{#1}{\ekvc@tmp}}%
+    \edef\ekvc@tmp{\the\numexpr\ekvc@tmp+1\relax}%
+  }
+%    \end{macrocode}
+%   The use-time helper will check if the macro for the passed in choice exists,
+%   if it doesn't throws an error, else calls that macro which will set the
+%   correct value.
+%    \begin{macrocode}
+\ekv@if@lastnamedcs
+  {%
+    \ekv@exparg{\def\ekvc@h@enum#1\ekvc@stop#2#3}%
+      {%
+        \expandafter\ifcsname\ekvc@enum@name{#2}{#3}{#1}\endcsname
+          \expandafter\ekvc@h@enum@\lastnamedcs
+        \fi
+        \ekvc@err@unknown@enum{#2}{#3}{#1}%
+      }
+    \def\ekvc@h@enum@#1\fi\ekvc@err@unknown@enum#2#3#4%
+      {%
+        \fi
+        \ifx#1\relax
+          \ekvc@err@unknown@enum{#2}{#3}{#4}%
+          \expandafter\@gobble
+        \fi
+        #1%
+      }
+  }
+  {%
+    \def\ekvc@h@enum#1%
+      {%
+        \def\ekvc@h@enum##1\ekvc@stop##2##3%
+          {%
+            \expandafter\ekvc@h@enum@
+              \csname\ifcsname#1\endcsname#1\else relax\fi\endcsname
+              {##2}{##3}{##1}%
+          }%
+      }
+    \expandafter\ekvc@h@enum\expandafter{\ekvc@enum@name{#2}{#3}{#1}}
+    \def\ekvc@h@enum@#1#2#3#4%
+      {%
+        \ifx#1\relax
+          \ekvc@err@unknown@enum{#2}{#3}{#4}%
+          \expandafter\@gobble
+        \fi
+        #1%
+      }
+  }
+%    \end{macrocode}
+%   We don't need |\ekvc@enum@name| anymore, so let's undefine it.
+%    \begin{macrocode}
+\let\ekvc@enum@name\ekvc@undefined
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \begin{macro}[internal]{\ekvc@t@aggregate}
 %   Aggregating isn't easy to define. We'll have to extract the correct mark for
 %   the specified key, branch correctly for short and long keys, and use a small
@@ -3222,7 +3394,7 @@ and the derived files           expkv-cs.pdf
 % \begin{macro}[internal]
 %   {
 %     \ekvc@err@unknown@hash,\ekvc@err@empty@hash,\ekvc@err@missing@hash,
-%     \ekvc@err@invalid@bool
+%     \ekvc@err@invalid@bool,\ekvc@err@unknown@enum
 %   }
 %   And here are the expandable error messages.
 %    \begin{macrocode}
@@ -3232,6 +3404,8 @@ and the derived files           expkv-cs.pdf
 \def\ekvc@err@invalid@bool#1{\ekvc@err{invalid boolean value `#1'}}
 \long\def\ekvc@err@unknown@key@or@macro#1#2%
   {\ekvc@err{unknown key `#2' for macro #1}}
+\def\ekvc@err@unknown@enum#1#2#3%
+  {\ekvc@err{unknown value `#3' for enum `#2' in macro #1}}
 %    \end{macrocode}
 % \end{macro}
 %

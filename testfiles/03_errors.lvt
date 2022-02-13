@@ -90,4 +90,18 @@
   {%
     \ekvcValueSplit{heigt}{}\myfirst
   }
+
+\OMIT
+\ekvcSplit\enumsplit{long kk = -1}{#1}
+\ekvcSecondaryKeys\enumsplit{enum a = {kk}{a,b}}
+\TIMO
+\TEST{wrong enum definitions}
+  {%
+    \ekvcSecondaryKeys\enumsplit{enum K = {undefined}{a,b,c,d}}
+    \ekvcSecondaryKeys\enumsplit{enum K = {a,b,c,d}}
+  }
+\TESTEXP{undefined enum value}
+  {%
+    \enumsplit{a=c}%
+  }
 \END
